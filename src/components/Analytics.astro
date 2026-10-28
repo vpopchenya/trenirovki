@@ -1,0 +1,51 @@
+---
+// Яндекс Метрика — только после согласия (закон РБ № 99-З: cookie аналитики = согласие). Как подключить —
+// в src/lib/analytics.ts. Остальной код шлёт цели событием `goal` на window и не зависит от того, включена ли Метрика.
+import { METRIKA_ID, CONSENT_KEY } from "../lib/analytics";
+const base = import.meta.env.BASE_URL;
+---
+{METRIKA_ID && (
+  <>
+    <div class="consent" data-testid="consent-banner" hidden>
+      <p>Мы считаем посещения через Яндекс Метрику (она ставит cookie), чтобы понимать, что полезно. <a href={`${base}o-proekte/#privacy`}>Подробнее</a></p>
+      <div class="actions">
+        <button class="btn main" type="button" data-v="yes" data-testid="consent-yes">Разрешить</button>
+        <button class="btn" type="button" data-v="no" data-testid="consent-no">Только нужные</button>
+      </div>
+    </div>
+    <script is:inline define:vars={{ id: METRIKA_ID, KEY: CONSENT_KEY }}>
+      (function () {
+        var get = function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } };
+        var set = function (v) { try { localStorage.setItem(KEY, v); } catch (e) {} };
+        function load() {
+          (function (m, e, t, r, i, k, a) { m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); }; m[i].l = 1 * new Date();
+            k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a); })
+            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+          window.ym(id, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true });
+          addEventListener("goal", function (ev) { window.ym(id, "reachGoal", ev.detail); });
+        }
+        var banner = document.querySelector(".consent");
+        var v = get();
+        if (v === "yes") load();
+        else if (v !== "no" && banner) {
+          banner.hidden = false;
+          banner.addEventListener("click", function (ev) {
+            var b = ev.target.closest("button"); if (!b) return;
+            set(b.dataset.v); banner.hidden = true;
+            if (b.dataset.v === "yes") load();
+          });
+        }
+      })();
+    </script>
+  </>
+)}
+
+<style>
+  .consent { position: fixed; z-index: 20; left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)); max-width: 560px; margin: 0 auto; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; font-size: 14px; }
+  .consent p { margin: 0; color: var(--muted); }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .actions .btn:not(.main) { background: transparent; border: 1px solid var(--line); }
+  @media (min-width: 1024px) { .consent { bottom: 16px; } }
+</style>

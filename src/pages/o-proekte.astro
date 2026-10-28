@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import { METRIKA_ID, CONSENT_KEY } from "../lib/analytics";
 const base = import.meta.env.BASE_URL;
 ---
 <Base title="О проекте" description="Карманный тренер — бесплатный каталог упражнений с техникой на русском. Кто делает, откуда материалы." nav="none">
@@ -10,13 +11,27 @@ const base = import.meta.env.BASE_URL;
     <p class="warn" data-testid="health-warning">Мы не врачи и не тренеры. Есть болезни или травмы — сначала к врачу.</p>
     <h2>Чужие материалы</h2>
     <p>Схема тела — <a href="https://github.com/HichamELBSI/react-native-body-highlighter">react-native-body-highlighter</a>, © 2022 ELABBASSI Hicham, <a href={`${base}licenses/body-highlighter.txt`}>лицензия MIT</a>.</p>
-    <h2>Конфиденциальность</h2>
-    <p><span class="stub">ЗАГЛУШКА</span> — политика появится вместе с аналитикой.</p>
+    <h2 id="privacy">Конфиденциальность</h2>
+    <p>Регистрации и форм нет — мы не просим имя, телефон, почту и другие личные данные.</p>
+    <p>Сайт размещён на GitHub Pages. GitHub, как любой хостинг, видит IP-адрес посетителя — дальше действуют <a href="https://docs.github.com/ru/site-policy/privacy-policies/github-general-privacy-statement">правила GitHub</a>.</p>
+    <p>Сайт сохраняется в памяти твоего телефона или браузера, чтобы открываться без интернета. Эти файлы никуда не отправляются, удалить их можно в настройках браузера.</p>
+    <p>Картинки-превью роликов загружаются с серверов YouTube, а сам ролик — только после нажатия ▶, в режиме повышенной конфиденциальности YouTube (youtube-nocookie.com). После запуска ролика YouTube может сохранять свои данные в браузере и видит твой IP-адрес. Дальше действуют <a href="https://policies.google.com/privacy?hl=ru">правила Google</a>.</p>
+    <p>Если подключим Яндекс Метрику, она будет работать только после твоего согласия в плашке внизу экрана, и здесь появится подробный текст.</p>
+    {METRIKA_ID && <p><button class="btn reset" type="button" data-key={CONSENT_KEY} data-testid="consent-reset">Изменить выбор по аналитике</button></p>}
   </div>
 </Base>
+
+<script>
+  // Отозвать или дать согласие так же просто, как в плашке: стираем выбор и перезагружаем — плашка появится снова.
+  document.querySelector<HTMLButtonElement>(".reset")?.addEventListener("click", ev => {
+    try { localStorage.removeItem((ev.currentTarget as HTMLElement).dataset.key!); } catch {}
+    location.reload();
+  });
+</script>
 
 <style>
   .about { max-width: 70ch; display: grid; gap: 16px; }
   .about p { margin: 0; color: var(--muted); }
+  .reset { background: transparent; border: 1px solid var(--line); }
   .warn { font-size: 14px; border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; }
 </style>

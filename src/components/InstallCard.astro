@@ -39,7 +39,10 @@
       prompt = null;
       btn.hidden = true;
     });
-    addEventListener("appinstalled", () => (card.hidden = true));
+    addEventListener("appinstalled", () => {
+      card.hidden = true;
+      dispatchEvent(new CustomEvent("goal", { detail: "app_installed" }));
+    });
   }
 </script>
 

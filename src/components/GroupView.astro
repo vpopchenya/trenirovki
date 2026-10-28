@@ -3,7 +3,7 @@
 // (они нужны для поиска: «упражнения на верх груди»), оборудование фильтруется прямо на странице.
 import Base from "../layouts/Base.astro";
 import ThumbDefs from "./ThumbDefs.astro";
-import { exercisesOf, subsWithExercises, slugify, plural, levelClass, type Group } from "../lib/catalog";
+import { exercisesOf, subsWithExercises, slugify, plural, levelClass, breadcrumbs, type Group } from "../lib/catalog";
 
 interface Props { group: Group; sub?: string }
 const { group, sub } = Astro.props;
@@ -18,7 +18,9 @@ const description = sub
   ? `${sub} — упражнения на ${group.acc} в зале. Техника по шагам и частые ошибки.`
   : `Упражнения на ${group.acc} в зале: ${group.subs.join(", ").toLowerCase()}. Техника по шагам и частые ошибки.`;
 ---
-<Base title={title} description={description}>
+<Base title={title} description={description} jsonLd={breadcrumbs(Astro.site!, [
+  ["Каталог", base], [group.name, groupUrl], ...(sub ? [[sub, `${groupUrl}${slugify(sub)}/`] as [string, string]] : []),
+])}>
   <div style={`--gc: var(--g-${group.id})`}>
     <nav class="crumbs" aria-label="Путь">
       <a href={base}>Каталог</a><span>/</span>

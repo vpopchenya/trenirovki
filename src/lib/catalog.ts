@@ -28,4 +28,11 @@ export async function subsWithExercises(group: Group) {
 export const plural = (n: number) =>
   n % 10 === 1 && n % 100 !== 11 ? "упражнение" : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? "упражнения" : "упражнений";
 
+/** Разметка «хлебных крошек» для поисковиков: [название, путь от корня сайта]. */
+export const breadcrumbs = (site: URL, items: [string, string][]) => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: items.map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: new URL(path, site).href })),
+});
+
 export const levelClass = (level: string) => (level === "новичок" ? "lvl1" : "lvl2");

@@ -3,7 +3,7 @@ import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import BodyMap from "../../components/BodyMap.astro";
 import groups from "../../data/groups.json";
-import { levelClass, slugify } from "../../lib/catalog";
+import { levelClass, slugify, breadcrumbs } from "../../lib/catalog";
 
 export async function getStaticPaths() {
   const all = await getCollection("exercises");
@@ -18,7 +18,10 @@ const group = groups.find(g => g.id === e.group)!;
 const base = import.meta.env.BASE_URL;
 const v = e.video;
 ---
-<Base title={`${e.name}: техника`} description={`${e.name}: как делать по шагам и частые ошибки. Работает ${group.acc} (${e.sub.toLowerCase()}), помогают: ${e.helpers.join(", ").toLowerCase() || "—"}.`}>
+<Base jsonLd={breadcrumbs(Astro.site!, [
+  ["Каталог", base], [group.name, `${base}myshcy/${group.slug}/`],
+  [e.sub, `${base}myshcy/${group.slug}/${slugify(e.sub)}/`], [e.name, `${base}uprazhneniya/${ex.id}/`],
+])} title={`${e.name}: техника`} description={`${e.name}: как делать по шагам и частые ошибки. Работает ${group.acc} (${e.sub.toLowerCase()}), помогают: ${e.helpers.join(", ").toLowerCase() || "—"}.`}>
   <div style={`--gc: var(--g-${group.id})`}>
     <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><a href={`${base}myshcy/${group.slug}/`}>{group.name}</a><span>/</span><a href={`${base}myshcy/${group.slug}/${slugify(e.sub)}/`}>{e.sub}</a><span>/</span><span>{e.name}</span></nav>
     <h1 data-testid="exercise-title">{e.name}</h1>
@@ -74,10 +77,12 @@ const v = e.video;
 </Base>
 
 <script>
+  dispatchEvent(new CustomEvent("goal", { detail: "exercise_open" }));
   // Плеер YouTube грузим только по нажатию: страница открывается быстро и без чужих cookie.
   document.querySelectorAll<HTMLElement>(".video[data-id]").forEach(box => {
     box.querySelector(".play")?.addEventListener("click", () => {
       if (!navigator.onLine) { box.classList.add("is-offline"); return; }
+      dispatchEvent(new CustomEvent("goal", { detail: "video_play" }));
       const f = document.createElement("iframe");
       f.src = `https://www.youtube-nocookie.com/embed/${box.dataset.id}?autoplay=1&rel=0`;
       f.title = "Ролик с техникой";

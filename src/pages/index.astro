@@ -10,7 +10,7 @@ const count = (id: string) => all.filter(e => e.data.group === id).length;
 const base = import.meta.env.BASE_URL;
 const first = groups[0];
 ---
-<Base title="Карманный тренер" description="Бесплатный каталог упражнений для зала: 7 групп мышц, техника по шагам на русском и частые ошибки. Работает на телефоне.">
+<Base jsonLd={{ "@context": "https://schema.org", "@type": "WebSite", name: "Карманный тренер", inLanguage: "ru", url: new URL(base, Astro.site).href }} title="Карманный тренер" description="Бесплатный каталог упражнений для зала: 7 групп мышц, техника по шагам на русском и частые ошибки. Работает на телефоне.">
   <div class="home">
     <h1 data-testid="home-title">Что качаем <em>сегодня?</em></h1>
 
