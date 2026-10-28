@@ -1,0 +1,75 @@
+---
+// Схема тела: контуры мышц из react-native-body-highlighter (MIT, см. src/data/body.LICENSE.txt).
+// Рисуем все четыре фигуры сразу (М/Ж × спереди/сзади), переключатели только показывают нужную.
+import body from "../data/body.json";
+import groups from "../data/groups.json";
+
+interface Props {
+  selected: string;   // id группы, которая подсвечена
+  clickable?: boolean; // нажатие на мышцу выбирает группу
+}
+const { selected, clickable = false } = Astro.props;
+const side = groups.find(g => g.id === selected)?.side ?? "front";
+const figures = (["m", "f"] as const).flatMap(sex => (["front", "back"] as const).map(s => ({ sex, side: s, ...body[sex][s] })));
+---
+<div class="bodymap" data-selected={selected} data-clickable={clickable ? "1" : undefined}>
+  <div class="ctrls">
+    <div class="seg" data-k="side">
+      <button type="button" data-v="front" data-testid="side-front" aria-pressed={String(side === "front")}>Спереди</button>
+      <button type="button" data-v="back" data-testid="side-back" aria-pressed={String(side === "back")}>Сзади</button>
+    </div>
+    <div class="seg" data-k="sex">
+      <button type="button" data-v="m" data-testid="sex-m" aria-pressed="true">М</button>
+      <button type="button" data-v="f" data-testid="sex-f" aria-pressed="false">Ж</button>
+    </div>
+  </div>
+  {figures.map(f => (
+    <svg class="fig" viewBox={f.viewBox} data-sex={f.sex} data-side={f.side} hidden={!(f.sex === "m" && f.side === side)}
+         data-testid={`figure-${f.sex}-${f.side}`} role="img" aria-label="Схема тела: нажми на мышцу">
+      <path class="outline" d={f.outline} />
+      {f.parts.map(([g, ds]) => (ds as string[]).map(d => g
+        ? <path class:list={["m", { sel: g === selected }]} data-g={g} data-testid={`muscle-${g}`} style={`--gc: var(--g-${g})`} d={d} />
+        : <path class="base" d={d} />))}
+    </svg>
+  ))}
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".bodymap").forEach(map => {
+    const state = { sex: "m", side: map.querySelector<HTMLElement>('[data-k="side"] [aria-pressed="true"]')!.dataset.v! };
+    const show = () => map.querySelectorAll<SVGElement>(".fig").forEach(f => f.toggleAttribute("hidden", !(f.dataset.sex === state.sex && f.dataset.side === state.side)));
+    const press = (k: "sex" | "side", v: string) => {
+      state[k] = v;
+      map.querySelectorAll<HTMLButtonElement>(`[data-k="${k}"] button`).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === v)));
+      show();
+    };
+    map.querySelectorAll<HTMLElement>(".seg").forEach(seg => seg.addEventListener("click", ev => {
+      const b = (ev.target as Element).closest<HTMLButtonElement>("button");
+      if (b) press(seg.dataset.k as "sex" | "side", b.dataset.v!);
+    }));
+    if (!map.dataset.clickable) return;
+    map.addEventListener("click", ev => {
+      const m = (ev.target as Element).closest<SVGElement>(".m");
+      if (!m) return;
+      const g = m.dataset.g!;
+      map.querySelectorAll<SVGElement>(".m").forEach(p => p.classList.toggle("sel", p.dataset.g === g));
+      map.dispatchEvent(new CustomEvent("pick", { detail: g, bubbles: true }));
+    });
+  });
+</script>
+
+<style>
+  .ctrls { display: flex; justify-content: space-between; gap: 8px; }
+  .seg { display: flex; gap: 4px; background: var(--bg); border-radius: 999px; padding: 4px; }
+  .seg button { font-weight: 600; font-size: 13px; color: var(--muted); background: transparent; border: 0; border-radius: 999px; padding: 0 16px; min-height: 40px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+  .fig { display: block; width: 100%; max-width: 100%; height: clamp(320px, 52vh, 520px); margin-top: 8px; }
+  .outline { fill: var(--skin); stroke: var(--line); stroke-width: 2; }
+  .m { fill: var(--muscle); stroke: var(--skin); stroke-width: 1; transition: fill .15s; }
+  [data-clickable] .m { cursor: pointer; }
+  /* Только там, где есть мышь: на телефоне hover «залипает» и перекрывает цвет выбранной мышцы. */
+  @media (hover: hover) { [data-clickable] .m:not(.sel):hover { fill: var(--muscle-hi); } }
+  .m.sel { fill: var(--gc); }
+  .base { fill: var(--muscle); opacity: .55; }
+  @media (prefers-reduced-motion: reduce) { .m { transition: none; } }
+</style>

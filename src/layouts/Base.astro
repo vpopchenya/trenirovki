@@ -1,0 +1,81 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  nav?: "catalog" | "none";
+  noindex?: boolean;  // для 404: не показывать в поиске
+}
+const { title, description, nav = "catalog", noindex = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const fullTitle = title === "Карманный тренер" ? title : `${title} — Карманный тренер`;
+
+// «Программы» и «Тренировка» появятся на этапах 2–3, пока видны с пометкой «скоро».
+const items = [
+  { id: "catalog", label: "Каталог", href: base, icon: '<path d="M4 6h16M4 12h16M4 18h10"/>' },
+  { id: "programs", label: "Программы", icon: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/>' },
+  { id: "workout", label: "Тренировка", icon: '<path d="M3 12h3m12 0h3M6 8v8m12-8v8M9 10v4m6-4v4M9 12h6"/>' },
+  { id: "basics", label: "Основы", icon: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>' },
+];
+---
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121417">
+  <title>{fullTitle}</title>
+  <meta name="description" content={description}>
+  {noindex ? <meta name="robots" content="noindex"> : <link rel="canonical" href={canonical}>}
+  <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml">
+</head>
+<body>
+  <header class="bar gut"><div class="wrap">
+    <a class="logo" href={base} data-testid="logo"><i></i>Карманный тренер</a>
+    <nav class="topnav" aria-label="Разделы">
+      {items.map(i => i.href
+        ? <a href={i.href} class:list={{ on: i.id === nav }}>{i.label}</a>
+        : <span>{i.label}<span class="soon">скоро</span></span>)}
+    </nav>
+  </div></header>
+
+  <main class="gut"><div class="wrap"><slot /></div></main>
+  <footer class="gut"><div class="wrap"><a href={`${base}o-proekte/`}>О проекте</a></div></footer>
+
+  <nav class="tabbar" aria-label="Разделы" data-testid="tabbar"><div class="in">
+    {items.map(i => i.href
+      ? <a href={i.href} class:list={{ on: i.id === nav }}><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} />{i.label}</a>
+      : <span class="off"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} />{i.label}</span>)}
+  </div></nav>
+</body>
+</html>
+
+<style>
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .bar .wrap { display: flex; align-items: center; gap: 24px; height: 60px; }
+  .logo { font: 16px var(--f-display); text-decoration: none; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+  .logo i { width: 22px; height: 22px; border-radius: 50%; background: conic-gradient(var(--g-chest) 0 25%, var(--g-back) 0 50%, var(--g-shoulders) 0 75%, var(--g-legs) 0); box-shadow: inset 0 0 0 6px var(--bg); }
+  .topnav { display: none; gap: 22px; margin-left: auto; font-weight: 600; font-size: 15px; color: var(--muted); }
+  .topnav a { text-decoration: none; }
+  .topnav a.on { color: var(--fg); }
+
+  main { padding-top: 28px; }
+  footer { padding-block: 40px calc(90px + env(safe-area-inset-bottom, 0px)); font-size: 13px; color: var(--muted); }
+
+  .tabbar { position: fixed; inset: auto 0 0; z-index: 5; background: var(--bg); border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+  .tabbar .in { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .tabbar a, .tabbar .off { text-align: center; font-size: 11px; font-weight: 600; padding: 9px 0 10px; color: var(--muted); text-decoration: none; }
+  .tabbar .off { opacity: .45; }
+  .tabbar a.on { color: var(--accent); }
+  .tabbar svg { display: block; margin: 0 auto 3px; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+
+  @media (min-width: 1024px) {
+    .topnav { display: flex; }
+    .tabbar { display: none; }
+    footer { padding-bottom: 40px; }
+  }
+</style>

@@ -1,0 +1,16 @@
+{
+  "name": "trenirovki",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@fontsource/dela-gothic-one": "5.2.5",
+    "@fontsource/ibm-plex-mono": "5.2.5",
+    "@fontsource/manrope": "5.2.5",
+    "astro": "7.3.8"
+  }
+}

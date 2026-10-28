@@ -1,0 +1,81 @@
+---
+import Base from "../layouts/Base.astro";
+import BodyMap from "../components/BodyMap.astro";
+import groups from "../data/groups.json";
+
+const base = import.meta.env.BASE_URL;
+const first = groups[0];
+---
+<Base title="Карманный тренер" description="Бесплатный каталог упражнений для зала: 7 групп мышц, техника по шагам на русском и частые ошибки. Работает на телефоне.">
+  <div class="home">
+    <h1 data-testid="home-title">Что качаем <em>сегодня?</em></h1>
+
+    <section class="map" aria-label="Выбор мышцы">
+      <BodyMap selected={first.id} clickable />
+      <div class="pick" data-testid="picked-group" style={`--gc: var(--g-${first.id})`}>
+        <span><b class="pn">{first.name}</b><small class="ps">{first.subs.join(" · ")}</small></span>
+        <a class="btn main" href={`${base}myshcy/${first.slug}/`}>Упражнения →</a>
+      </div>
+    </section>
+
+    <div class="left">
+      <p class="lead">Нажми на мышцу на схеме или выбери группу. У каждого упражнения — техника по шагам и частые ошибки.</p>
+      <nav class="groups" aria-label="Группы мышц">
+        {groups.map(g => (
+          <a class:list={["gcard", { sel: g.id === first.id }]} style={`--gc: var(--g-${g.id})`} href={`${base}myshcy/${g.slug}/`} data-g={g.id} data-testid={`group-${g.id}`}>
+            <b>{g.name}</b><span>{g.subs.join(" · ")}</span>
+          </a>
+        ))}
+      </nav>
+      <div>
+        <p class="eyebrow">Основы</p>
+        <div class="basics">
+          <div><b>Сон</b><span>Сколько спать, чтобы росли мышцы</span><span class="soon">скоро</span></div>
+          <div><b>Питание</b><span>Белок, калории, вода — без диет</span><span class="soon">скоро</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<script>
+  import groups from "../data/groups.json";
+  const byId = Object.fromEntries(groups.map(g => [g.id, g]));
+  const base = import.meta.env.BASE_URL;
+  const pick = document.querySelector<HTMLElement>(".pick")!;
+
+  document.addEventListener("pick", ev => {
+    const g = byId[(ev as CustomEvent<string>).detail];
+    pick.style.setProperty("--gc", `var(--g-${g.id})`);
+    pick.querySelector(".pn")!.textContent = g.name;
+    pick.querySelector(".ps")!.textContent = g.subs.join(" · ");
+    pick.querySelector("a")!.href = `${base}myshcy/${g.slug}/`;
+    document.querySelectorAll<HTMLElement>(".gcard").forEach(c => c.classList.toggle("sel", c.dataset.g === g.id));
+  });
+</script>
+
+<style>
+  /* Телефон: заголовок → схема → группы. Компьютер: схема справа на всю высоту. */
+  .home { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "map" "left"; gap: 24px; align-items: start; }
+  h1 { grid-area: title; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .map { grid-area: map; background: var(--surface); border-radius: 24px; padding: 14px; }
+  .left { grid-area: left; display: grid; gap: 28px; }
+  @media (min-width: 1024px) {
+    .home { grid-template-columns: minmax(0, 1fr) minmax(0, 460px); grid-template-areas: "title map" "left map"; column-gap: 48px; }
+    .map { position: sticky; top: 76px; }
+  }
+  .pick { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; background: var(--bg); border-radius: 16px; padding: 12px 14px; border-left: 6px solid var(--gc); }
+  .pick b { font: 20px var(--f-display); display: block; }
+  .pick small { color: var(--muted); font-size: 12px; }
+  .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .gcard { display: grid; gap: 2px; background: var(--surface); border-radius: 16px; padding: 14px 14px 14px 18px; text-decoration: none; position: relative; overflow: hidden; border: 1px solid transparent; }
+  .gcard::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--gc); }
+  .gcard b { font-size: 16px; }
+  .gcard span { color: var(--muted); font-size: 12px; line-height: 1.4; }
+  .gcard.sel { border-color: var(--gc); }
+  .basics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  .basics div { background: var(--surface); border-radius: 16px; padding: 16px; display: grid; gap: 2px; justify-items: start; }
+  .basics span:not(.soon) { color: var(--muted); font-size: 14px; }
+  .basics .soon { margin: 6px 0 0; }
+</style>

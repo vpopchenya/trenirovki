@@ -1,0 +1,22 @@
+---
+import Base from "../layouts/Base.astro";
+const base = import.meta.env.BASE_URL;
+---
+<Base title="О проекте" description="Карманный тренер — бесплатный каталог упражнений с техникой на русском. Кто делает, откуда материалы." nav="none">
+  <div class="about">
+    <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><span>О проекте</span></nav>
+    <h1>О проекте</h1>
+    <p>Бесплатный каталог упражнений для зала с техникой на русском. Скоро — готовые программы и дневник тренировок.</p>
+    <p class="warn" data-testid="health-warning">Мы не врачи и не тренеры. Есть болезни или травмы — сначала к врачу.</p>
+    <h2>Чужие материалы</h2>
+    <p>Схема тела — <a href="https://github.com/HichamELBSI/react-native-body-highlighter">react-native-body-highlighter</a>, © 2022 ELABBASSI Hicham, <a href={`${base}licenses/body-highlighter.txt`}>лицензия MIT</a>.</p>
+    <h2>Конфиденциальность</h2>
+    <p><span class="stub">ЗАГЛУШКА</span> — политика появится вместе с аналитикой.</p>
+  </div>
+</Base>
+
+<style>
+  .about { max-width: 70ch; display: grid; gap: 16px; }
+  .about p { margin: 0; color: var(--muted); }
+  .warn { font-size: 14px; border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; }
+</style>

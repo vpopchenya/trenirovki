@@ -1,0 +1,31 @@
+---
+import Base from "../../layouts/Base.astro";
+import groups from "../../data/groups.json";
+
+export function getStaticPaths() {
+  return groups.map(g => ({ params: { slug: g.slug }, props: { group: g } }));
+}
+const { group } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<Base title={group.name} description={`Упражнения на ${group.acc} в зале: ${group.subs.join(", ").toLowerCase()}. Техника по шагам и частые ошибки.`}>
+  <div style={`--gc: var(--g-${group.id})`}>
+    <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><span>{group.name}</span></nav>
+    <div class="ghead">
+      <span class="plate" aria-hidden="true"></span>
+      <div>
+        <h1 data-testid="group-title">{group.name}</h1>
+        <p class="eyebrow">{group.subs.join(" · ")}</p>
+      </div>
+    </div>
+    <p class="lead empty" data-testid="group-empty">Упражнения на эту группу скоро появятся.</p>
+  </div>
+</Base>
+
+<style>
+  .ghead { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .ghead .eyebrow { margin: 6px 0 0; }
+  .plate { width: 56px; height: 56px; border-radius: 50%; flex: none; background: var(--gc);
+    box-shadow: inset 0 0 0 9px color-mix(in srgb, var(--gc) 70%, #000), inset 0 0 0 20px var(--gc), inset 0 0 0 24px var(--bg); }
+  .empty { margin-top: 24px; }
+</style>
