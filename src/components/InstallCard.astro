@@ -1,0 +1,51 @@
+---
+// Карточка «Поставь на телефон». Android/Chrome — кнопка системной установки (событие beforeinstallprompt),
+// iPhone — подсказка «Поделиться → На экран „Домой“» (у Safari нет кнопки установки).
+// Уже установлено (открыто с главного экрана) — карточку не показываем.
+---
+<section class="install" data-testid="install-card" hidden>
+  <div>
+    <b>Поставь на телефон</b>
+    <p class="text android" hidden>Иконка на главном экране, открывается без интернета.</p>
+    <p class="text ios" hidden>В Safari нажми <span class="key">Поделиться</span> → <span class="key">На экран «Домой»</span>. Потом работает и без интернета.</p>
+    <p class="text other" hidden>В меню браузера выбери «Добавить на главный экран» или «Установить» — будет работать без интернета. На iPhone — через Safari.</p>
+  </div>
+  <button class="btn main" type="button" data-testid="install-btn" hidden>Установить</button>
+</section>
+
+<script>
+  const card = document.querySelector<HTMLElement>(".install");
+  const standalone = matchMedia("(display-mode: standalone)").matches || (navigator as { standalone?: boolean }).standalone;
+  if (card && !standalone) {
+    // iPad с iPadOS 13+ представляется Маком — узнаём его по сенсорному экрану.
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const show = (kind: string) => {
+      card.querySelectorAll<HTMLElement>(".text").forEach(t => (t.hidden = !t.classList.contains(kind)));
+      card.hidden = false;
+    };
+    show(isIos ? "ios" : "other");
+    // Chrome сообщает, что сайт можно установить, — тогда показываем свою кнопку.
+    let prompt: (Event & { prompt: () => Promise<void> }) | null = null;
+    const btn = card.querySelector<HTMLButtonElement>("button")!;
+    addEventListener("beforeinstallprompt", ev => {
+      ev.preventDefault();
+      prompt = ev as typeof prompt;
+      show("android");
+      btn.hidden = false;
+    });
+    btn.addEventListener("click", async () => {
+      if (!prompt) return;
+      await prompt.prompt();
+      prompt = null;
+      btn.hidden = true;
+    });
+    addEventListener("appinstalled", () => (card.hidden = true));
+  }
+</script>
+
+<style>
+  .install { display: flex; align-items: center; justify-content: space-between; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; }
+  .install b { font-size: 16px; }
+  .install p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+  .key { color: var(--fg); font-weight: 600; }
+</style>

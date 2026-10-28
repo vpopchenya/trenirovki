@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && workbox generateSW workbox-config.cjs",
     "preview": "astro preview"
   },
   "dependencies": {
@@ -12,5 +12,8 @@
     "@fontsource/ibm-plex-mono": "5.2.5",
     "@fontsource/manrope": "5.2.5",
     "astro": "7.3.8"
+  },
+  "devDependencies": {
+    "workbox-cli": "7.4.1"
   }
 }

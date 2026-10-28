@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import BodyMap from "../components/BodyMap.astro";
+import InstallCard from "../components/InstallCard.astro";
 import { getCollection } from "astro:content";
 import groups from "../data/groups.json";
 
@@ -22,6 +23,7 @@ const first = groups[0];
     </section>
 
     <div class="left">
+      <InstallCard />
       <p class="lead">Нажми на мышцу на схеме или выбери группу. У каждого упражнения — техника по шагам и частые ошибки.</p>
       <nav class="groups" aria-label="Группы мышц">
         {groups.map(g => (

@@ -1,0 +1,39 @@
+{
+  "id": "/trenirovki/",
+  "name": "Карманный тренер",
+  "short_name": "Тренер",
+  "description": "Каталог упражнений для зала: техника по шагам на русском, частые ошибки и ролики.",
+  "lang": "ru",
+  "start_url": "/trenirovki/",
+  "scope": "/trenirovki/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#121417",
+  "theme_color": "#121417",
+  "icons": [
+    {
+      "src": "/trenirovki/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/trenirovki/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/trenirovki/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/trenirovki/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -30,6 +30,11 @@ const items = [
   <meta name="description" content={description}>
   {noindex ? <meta name="robots" content="noindex"> : <link rel="canonical" href={canonical}>}
   <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml">
+  <link rel="manifest" href={`${base}manifest.webmanifest`}>
+  <link rel="apple-touch-icon" href={`${base}icons/icon-180.png`}>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Тренер">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
   <header class="bar gut"><div class="wrap">
@@ -49,6 +54,14 @@ const items = [
       ? <a href={i.href} class:list={{ on: i.id === nav }}><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} />{i.label}</a>
       : <span class="off"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} />{i.label}</span>)}
   </div></nav>
+
+  <script>
+    // Service worker (dist/sw.js, собирает Workbox) сохраняет сайт на телефоне для работы без интернета.
+    // В режиме разработки его нет — регистрируем только в собранном сайте.
+    if ("serviceWorker" in navigator && import.meta.env.PROD) {
+      navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
+    }
+  </script>
 </body>
 </html>
 

@@ -32,7 +32,7 @@ const v = e.video;
       <div class="main">
         {v ? (
           <div class="video" data-id={v.id} data-testid="video">
-            <img src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt="" loading="lazy" width="480" height="360" />
+            <img src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt="" loading="lazy" crossorigin="anonymous" width="480" height="360" />
             <button class="play" type="button" data-testid="video-play" aria-label={`Смотреть ролик: ${v.title}`}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l16 9-16 9z" /></svg></button>
             <span class="note">{v.channel}{v.lang === "en" && " · 🇬🇧 англ."}</span>
             <span class="offline">Ролик откроется, когда будет интернет</span>
