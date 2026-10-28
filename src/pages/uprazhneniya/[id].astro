@@ -17,18 +17,21 @@ const e = ex.data;
 const group = groups.find(g => g.id === e.group)!;
 const base = import.meta.env.BASE_URL;
 const v = e.video;
+// Последнее слово названия — цветом группы («Жим штанги <лёжа>»), чтобы заголовок был живее.
+const cut = e.name.lastIndexOf(" ");
+const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)] : ["", e.name];
 ---
 <Base jsonLd={breadcrumbs(Astro.site!, [
   ["Каталог", base], [group.name, `${base}myshcy/${group.slug}/`],
   [e.sub, `${base}myshcy/${group.slug}/${slugify(e.sub)}/`], [e.name, `${base}uprazhneniya/${ex.id}/`],
 ])} title={`${e.name}: техника`} description={`${e.name}: как делать по шагам и частые ошибки. Работает ${group.acc} (${e.sub.toLowerCase()}), помогают: ${e.helpers.join(", ").toLowerCase() || "—"}.`}>
-  <div style={`--gc: var(--g-${group.id})`}>
+  <div style={`--gc: var(--g-${group.id}); --gi: var(--gi-${group.id})`}>
     <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><a href={`${base}myshcy/${group.slug}/`}>{group.name}</a><span>/</span><a href={`${base}myshcy/${group.slug}/${slugify(e.sub)}/`}>{e.sub}</a><span>/</span><span>{e.name}</span></nav>
-    <h1 data-testid="exercise-title">{e.name}</h1>
+    <h1 data-testid="exercise-title">{head}<em>{tail}</em></h1>
     <div class="tags">
-      <span class="tag">{e.equipment.join(", ")}</span>
-      <span class:list={["tag", levelClass(e.level)]}>{e.level}</span>
-      <span class="tag">{e.sets}</span>
+      <span class="tag eq">{e.equipment.join(", ")}</span>
+      <span class:list={["tag", levelClass(e.level)]}><span aria-hidden="true">● </span>{e.level}</span>
+      <span class="tag sets">{e.sets}</span>
     </div>
 
     <div class="exgrid">
@@ -95,6 +98,11 @@ const v = e.video;
 
 <style>
   h1 { margin-bottom: 12px; }
+  h1 em { font-style: normal; color: var(--gc); }
+  .tag.eq { color: var(--fg); background: var(--surface2); }
+  .tag.lvl1 { background: color-mix(in srgb, #7fd99a 14%, transparent); }
+  .tag.lvl2 { background: color-mix(in srgb, #ffb36b 14%, transparent); }
+  .tag.sets { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
   .tag { background: var(--surface); }
   .exgrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-items: start; margin-top: 20px; }
   @media (min-width: 1024px) {
@@ -112,11 +120,16 @@ const v = e.video;
   .sect { margin-top: 28px; }
   .sect h2 { margin-bottom: 14px; }
   .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: s; }
-  .steps li { counter-increment: s; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; background: var(--surface); border-radius: 14px; padding: 12px 14px; }
-  .steps li::before { content: counter(s); font: 18px var(--f-display); color: var(--gc); }
-  .errs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-  .errs li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; }
-  .errs li::before { content: "✕"; color: var(--accent); font-weight: 700; }
+  /* Шаги: номер в кружке цвета группы и полоска слева. Ошибки: красноватые плашки с «!». */
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; background: var(--surface);
+    border-left: 3px solid var(--gc); border-radius: 14px; padding: 12px 14px; color: var(--fg); }
+  .steps li::before { content: counter(s); width: 28px; height: 28px; border-radius: 50%; background: var(--gc); color: var(--gi);
+    display: grid; place-items: center; font: 14px var(--f-display); }
+  .errs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .errs li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 10px; align-items: start; background: color-mix(in srgb, var(--g-chest) 12%, transparent);
+    border-radius: 12px; padding: 10px 12px; color: var(--fg); }
+  .errs li::before { content: "!"; width: 24px; height: 24px; border-radius: 50%; background: var(--g-chest); color: #fff; font-weight: 800;
+    display: grid; place-items: center; font-size: 14px; }
   .side { display: grid; gap: 12px; }
   .box { background: var(--surface); border-radius: 18px; padding: 16px; }
   .mus { display: grid; gap: 6px; margin-top: 12px; font-size: 14px; }

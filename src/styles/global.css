@@ -8,10 +8,12 @@
 
 :root {
   color-scheme: dark;
-  --bg: #121417; --surface: #1c1f24; --fg: #eef0f2; --muted: #8a9099; --line: #2b2f36;
+  --bg: #121417; --surface: #1c1f24; --surface2: #23272d; --fg: #eef0f2; --fg2: #c9cdd3; --muted: #8a9099; --line: #2b2f36;
   --accent: #ff7a1a; --accent-ink: #121417;
   --muscle: #3c424c; --muscle-hi: #5a6370; --skin: #262a31;
   --g-chest: #e5322d; --g-back: #2f6fe0; --g-shoulders: #f2c230; --g-arms: #e9ecef; --g-legs: #2e9e4f; --g-glutes: #ff7a1a; --g-core: #9aa3ad;
+  /* Цвет текста поверх цвета группы (цифры в кружках): на тёмных — белый, на светлых — тёмный. */
+  --gi-chest: #fff; --gi-back: #fff; --gi-shoulders: #121417; --gi-arms: #121417; --gi-legs: #121417; --gi-glutes: #121417; --gi-core: #121417;
   --f-display: "Dela Gothic One", "Arial Black", system-ui, sans-serif;
   --f-body: "Manrope", "Segoe UI", system-ui, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
@@ -30,7 +32,7 @@ h1, h2 { font-family: var(--f-display); font-weight: 400; margin: 0; text-wrap: 
 h1 { font-size: clamp(30px, 5vw, 56px); }
 h2 { font-size: clamp(20px, 2.4vw, 26px); }
 .eyebrow { font: 500 12px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.lead { color: var(--muted); max-width: 54ch; margin: 0; }
+.lead { color: var(--fg2); max-width: 54ch; margin: 0; }
 
 .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: none; white-space: nowrap; }
 .btn.main { background: var(--accent); color: var(--accent-ink); }

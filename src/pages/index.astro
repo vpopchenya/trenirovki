@@ -2,6 +2,8 @@
 import Base from "../layouts/Base.astro";
 import BodyMap from "../components/BodyMap.astro";
 import InstallCard from "../components/InstallCard.astro";
+import BodyDefs from "../components/BodyDefs.astro";
+import MuscleIcon from "../components/MuscleIcon.astro";
 import { getCollection } from "astro:content";
 import groups from "../data/groups.json";
 
@@ -25,9 +27,11 @@ const first = groups[0];
     <div class="left">
       <InstallCard />
       <p class="lead">Нажми на мышцу на схеме или выбери группу. У каждого упражнения — техника по шагам и частые ошибки.</p>
+      <BodyDefs sides={["front", "back"]} />
       <nav class="groups" aria-label="Группы мышц">
         {groups.map(g => (
           <a class:list={["gcard", { sel: g.id === first.id }]} style={`--gc: var(--g-${g.id})`} href={`${base}myshcy/${g.slug}/`} data-g={g.id} data-testid={`group-${g.id}`}>
+            <MuscleIcon group={g} class="gmuscle" />
             <b>{g.name}</b><span>{g.subs.join(" · ")}</span><em>{count(g.id) ? `${count(g.id)} упр.` : "скоро"}</em>
           </a>
         ))}
@@ -74,11 +78,17 @@ const first = groups[0];
   .pick b { font: 20px var(--f-display); display: block; }
   .pick small { color: var(--muted); font-size: 12px; }
   .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-  .gcard { display: grid; gap: 2px; background: var(--surface); border-radius: 16px; padding: 14px 14px 14px 18px; text-decoration: none; position: relative; overflow: hidden; border: 1px solid transparent; }
+  .gcard { display: grid; gap: 2px; background: var(--surface); border-radius: 16px; padding: 14px 52px 14px 18px; text-decoration: none; position: relative; overflow: hidden;
+    border: 1px solid transparent; transition: transform .12s, border-color .15s; -webkit-tap-highlight-color: transparent; }
+  .gcard:active { transform: scale(.97); }
+  @media (hover: hover) { .gcard:hover { border-color: var(--gc); } }
+  .gcard :global(.gmuscle) { position: absolute; right: -12px; bottom: -12px; width: 72px; height: 72px; pointer-events: none; }
   .gcard::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--gc); }
   .gcard b { font-size: 16px; }
-  .gcard span { color: var(--muted); font-size: 12px; line-height: 1.4; }
-  .gcard em { font: 500 11px var(--f-mono); font-style: normal; color: var(--muted); margin-top: 4px; }
+  .gcard span { color: var(--fg2); font-size: 12px; line-height: 1.4; }
+  .gcard em { font: 500 11px var(--f-mono); font-style: normal; color: var(--fg2); margin-top: 4px; }
+  .gcard b, .gcard span, .gcard em { position: relative; }
+  @media (prefers-reduced-motion: reduce) { .gcard { transition: none; } }
   .gcard.sel { border-color: var(--gc); }
   .basics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
   .basics div { background: var(--surface); border-radius: 16px; padding: 16px; display: grid; gap: 2px; justify-items: start; }
