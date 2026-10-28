@@ -4,7 +4,7 @@ module.exports = {
   globDirectory: "dist/",
   // Из шрифтов — только кириллица и латиница: остальные алфавиты (вьетнамский, греческий…) сайту не нужны,
   // а весят около 2 МБ.
-  globPatterns: ["**/*.{html,css,js,svg,png,txt,webmanifest}", "_astro/*-{cyrillic,latin}-*.woff2"],
+  globPatterns: ["**/*.{html,css,js,svg,png,txt,webmanifest}", "_astro/*-{cyrillic,latin}-[0-9]*.woff2"],
   // Сайт живёт в подпапке /trenirovki/ — к путям файлов из dist добавляем её.
   modifyURLPrefix: { "": "/trenirovki/" },
   // Адрес вида /trenirovki/myshcy/grud/ открывает сохранённый myshcy/grud/index.html.

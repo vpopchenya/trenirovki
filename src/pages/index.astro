@@ -6,6 +6,7 @@ import BodyDefs from "../components/BodyDefs.astro";
 import MuscleIcon from "../components/MuscleIcon.astro";
 import { getCollection } from "astro:content";
 import groups from "../data/groups.json";
+import { plural } from "../lib/catalog";
 
 const all = await getCollection("exercises");
 const count = (id: string) => all.filter(e => e.data.group === id).length;
@@ -14,7 +15,10 @@ const first = groups[0];
 ---
 <Base jsonLd={{ "@context": "https://schema.org", "@type": "WebSite", name: "Карманный тренер", inLanguage: "ru", url: new URL(base, Astro.site).href }} title="Карманный тренер" description="Бесплатный каталог упражнений для зала: 7 групп мышц, техника по шагам на русском и частые ошибки. Работает на телефоне.">
   <div class="home">
-    <h1 data-testid="home-title">Что качаем <em>сегодня?</em></h1>
+    <div class="hello">
+      <p class="hi">Привет! Начнём?</p>
+      <h1 data-testid="home-title">Что качаем <em class="wave">сегодня?</em></h1>
+    </div>
 
     <section class="map" aria-label="Выбор мышцы">
       <BodyMap selected={first.id} clickable />
@@ -30,9 +34,10 @@ const first = groups[0];
       <BodyDefs sides={["front", "back"]} />
       <nav class="groups" aria-label="Группы мышц">
         {groups.map(g => (
-          <a class:list={["gcard", { sel: g.id === first.id }]} style={`--gc: var(--g-${g.id})`} href={`${base}myshcy/${g.slug}/`} data-g={g.id} data-testid={`group-${g.id}`}>
-            <MuscleIcon group={g} class="gmuscle" />
-            <b>{g.name}</b><span>{g.subs.join(" · ")}</span><em>{count(g.id) ? `${count(g.id)} упр.` : "скоро"}</em>
+          <a class:list={["gcard", { sel: g.id === first.id }]} style={`--gc: var(--g-${g.id}); --gi: var(--gi-${g.id})`} href={`${base}myshcy/${g.slug}/`} data-g={g.id} data-testid={`group-${g.id}`}>
+            <span class="disc"><MuscleIcon group={g} class="gmuscle" /></span>
+            {count(g.id) > 0 && <span class="big" aria-hidden="true">{count(g.id)}</span>}
+            <b>{g.name}</b><span class="subs">{g.subs.join(" · ")}</span><em>{count(g.id) ? `${count(g.id)} ${plural(count(g.id))}` : "скоро"}</em>
           </a>
         ))}
       </nav>
@@ -66,8 +71,8 @@ const first = groups[0];
 <style>
   /* Телефон: заголовок → схема → группы. Компьютер: схема справа на всю высоту. */
   .home { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "map" "left"; gap: 24px; align-items: start; }
-  h1 { grid-area: title; }
-  h1 em { font-style: normal; color: var(--accent); }
+  .hello { grid-area: title; }
+  .hi { margin: 0 0 6px; font-weight: 800; font-size: 15px; color: var(--accent); }
   .map { grid-area: map; background: var(--surface); border-radius: 24px; padding: 14px; }
   .left { grid-area: left; display: grid; gap: 28px; }
   @media (min-width: 1024px) {
@@ -75,23 +80,27 @@ const first = groups[0];
     .map { position: sticky; top: 76px; }
   }
   .pick { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; background: var(--bg); border-radius: 16px; padding: 12px 14px; border-left: 6px solid var(--gc); }
-  .pick b { font: 20px var(--f-display); display: block; }
+  .pick b { font: 800 19px var(--f-display); letter-spacing: -.02em; display: block; }
   .pick small { color: var(--muted); font-size: 12px; }
+  /* Группы — плитки целиком в цвете блина: мышца в тёмном «диске», крупная бледная цифра — сколько упражнений. */
   .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-  .gcard { display: grid; gap: 2px; background: var(--surface); border-radius: 16px; padding: 14px 52px 14px 18px; text-decoration: none; position: relative; overflow: hidden;
-    border: 1px solid transparent; transition: transform .12s, border-color .15s; -webkit-tap-highlight-color: transparent; }
-  .gcard:active { transform: scale(.97); }
-  @media (hover: hover) { .gcard:hover { border-color: var(--gc); } }
-  .gcard :global(.gmuscle) { position: absolute; right: -12px; bottom: -12px; width: 72px; height: 72px; pointer-events: none; }
-  .gcard::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--gc); }
-  .gcard b { font-size: 16px; }
-  .gcard span { color: var(--fg2); font-size: 12px; line-height: 1.4; }
-  .gcard em { font: 500 11px var(--f-mono); font-style: normal; color: var(--fg2); margin-top: 4px; }
-  .gcard b, .gcard span, .gcard em { position: relative; }
+  .gcard { display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; min-height: 150px; background: var(--gc); color: var(--gi);
+    border-radius: 26px; padding: 14px 16px; text-decoration: none; position: relative; overflow: hidden;
+    transition: transform .15s cubic-bezier(.3, 1.5, .5, 1), box-shadow .15s; -webkit-tap-highlight-color: transparent; }
+  .gcard:active { transform: scale(.95) rotate(-1deg); }
+  @media (hover: hover) { .gcard:hover { transform: translateY(-3px); } }
+  .disc { position: absolute; left: 12px; top: 12px; width: 52px; height: 52px; border-radius: 50%; background: var(--bg); overflow: hidden; }
+  .disc :global(.gmuscle) { width: 100%; height: 100%; display: block; }
+  .big { position: absolute; right: 10px; top: -10px; font: 800 76px/1 var(--f-display); letter-spacing: -.06em; opacity: .2; pointer-events: none; }
+  .gcard b { font: 800 17px var(--f-display); letter-spacing: -.02em; margin-top: 64px; }
+  .gcard .subs { font-size: 13px; line-height: 1.35; font-weight: 700; }
+  .gcard em { font-style: normal; font-weight: 800; font-size: 12px; margin-top: 4px; }
+  /* На телефоне плиток две в ряд: нечётная последняя растягивается, чтобы не висела одна. */
+  @media (max-width: 559px) { .gcard:last-child:nth-child(odd) { grid-column: 1 / -1; min-height: 120px; } }
+  .gcard.sel { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--gc); }
   @media (prefers-reduced-motion: reduce) { .gcard { transition: none; } }
-  .gcard.sel { border-color: var(--gc); }
   .basics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
-  .basics div { background: var(--surface); border-radius: 16px; padding: 16px; display: grid; gap: 2px; justify-items: start; }
+  .basics div { background: var(--surface); border-radius: 22px; padding: 16px; display: grid; gap: 2px; justify-items: start; }
   .basics span:not(.soon) { color: var(--muted); font-size: 14px; }
   .basics .soon { margin: 6px 0 0; }
 </style>

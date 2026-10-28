@@ -1,43 +1,51 @@
 /* Вариант «Блины»: графит как гриф, оранжевый — действие, цвет группы мышц — цвет соревновательного блина.
+   Вид «Цветные плитки» (28.10.2026): округлые шрифты Unbounded (заголовки) и Nunito (текст), группы — плитки в цвете блина.
    Вёрстка от телефона (375): до 1024 — нижнее меню, с 1024 — верхнее. */
-@import "@fontsource/manrope/400.css";
-@import "@fontsource/manrope/600.css";
-@import "@fontsource/manrope/700.css";
-@import "@fontsource/dela-gothic-one/400.css";
+@import "@fontsource/nunito/500.css";
+@import "@fontsource/nunito/700.css";
+@import "@fontsource/nunito/800.css";
+@import "@fontsource/unbounded/800.css";
 @import "@fontsource/ibm-plex-mono/500.css";
 
 :root {
   color-scheme: dark;
-  --bg: #121417; --surface: #1c1f24; --surface2: #23272d; --fg: #eef0f2; --fg2: #c9cdd3; --muted: #8a9099; --line: #2b2f36;
+  --bg: #121417; --surface: #1c1f24; --surface2: #23272d; --fg: #eef0f2; --text: #e2e5e9; --fg2: #c9cdd3; --muted: #8a9099; --line: #2b2f36;
   --accent: #ff7a1a; --accent-ink: #121417;
+  --paper: #f1f2f4; --paper-ink: #4a505a; /* светлая капсула нижнего меню */
   --muscle: #3c424c; --muscle-hi: #5a6370; --skin: #262a31;
   --g-chest: #e5322d; --g-back: #2f6fe0; --g-shoulders: #f2c230; --g-arms: #e9ecef; --g-legs: #2e9e4f; --g-glutes: #ff7a1a; --g-core: #9aa3ad;
   /* Цвет текста поверх цвета группы (цифры в кружках): на тёмных — белый, на светлых — тёмный. */
   --gi-chest: #fff; --gi-back: #fff; --gi-shoulders: #121417; --gi-arms: #121417; --gi-legs: #121417; --gi-glutes: #121417; --gi-core: #121417;
-  --f-display: "Dela Gothic One", "Arial Black", system-ui, sans-serif;
-  --f-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  /* У Unbounded подключено только начертание 800 — пишем его явно (font: 800 …), иначе браузер дорисует жирность сам. */
+  --f-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --f-body: "Nunito", "Segoe UI", system-ui, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--fg); font: 16px/1.55 var(--f-body); -webkit-text-size-adjust: 100%; }
+body { background: var(--bg); color: var(--fg); font: 500 16px/1.55 var(--f-body); -webkit-text-size-adjust: 100%; }
 a { color: inherit; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .wrap { max-width: 1200px; margin: 0 auto; }
 
-h1, h2 { font-family: var(--f-display); font-weight: 400; margin: 0; text-wrap: balance; line-height: 1.08; }
-h1 { font-size: clamp(30px, 5vw, 56px); }
-h2 { font-size: clamp(20px, 2.4vw, 26px); }
+h1, h2 { font-family: var(--f-display); font-weight: 800; letter-spacing: -.03em; margin: 0; text-wrap: balance; line-height: 1.12; }
+h1 { font-size: clamp(27px, 4.6vw, 52px); }
+h2 { font-size: clamp(19px, 2.2vw, 24px); letter-spacing: -.02em; }
+/* Главное слово заголовка — цветом группы (или оранжевым) с волнистым подчёркиванием. */
+.wave { font-style: normal; color: var(--gc, var(--accent)); text-decoration: underline wavy var(--gc, var(--accent));
+  text-decoration-thickness: 3px; text-underline-offset: .22em; text-decoration-skip-ink: none; }
 .eyebrow { font: 500 12px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.lead { color: var(--fg2); max-width: 54ch; margin: 0; }
+.lead { color: var(--text); font-size: 17px; max-width: 54ch; margin: 0; }
 
-.btn { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 11px 18px; font-weight: 800; font-size: 15px; cursor: pointer; text-decoration: none; white-space: nowrap; }
 .btn.main { background: var(--accent); color: var(--accent-ink); }
 .soon { font: 500 10px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; margin-left: 4px; }
 .crumbs { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+/* На телефоне путь заменяет кнопка «Назад» в шапке — длинная строка ссылок там только мешает. */
+@media (max-width: 767px) { .crumbs { display: none; } }
 .crumbs a { color: var(--muted); }
 .stub { color: #ffb36b; }
 /* Метки упражнения: мелкая группа, оборудование, уровень (lvl1 — новичок, lvl2 — опытный). */

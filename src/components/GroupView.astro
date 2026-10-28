@@ -19,10 +19,10 @@ const description = sub
   ? `${sub} — упражнения на ${group.acc} в зале. Техника по шагам и частые ошибки.`
   : `Упражнения на ${group.acc} в зале: ${group.subs.join(", ").toLowerCase()}. Техника по шагам и частые ошибки.`;
 ---
-<Base title={title} description={description} jsonLd={breadcrumbs(Astro.site!, [
+<Base title={title} description={description} back={sub ? { href: groupUrl, label: group.name, group: group.id } : { href: base, label: "Каталог" }} jsonLd={breadcrumbs(Astro.site!, [
   ["Каталог", base], [group.name, groupUrl], ...(sub ? [[sub, `${groupUrl}${slugify(sub)}/`] as [string, string]] : []),
 ])}>
-  <div style={`--gc: var(--g-${group.id})`}>
+  <div style={`--gc: var(--g-${group.id}); --gi: var(--gi-${group.id})`}>
     <nav class="crumbs" aria-label="Путь">
       <a href={base}>Каталог</a><span>/</span>
       {sub ? <><a href={groupUrl}>{group.name}</a><span>/</span><span>{sub}</span></> : <span>{group.name}</span>}
@@ -31,7 +31,7 @@ const description = sub
       <BodyDefs sides={[group.side as Side]} />
       <MuscleIcon group={group} class="gicon" />
       <div>
-        <h1 data-testid="group-title">{sub ? `${group.name}: ${sub.toLowerCase()}` : group.name}</h1>
+        <h1 data-testid="group-title">{sub ? <>{group.name}: <em class="wave">{sub.toLowerCase()}</em></> : group.name}</h1>
         <p class="eyebrow">{list.length > 0 && `${list.length} ${plural(list.length)} · `}{group.subs.join(" · ")}</p>
       </div>
     </div>
@@ -95,18 +95,22 @@ const description = sub
 <style>
   .ghead { display: flex; align-items: center; gap: 14px; }
   .ghead > div { min-width: 0; }
-  .ghead .eyebrow { margin: 6px 0 0; }
-  .ghead :global(.gicon) { width: 64px; height: 64px; flex: none; border-radius: 18px; display: block;
-    background: color-mix(in srgb, var(--gc) 14%, var(--bg)); border: 1px solid color-mix(in srgb, var(--gc) 45%, transparent); }
+  .ghead .eyebrow { margin: 12px 0 0; } /* место под волнистое подчёркивание заголовка */
+  .ghead :global(.gicon) { width: 68px; height: 68px; flex: none; border-radius: 50%; display: block; background: var(--bg); box-shadow: 0 0 0 4px var(--gc); }
   .empty, .nothing { margin-top: 24px; }
   .filters { display: grid; gap: 10px; margin: 24px 0 20px; }
   .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-  .chip { flex: none; display: inline-flex; align-items: center; font-weight: 600; font-size: 14px; text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0 14px; min-height: 40px; cursor: pointer; }
-  .chip[aria-pressed="true"], .chip[aria-current="page"] { border-color: var(--gc); background: color-mix(in srgb, var(--gc) 16%, var(--surface)); }
+  .chip { flex: none; display: inline-flex; align-items: center; font-weight: 800; font-size: 14px; text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0 14px; min-height: 40px; cursor: pointer; }
+  .chip { transition: transform .1s; -webkit-tap-highlight-color: transparent; }
+  .chip:active { transform: scale(.95); }
+  .chip[aria-pressed="true"], .chip[aria-current="page"] { border-color: var(--gc); background: var(--gc); color: var(--gi); }
   .exlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
-  .ex { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; background: var(--surface); border-radius: 18px; padding: 12px; text-decoration: none; border: 1px solid transparent; }
-  @media (hover: hover) { .ex:hover { border-color: var(--line); } }
-  .ex :global(.thumb) { width: 72px; height: 72px; border-radius: 12px; background: var(--bg); display: block; }
-  .ex b { display: block; font-size: 16px; line-height: 1.3; }
+  .ex { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; background: color-mix(in srgb, var(--gc) 10%, var(--surface));
+    border-radius: 24px; padding: 12px; text-decoration: none; border: 1px solid transparent; transition: transform .15s cubic-bezier(.3, 1.5, .5, 1); -webkit-tap-highlight-color: transparent; }
+  .ex:active { transform: scale(.97); }
+  @media (hover: hover) { .ex:hover { border-color: color-mix(in srgb, var(--gc) 50%, transparent); } }
+  .ex :global(.thumb) { width: 72px; height: 72px; border-radius: 50%; background: var(--bg); display: block; box-shadow: 0 0 0 3px var(--gc); }
+  .ex b { display: block; font-weight: 800; font-size: 17px; line-height: 1.3; }
+  @media (prefers-reduced-motion: reduce) { .ex, .chip { transition: none; } }
   .ex .tags { margin-top: 6px; }
 </style>

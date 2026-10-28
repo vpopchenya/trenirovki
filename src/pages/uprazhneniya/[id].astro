@@ -18,13 +18,13 @@ const [v] = e.videos;
 const cut = e.name.lastIndexOf(" ");
 const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)] : ["", e.name];
 ---
-<Base jsonLd={breadcrumbs(Astro.site!, [
+<Base back={{ href: `${base}myshcy/${group.slug}/`, label: group.name, group: group.id }} jsonLd={breadcrumbs(Astro.site!, [
   ["Каталог", base], [group.name, `${base}myshcy/${group.slug}/`],
   [e.sub, `${base}myshcy/${group.slug}/${slugify(e.sub)}/`], [e.name, `${base}uprazhneniya/${ex.id}/`],
 ])} title={`${e.name}: техника`} description={`${e.name}: как делать по шагам и частые ошибки. Работает ${group.acc} (${e.sub.toLowerCase()}), помогают: ${e.helpers.join(", ").toLowerCase() || "—"}.`}>
   <div style={`--gc: var(--g-${group.id}); --gi: var(--gi-${group.id})`}>
     <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><a href={`${base}myshcy/${group.slug}/`}>{group.name}</a><span>/</span><a href={`${base}myshcy/${group.slug}/${slugify(e.sub)}/`}>{e.sub}</a><span>/</span><span>{e.name}</span></nav>
-    <h1 data-testid="exercise-title">{head}<em>{tail}</em></h1>
+    <h1 data-testid="exercise-title">{head}<em class="wave">{tail}</em></h1>
     <div class="tags">
       <span class="tag eq">{e.equipment.join(", ")}</span>
       <span class:list={["tag", levelClass(e.level)]}><span aria-hidden="true">● </span>{e.level}</span>
@@ -118,8 +118,7 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
 </script>
 
 <style>
-  h1 { margin-bottom: 12px; }
-  h1 em { font-style: normal; color: var(--gc); }
+  h1 { margin-bottom: 14px; }
   .tag.eq { color: var(--fg); background: var(--surface2); }
   .tag.lvl1 { background: color-mix(in srgb, #7fd99a 14%, transparent); }
   .tag.lvl2 { background: color-mix(in srgb, #ffb36b 14%, transparent); }
@@ -130,7 +129,7 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
     .exgrid { grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 32px; }
     .side { position: sticky; top: 76px; }
   }
-  .video { aspect-ratio: 16 / 9; max-width: 100%; border-radius: 20px; background: var(--surface); display: grid; place-items: center; position: relative; overflow: hidden; }
+  .video { aspect-ratio: 16 / 9; max-width: 100%; border-radius: 24px; background: var(--surface); display: grid; place-items: center; position: relative; overflow: hidden; }
   .video img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .55; }
   .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .play { position: relative; width: 72px; height: 72px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; border: 0; cursor: pointer; }
@@ -151,23 +150,23 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
   .sect h2 { margin-bottom: 14px; }
   .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: s; }
   /* Шаги: номер в кружке цвета группы и полоска слева. Ошибки: красноватые плашки с «!». */
-  .steps li { counter-increment: s; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; background: var(--surface);
-    border-left: 3px solid var(--gc); border-radius: 14px; padding: 12px 14px; color: var(--fg); }
-  .steps li::before { content: counter(s); width: 28px; height: 28px; border-radius: 50%; background: var(--gc); color: var(--gi);
-    display: grid; place-items: center; font: 14px var(--f-display); }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start;
+    background: color-mix(in srgb, var(--gc) 12%, var(--surface)); border-radius: 20px; padding: 12px 14px; color: var(--fg); font-size: 16.5px; }
+  .steps li::before { content: counter(s); width: 34px; height: 34px; border-radius: 50%; background: var(--gc); color: var(--gi);
+    display: grid; place-items: center; font: 800 15px var(--f-display); }
   .errs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   .errs li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 10px; align-items: start; background: color-mix(in srgb, var(--g-chest) 12%, transparent);
-    border-radius: 12px; padding: 10px 12px; color: var(--fg); }
+    border-radius: 18px; padding: 10px 12px; color: var(--fg); }
   .errs li::before { content: "!"; width: 24px; height: 24px; border-radius: 50%; background: var(--g-chest); color: #fff; font-weight: 800;
     display: grid; place-items: center; font-size: 14px; }
   .side { display: grid; gap: 12px; }
-  .box { background: var(--surface); border-radius: 18px; padding: 16px; }
+  .box { background: var(--surface); border-radius: 24px; padding: 16px; }
   .mus { display: grid; gap: 6px; margin-top: 12px; font-size: 14px; }
   .mus div { display: flex; align-items: center; gap: 8px; }
   .mus i { width: 10px; height: 10px; border-radius: 50%; background: var(--gc); flex: none; }
   .mus .sec i { background: transparent; box-shadow: inset 0 0 0 2px var(--muted); }
   .kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 14px; margin: 0; }
   .kv dt { color: var(--muted); }
-  .kv dd { margin: 0; font-weight: 600; }
+  .kv dd { margin: 0; font-weight: 700; }
   .warn { font-size: 13px; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; margin: 0; }
 </style>

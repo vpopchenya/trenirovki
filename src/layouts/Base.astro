@@ -9,8 +9,10 @@ interface Props {
   nav?: "catalog" | "none";
   noindex?: boolean;  // для 404: не показывать в поиске
   jsonLd?: object;     // разметка для поисковиков (хлебные крошки и т.п.)
+  // Кнопка «Назад» на внутренних страницах: куда ведёт, если пришли не с нашего сайта, и подпись (группа — точка её цвета).
+  back?: { href: string; label: string; group?: string };
 }
-const { title, description, nav = "catalog", noindex = false, jsonLd } = Astro.props;
+const { title, description, nav = "catalog", noindex = false, jsonLd, back } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const fullTitle = title === "Карманный тренер" ? title : `${title} — Карманный тренер`;
@@ -54,7 +56,12 @@ const items = [
 </head>
 <body>
   <header class="bar gut"><div class="wrap">
-    <a class="logo" href={base} data-testid="logo"><Logo />Карманный <em>тренер</em></a>
+    {back && (
+      <a class="back" href={back.href} data-testid="back" style={back.group && `--gc: var(--g-${back.group})`}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>{back.group && <i></i>}<span>{back.label}</span>
+      </a>
+    )}
+    <a class:list={["logo", { "has-back": back }]} href={base} data-testid="logo"><Logo />Карманный <em>тренер</em></a>
     <nav class="topnav" aria-label="Разделы">
       {items.map(i => i.href
         ? <a href={i.href} class:list={{ on: i.id === nav }} aria-current={i.id === nav ? "page" : undefined}>{i.label}</a>
@@ -67,8 +74,8 @@ const items = [
 
   <nav class="tabbar" aria-label="Разделы" data-testid="tabbar"><div class="in">
     {items.map(i => i.href
-      ? <a href={i.href} class:list={{ on: i.id === nav }} aria-current={i.id === nav ? "page" : undefined}><span class="pill"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} /></span>{i.label}</a>
-      : <span class="off"><span class="pill"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} /></span>{i.label}</span>)}
+      ? <a href={i.href} class:list={{ on: i.id === nav }} aria-current={i.id === nav ? "page" : undefined}><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} />{i.label}</a>
+      : <span class="off"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} />{i.label}</span>)}
   </div></nav>
 
   <Analytics />
@@ -78,6 +85,19 @@ const items = [
     if ("serviceWorker" in navigator && import.meta.env.PROD) {
       navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
     }
+    // «Назад»: пришли именно с той страницы, куда ведёт кнопка, — возвращаемся по истории (сохранятся прокрутка
+    // и фильтры); иначе (ссылка извне, другая наша страница) — обычный переход по href на уровень выше.
+    // В установленном на iPhone приложении другой кнопки «назад» нет.
+    document.querySelector<HTMLAnchorElement>(".back")?.addEventListener("click", ev => {
+      const link = ev.currentTarget as HTMLAnchorElement;
+      try {
+        const from = new URL(document.referrer);
+        if (from.origin === location.origin && from.pathname === new URL(link.href).pathname && history.length > 1) {
+          ev.preventDefault();
+          history.back();
+        }
+      } catch {} // referrer пустой — обычный переход по ссылке
+    });
   </script>
 </body>
 </html>
@@ -86,10 +106,19 @@ const items = [
   body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
   .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
   .bar .wrap { display: flex; align-items: center; gap: 24px; height: 60px; }
-  .logo { font: 16px var(--f-display); text-decoration: none; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+  .logo { font: 800 15px var(--f-display); letter-spacing: -.02em; text-decoration: none; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+  /* «Назад» — пилюля с подписью, куда ведёт. На телефоне встаёт на место логотипа. */
+  .back { display: inline-flex; align-items: center; gap: 7px; min-width: 0; max-width: 100%; height: 42px; padding: 0 16px 0 10px; border-radius: 999px;
+    background: var(--surface2); font-weight: 800; font-size: 15px; text-decoration: none; -webkit-tap-highlight-color: transparent; transition: transform .1s, background .15s; }
+  .back:active { transform: scale(.95); }
+  .back svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; }
+  .back i { width: 10px; height: 10px; border-radius: 50%; background: var(--gc); flex: none; }
+  .back span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (hover: hover) { .back:hover { background: var(--line); } }
+  @media (max-width: 1023px) { .logo.has-back { display: none; } }
   .logo em { font-style: normal; color: var(--accent); }
   /* Меню живое: светлый текст, активный раздел — оранжевый, нажатие «проседает», наведение подсвечивает. */
-  .topnav { display: none; gap: 6px; margin-left: auto; font-weight: 700; font-size: 15px; color: var(--fg2); align-items: center; }
+  .topnav { display: none; gap: 6px; margin-left: auto; font-weight: 800; font-size: 15px; color: var(--fg2); align-items: center; }
   .topnav > * { padding: 8px 14px; border-radius: 999px; text-decoration: none; transition: background .15s, color .15s, transform .1s; }
   .topnav a.on { background: var(--accent); color: var(--accent-ink); }
   .topnav a:active { transform: scale(.95); }
@@ -97,22 +126,22 @@ const items = [
   @media (hover: hover) { .topnav a:not(.on):hover { background: var(--surface2); color: var(--fg); } }
 
   main { padding-top: 28px; }
-  footer { padding-block: 40px calc(90px + env(safe-area-inset-bottom, 0px)); font-size: 13px; color: var(--muted); }
+  footer { padding-block: 40px calc(110px + env(safe-area-inset-bottom, 0px)); font-size: 13px; color: var(--muted); }
 
-  .tabbar { position: fixed; inset: auto 0 0; z-index: 5; background: var(--bg); border-top: 1px solid var(--line);
-    padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
-  .tabbar .in { display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px 4px 8px; }
-  .tabbar a, .tabbar .off { display: grid; justify-items: center; gap: 3px; font-size: 11px; font-weight: 700; padding: 4px 0; color: var(--fg2); text-decoration: none;
-    -webkit-tap-highlight-color: transparent; transition: color .15s, transform .1s; }
+  /* Нижнее меню — светлая капсула над краем экрана, выбранный раздел — оранжевая плашка. */
+  .tabbar { position: fixed; z-index: 5; bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
+    max-width: 520px; margin-inline: auto; background: var(--paper); color: var(--paper-ink); border-radius: 28px; box-shadow: 0 14px 30px -10px #000; }
+  .tabbar .in { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px; }
+  .tabbar a, .tabbar .off { display: grid; justify-items: center; align-content: center; gap: 2px; height: 54px; border-radius: 22px; font-size: 11px; font-weight: 800;
+    color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; transition: background .2s, color .2s, transform .15s cubic-bezier(.3, 1.5, .5, 1); }
   .tabbar .off { opacity: .45; }
-  .tabbar a:active { transform: scale(.92); }
-  .tabbar a.on { color: var(--accent); }
-  /* Активный раздел — иконка в оранжевой «пилюле». */
-  .pill { width: 56px; height: 30px; border-radius: 999px; display: grid; place-items: center; transition: background .2s, color .2s; }
-  .tabbar a.on .pill { background: var(--accent); color: var(--accent-ink); }
-  .tabbar svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.9; }
-  @media (hover: hover) { .tabbar a:not(.on):hover .pill { background: var(--surface2); } }
-  @media (prefers-reduced-motion: reduce) { .tabbar a, .pill, .topnav > * { transition: none; } }
+  .tabbar a:active { transform: scale(.9); }
+  .tabbar a.on { background: var(--accent); color: var(--accent-ink); }
+  .tabbar :focus-visible { outline-color: var(--accent-ink); }
+  .tabbar svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 2; }
+  @media (hover: hover) { .tabbar a:not(.on):hover { background: color-mix(in srgb, var(--paper-ink) 12%, var(--paper)); } }
+  @media (prefers-reduced-motion: reduce) { .tabbar a, .back, .topnav > * { transition: none; } }
 
   @media (min-width: 1024px) {
     .topnav { display: flex; }

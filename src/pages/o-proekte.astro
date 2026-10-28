@@ -3,10 +3,10 @@ import Base from "../layouts/Base.astro";
 import { METRIKA_ID, CONSENT_KEY } from "../lib/analytics";
 const base = import.meta.env.BASE_URL;
 ---
-<Base title="О проекте" description="Карманный тренер — бесплатный каталог упражнений с техникой на русском. Кто делает, откуда материалы." nav="none">
+<Base title="О проекте" description="Карманный тренер — бесплатный каталог упражнений с техникой на русском. Кто делает, откуда материалы." nav="none" back={{ href: base, label: "Каталог" }}>
   <div class="about">
     <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><span>О проекте</span></nav>
-    <h1>О проекте</h1>
+    <h1>О <em class="wave">проекте</em></h1>
     <p>Бесплатный каталог упражнений для зала с техникой на русском. Скоро — готовые программы и дневник тренировок.</p>
     <p class="warn" data-testid="health-warning">Мы не врачи и не тренеры. Есть болезни или травмы — сначала к врачу.</p>
     <h2>Чужие материалы</h2>
@@ -31,7 +31,7 @@ const base = import.meta.env.BASE_URL;
 
 <style>
   .about { max-width: 70ch; display: grid; gap: 16px; }
-  .about p { margin: 0; color: var(--muted); }
+  .about p { margin: 0; color: var(--fg2); }
   .reset { background: transparent; border: 1px solid var(--line); }
   .warn { font-size: 14px; border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; }
 </style>
