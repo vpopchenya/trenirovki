@@ -21,13 +21,15 @@ const exercises = defineCollection({
     rest: z.string(),                      // «1,5–3 мин»
     steps: z.array(z.string().min(1)).min(3),
     errors: z.array(z.string().min(1)).min(2),
-    // Пока ролик не подобран — null (в разработке видна заглушка). Сборка для прода без ролика падает.
-    video: z.object({
+    // Ролики разных авторов, чтобы человек выбрал, у кого понятнее. Первый показывается по умолчанию —
+    // ставим лучший: несколько ракурсов, коротко, хорошие отзывы. Название и канал — как на YouTube (oEmbed).
+    videos: z.array(z.object({
       id: z.string().regex(/^[\w-]{11}$/),
+      author: z.string().max(24),              // короткое имя для кнопки «Кто показывает»
       title: z.string(),
       channel: z.string(),
       lang: z.enum(["ru", "en"]),
-    }).nullable(),
+    })).min(1).max(3),
     order: z.number().int(),               // порядок в списке группы
   }).refine(e => subsOf[e.group].includes(e.sub), { message: "sub: такой мелкой группы нет в groups.json у этой группы" }),
 });
