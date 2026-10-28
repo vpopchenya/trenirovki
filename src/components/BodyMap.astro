@@ -17,8 +17,7 @@ const figures = compact
   ? [{ sex: "m" as const, side, ...body.m[side] }]
   : (["m", "f"] as const).flatMap(sex => (["front", "back"] as const).map(s => ({ sex, side: s, ...body[sex][s] })));
 ---
-<div class:list={["bodymap", { compact }]} data-selected={selected} data-clickable={clickable ? "1" : undefined} style={`--gc: var(--g-${selected})`}>
-  {!compact && <div class="glow" aria-hidden="true"></div>}
+<div class:list={["bodymap", { compact }]} data-selected={selected} data-clickable={clickable ? "1" : undefined}>
   {!compact && <div class="ctrls">
     <div class="seg" data-k="side">
       <button type="button" data-v="front" data-testid="side-front" aria-pressed={String(side === "front")}>Спереди</button>
@@ -64,14 +63,7 @@ const figures = compact
       const m = (ev.target as Element).closest<SVGElement>(".m");
       if (!m) return;
       const g = m.dataset.g!;
-      map.style.setProperty("--gc", `var(--g-${g})`);
-      map.querySelectorAll<SVGElement>(".m").forEach(p => {
-        p.classList.toggle("sel", p.dataset.g === g);
-        p.classList.remove("pop");
-      });
-      // Перезапуск анимации «выпрыгивания»: класс снят выше, чтение размеров заставляет браузер это заметить.
-      void map.offsetWidth;
-      map.querySelectorAll<SVGElement>(`.m[data-g="${g}"]`).forEach(p => p.classList.add("pop"));
+      map.querySelectorAll<SVGElement>(".m").forEach(p => p.classList.toggle("sel", p.dataset.g === g));
       hint?.classList.add("gone");
       setTimeout(() => hint?.remove(), 300); // после затухания — убрать совсем (и для чтения с экрана)
       try { localStorage.setItem(HINT_KEY, "1"); } catch {}
@@ -85,29 +77,19 @@ const figures = compact
   .seg { display: flex; gap: 4px; background: var(--bg); border-radius: 999px; padding: 4px; }
   .seg button { font-weight: 700; font-size: 13px; color: var(--muted); background: transparent; border: 0; border-radius: 999px; padding: 0 16px; min-height: 40px; cursor: pointer; }
   .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
-  /* Цветная карта: все группы видны в цветах своих блинов приглушённо, выбранная горит, светится и несколько раз «вдыхает»,
-     за фигурой — пятно света её цвета. На странице упражнения (compact) остальные группы серые — видно, что работает. */
-  .bodymap { position: relative; }
-  .glow { position: absolute; inset: 14% 4% 4%; border-radius: 50%; pointer-events: none;
-    background: radial-gradient(closest-side, color-mix(in srgb, var(--gc) 32%, transparent), transparent); transition: background .4s; }
-  .fig { position: relative; display: block; width: 100%; max-width: 100%; height: clamp(320px, 52vh, 520px); margin-top: 8px; }
+  .fig { display: block; width: 100%; max-width: 100%; height: clamp(320px, 52vh, 520px); margin-top: 8px; }
   .compact .fig { height: 240px; margin-top: 0; }
   .outline { fill: var(--skin); stroke: var(--line); stroke-width: 2; }
-  .m { fill: color-mix(in srgb, var(--gc) 32%, var(--muscle)); stroke: var(--skin); stroke-width: 1; transition: fill .2s; transform-box: fill-box; transform-origin: center; }
-  .compact .m:not(.sel) { fill: var(--muscle); }
+  .m { fill: var(--muscle); stroke: var(--skin); stroke-width: 1; transition: fill .15s; }
   [data-clickable] .m { cursor: pointer; }
   /* Только там, где есть мышь: на телефоне hover «залипает» и перекрывает цвет выбранной мышцы. */
-  @media (hover: hover) { [data-clickable] .m:not(.sel):hover { fill: color-mix(in srgb, var(--gc) 60%, var(--muscle)); } }
-  .m.sel { fill: var(--gc); filter: drop-shadow(0 0 8px var(--gc)); animation: breathe 2s ease-in-out 4; }
-  .compact .m.sel { filter: none; animation: none; }
-  .m.pop { animation: pop .35s cubic-bezier(.3, 1.6, .5, 1), breathe 2s ease-in-out .35s 4; }
-  @keyframes breathe { 50% { opacity: .8; } }
-  @keyframes pop { 40% { transform: scale(1.12); } }
+  @media (hover: hover) { [data-clickable] .m:not(.sel):hover { fill: var(--muscle-hi); } }
+  .m.sel { fill: var(--gc); }
   .base { fill: var(--muscle); opacity: .55; }
+  /* Тихая подсказка для новичка — до первого нажатия на мышцу. */
+  .bodymap { position: relative; }
   .hint { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); white-space: nowrap; pointer-events: none;
-    font-weight: 800; font-size: 13px; background: var(--paper); color: var(--accent-ink); border-radius: 999px; padding: 6px 12px;
-    box-shadow: 0 8px 18px -8px #000; animation: bob 1.6s ease-in-out infinite; transition: opacity .3s; }
+    font-weight: 700; font-size: 13px; color: var(--fg2); background: var(--surface2); border-radius: 999px; padding: 5px 12px; transition: opacity .3s; }
   .hint.gone { opacity: 0; }
-  @keyframes bob { 50% { transform: translate(-50%, -4px); } }
-  @media (prefers-reduced-motion: reduce) { .m, .glow, .hint { transition: none; animation: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .m, .hint { transition: none; } }
 </style>
