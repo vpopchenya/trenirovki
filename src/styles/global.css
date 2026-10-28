@@ -38,3 +38,8 @@ h2 { font-size: clamp(20px, 2.4vw, 26px); }
 .crumbs { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
 .crumbs a { color: var(--muted); }
 .stub { color: #ffb36b; }
+/* Метки упражнения: мелкая группа, оборудование, уровень (lvl1 — новичок, lvl2 — опытный). */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font: 500 12px var(--f-mono); color: var(--muted); background: var(--bg); border-radius: 6px; padding: 2px 8px; }
+.tag.lvl1 { color: #7fd99a; }
+.tag.lvl2 { color: #ffb36b; }

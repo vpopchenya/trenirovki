@@ -1,0 +1,16 @@
+---
+import GroupView from "../../../components/GroupView.astro";
+import groups from "../../../data/groups.json";
+import { subsWithExercises, slugify } from "../../../lib/catalog";
+
+// Страница есть только у мелкой группы, для которой уже есть упражнения.
+export async function getStaticPaths() {
+  const paths = [];
+  for (const g of groups) {
+    for (const s of await subsWithExercises(g)) paths.push({ params: { slug: g.slug, sub: slugify(s) }, props: { group: g, sub: s } });
+  }
+  return paths;
+}
+const { group, sub } = Astro.props;
+---
+<GroupView group={group} sub={sub} />

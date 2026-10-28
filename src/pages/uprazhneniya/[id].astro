@@ -1,0 +1,125 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import BodyMap from "../../components/BodyMap.astro";
+import groups from "../../data/groups.json";
+import { levelClass, slugify } from "../../lib/catalog";
+
+export async function getStaticPaths() {
+  const all = await getCollection("exercises");
+  // Ролик можно не подобрать при разработке (null — заглушка), но на прод без ролика не выкладываем.
+  const noVideo = all.filter(e => !e.data.video).map(e => e.id);
+  if (import.meta.env.PROD && noVideo.length) throw new Error(`Нет ролика: ${noVideo.join(", ")}`);
+  return all.map(e => ({ params: { id: e.id }, props: { ex: e } }));
+}
+const { ex } = Astro.props;
+const e = ex.data;
+const group = groups.find(g => g.id === e.group)!;
+const base = import.meta.env.BASE_URL;
+const v = e.video;
+---
+<Base title={`${e.name}: техника`} description={`${e.name}: как делать по шагам и частые ошибки. Работает ${group.acc} (${e.sub.toLowerCase()}), помогают: ${e.helpers.join(", ").toLowerCase() || "—"}.`}>
+  <div style={`--gc: var(--g-${group.id})`}>
+    <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><a href={`${base}myshcy/${group.slug}/`}>{group.name}</a><span>/</span><a href={`${base}myshcy/${group.slug}/${slugify(e.sub)}/`}>{e.sub}</a><span>/</span><span>{e.name}</span></nav>
+    <h1 data-testid="exercise-title">{e.name}</h1>
+    <div class="tags">
+      <span class="tag">{e.equipment.join(", ")}</span>
+      <span class:list={["tag", levelClass(e.level)]}>{e.level}</span>
+      <span class="tag">{e.sets}</span>
+    </div>
+
+    <div class="exgrid">
+      <div class="main">
+        {v ? (
+          <div class="video" data-id={v.id} data-testid="video">
+            <img src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt="" loading="lazy" width="480" height="360" />
+            <button class="play" type="button" data-testid="video-play" aria-label={`Смотреть ролик: ${v.title}`}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l16 9-16 9z" /></svg></button>
+            <span class="note">{v.channel}{v.lang === "en" && " · 🇬🇧 англ."}</span>
+            <span class="offline">Ролик откроется, когда будет интернет</span>
+          </div>
+        ) : (
+          <div class="video" data-testid="video"><span class="note"><span class="stub">ЗАГЛУШКА</span> · ролик подберём</span></div>
+        )}
+
+        <section class="sect">
+          <h2>Как делать</h2>
+          <ol class="steps" data-testid="steps">{e.steps.map(s => <li>{s}</li>)}</ol>
+        </section>
+        <section class="sect">
+          <h2>Частые ошибки</h2>
+          <ul class="errs" data-testid="errors">{e.errors.map(s => <li>{s}</li>)}</ul>
+        </section>
+      </div>
+
+      <aside class="side">
+        <div class="box">
+          <BodyMap selected={group.id} compact />
+          <div class="mus">
+            <div><i></i>{group.name} · {e.sub.toLowerCase()} — основная</div>
+            {e.helpers.map(h => <div class="sec"><i></i>{h} — помогает</div>)}
+          </div>
+        </div>
+        <div class="box">
+          <dl class="kv">
+            <dt>Оборудование</dt><dd>{e.equipment.join(", ")}</dd>
+            <dt>Уровень</dt><dd>{e.level}</dd>
+            <dt>Подходы</dt><dd>{e.sets}</dd>
+            <dt>Отдых</dt><dd>{e.rest}</dd>
+          </dl>
+        </div>
+        <p class="warn" data-testid="health-warning">Мы не врачи. Есть болезни или травмы — сначала к врачу или тренеру. Тяжёлые веса — только со страховкой.</p>
+      </aside>
+    </div>
+  </div>
+</Base>
+
+<script>
+  // Плеер YouTube грузим только по нажатию: страница открывается быстро и без чужих cookie.
+  document.querySelectorAll<HTMLElement>(".video[data-id]").forEach(box => {
+    box.querySelector(".play")?.addEventListener("click", () => {
+      if (!navigator.onLine) { box.classList.add("is-offline"); return; }
+      const f = document.createElement("iframe");
+      f.src = `https://www.youtube-nocookie.com/embed/${box.dataset.id}?autoplay=1&rel=0`;
+      f.title = "Ролик с техникой";
+      f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      f.allowFullscreen = true;
+      box.replaceChildren(f);
+    });
+  });
+</script>
+
+<style>
+  h1 { margin-bottom: 12px; }
+  .tag { background: var(--surface); }
+  .exgrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-items: start; margin-top: 20px; }
+  @media (min-width: 1024px) {
+    .exgrid { grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 32px; }
+    .side { position: sticky; top: 76px; }
+  }
+  .video { aspect-ratio: 16 / 9; max-width: 100%; border-radius: 20px; background: var(--surface); display: grid; place-items: center; position: relative; overflow: hidden; }
+  .video img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .55; }
+  .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .play { position: relative; width: 72px; height: 72px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; border: 0; cursor: pointer; }
+  .play svg { width: 26px; fill: var(--accent-ink); margin-left: 4px; }
+  .note { position: absolute; left: 14px; bottom: 12px; font: 500 12px var(--f-mono); color: var(--fg); text-shadow: 0 1px 4px #000; }
+  .offline { display: none; position: absolute; top: 12px; left: 14px; font-size: 13px; background: var(--bg); padding: 4px 10px; border-radius: 8px; }
+  .is-offline .offline { display: block; }
+  .sect { margin-top: 28px; }
+  .sect h2 { margin-bottom: 14px; }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: s; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; background: var(--surface); border-radius: 14px; padding: 12px 14px; }
+  .steps li::before { content: counter(s); font: 18px var(--f-display); color: var(--gc); }
+  .errs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .errs li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; }
+  .errs li::before { content: "✕"; color: var(--accent); font-weight: 700; }
+  .side { display: grid; gap: 12px; }
+  .box { background: var(--surface); border-radius: 18px; padding: 16px; }
+  .mus { display: grid; gap: 6px; margin-top: 12px; font-size: 14px; }
+  .mus div { display: flex; align-items: center; gap: 8px; }
+  .mus i { width: 10px; height: 10px; border-radius: 50%; background: var(--gc); flex: none; }
+  .mus .sec i { background: transparent; box-shadow: inset 0 0 0 2px var(--muted); }
+  .kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 14px; margin: 0; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-weight: 600; }
+  .warn { font-size: 13px; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; margin: 0; }
+</style>

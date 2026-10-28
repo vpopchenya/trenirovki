@@ -1,8 +1,11 @@
 ---
 import Base from "../layouts/Base.astro";
 import BodyMap from "../components/BodyMap.astro";
+import { getCollection } from "astro:content";
 import groups from "../data/groups.json";
 
+const all = await getCollection("exercises");
+const count = (id: string) => all.filter(e => e.data.group === id).length;
 const base = import.meta.env.BASE_URL;
 const first = groups[0];
 ---
@@ -23,7 +26,7 @@ const first = groups[0];
       <nav class="groups" aria-label="Группы мышц">
         {groups.map(g => (
           <a class:list={["gcard", { sel: g.id === first.id }]} style={`--gc: var(--g-${g.id})`} href={`${base}myshcy/${g.slug}/`} data-g={g.id} data-testid={`group-${g.id}`}>
-            <b>{g.name}</b><span>{g.subs.join(" · ")}</span>
+            <b>{g.name}</b><span>{g.subs.join(" · ")}</span><em>{count(g.id) ? `${count(g.id)} упр.` : "скоро"}</em>
           </a>
         ))}
       </nav>
@@ -73,6 +76,7 @@ const first = groups[0];
   .gcard::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--gc); }
   .gcard b { font-size: 16px; }
   .gcard span { color: var(--muted); font-size: 12px; line-height: 1.4; }
+  .gcard em { font: 500 11px var(--f-mono); font-style: normal; color: var(--muted); margin-top: 4px; }
   .gcard.sel { border-color: var(--gc); }
   .basics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
   .basics div { background: var(--surface); border-radius: 16px; padding: 16px; display: grid; gap: 2px; justify-items: start; }

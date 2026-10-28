@@ -1,0 +1,108 @@
+---
+// Страница группы мышц и страница её мелкой группы — одна вёрстка. Мелкие группы — ссылки на свои страницы
+// (они нужны для поиска: «упражнения на верх груди»), оборудование фильтруется прямо на странице.
+import Base from "../layouts/Base.astro";
+import ThumbDefs from "./ThumbDefs.astro";
+import { exercisesOf, subsWithExercises, slugify, plural, levelClass, type Group } from "../lib/catalog";
+
+interface Props { group: Group; sub?: string }
+const { group, sub } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const groupUrl = `${base}myshcy/${group.slug}/`;
+const list = (await exercisesOf(group.id)).filter(e => !sub || e.data.sub === sub);
+const subs = await subsWithExercises(group);
+const equipment = [...new Set(list.flatMap(e => e.data.equipment))];
+
+const title = sub ? `Упражнения на ${group.acc}: ${sub.toLowerCase()}` : `Упражнения на ${group.acc}`;
+const description = sub
+  ? `${sub} — упражнения на ${group.acc} в зале. Техника по шагам и частые ошибки.`
+  : `Упражнения на ${group.acc} в зале: ${group.subs.join(", ").toLowerCase()}. Техника по шагам и частые ошибки.`;
+---
+<Base title={title} description={description}>
+  <div style={`--gc: var(--g-${group.id})`}>
+    <nav class="crumbs" aria-label="Путь">
+      <a href={base}>Каталог</a><span>/</span>
+      {sub ? <><a href={groupUrl}>{group.name}</a><span>/</span><span>{sub}</span></> : <span>{group.name}</span>}
+    </nav>
+    <div class="ghead">
+      <span class="plate" aria-hidden="true"></span>
+      <div>
+        <h1 data-testid="group-title">{sub ? `${group.name}: ${sub.toLowerCase()}` : group.name}</h1>
+        <p class="eyebrow">{list.length > 0 && `${list.length} ${plural(list.length)} · `}{group.subs.join(" · ")}</p>
+      </div>
+    </div>
+
+    {list.length === 0 ? (
+      <p class="lead empty" data-testid="group-empty">Упражнения на эту группу скоро появятся.</p>
+    ) : (
+      <>
+        <ThumbDefs group={group} />
+        <div class="filters">
+          {subs.length > 1 && (
+            <nav class="chips" aria-label="Мелкая группа">
+              <a class="chip" href={groupUrl} aria-current={!sub ? "page" : undefined} data-testid="filter-sub-all">Все</a>
+              {subs.map(s => <a class="chip" href={`${groupUrl}${slugify(s)}/`} aria-current={s === sub ? "page" : undefined} data-testid={`filter-sub-${slugify(s)}`}>{s}</a>)}
+            </nav>
+          )}
+          {equipment.length > 1 && (
+            <div class="chips" data-f="eq" role="group" aria-label="Оборудование">
+              <button class="chip" type="button" aria-pressed="true" data-v="" data-testid="filter-eq-all">Любое</button>
+              {equipment.map(s => <button class="chip" type="button" aria-pressed="false" data-v={s} data-testid={`filter-eq-${slugify(s)}`}>{s}</button>)}
+            </div>
+          )}
+        </div>
+        <div class="exlist">
+          {list.map(e => (
+            <a class="ex" href={`${base}uprazhneniya/${e.id}/`} data-eq={e.data.equipment.join("|")} data-ex={e.id} data-testid="exercise-card">
+              <svg class="thumb" viewBox={group.thumb} aria-hidden="true"><use href="#thumb-body" /></svg>
+              <span>
+                <b>{e.data.name}</b>
+                <span class="tags">
+                  <span class="tag">{e.data.sub}</span>
+                  <span class="tag">{e.data.equipment.join(", ")}</span>
+                  <span class:list={["tag", levelClass(e.data.level)]}>{e.data.level}</span>
+                </span>
+              </span>
+            </a>
+          ))}
+        </div>
+        <p class="lead nothing" data-testid="filter-empty" hidden>С таким оборудованием упражнений нет. Нажми «Любое».</p>
+      </>
+    )}
+  </div>
+</Base>
+
+<script>
+  const cards = document.querySelectorAll<HTMLElement>(".ex");
+  const nothing = document.querySelector<HTMLElement>(".nothing");
+  document.querySelectorAll<HTMLElement>('[data-f="eq"]').forEach(row => row.addEventListener("click", ev => {
+    const b = (ev.target as Element).closest<HTMLButtonElement>(".chip");
+    if (!b) return;
+    const eq = b.dataset.v!;
+    row.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    let shown = 0;
+    cards.forEach(c => {
+      c.hidden = !!eq && !c.dataset.eq!.split("|").includes(eq);
+      if (!c.hidden) shown++;
+    });
+    if (nothing) nothing.hidden = shown > 0;
+  }));
+</script>
+
+<style>
+  .ghead { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .ghead .eyebrow { margin: 6px 0 0; }
+  .plate { width: 56px; height: 56px; border-radius: 50%; flex: none; background: var(--gc);
+    box-shadow: inset 0 0 0 9px color-mix(in srgb, var(--gc) 70%, #000), inset 0 0 0 20px var(--gc), inset 0 0 0 24px var(--bg); }
+  .empty, .nothing { margin-top: 24px; }
+  .filters { display: grid; gap: 10px; margin: 24px 0 20px; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .chip { flex: none; display: inline-flex; align-items: center; font-weight: 600; font-size: 14px; text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0 14px; min-height: 40px; cursor: pointer; }
+  .chip[aria-pressed="true"], .chip[aria-current="page"] { border-color: var(--gc); background: color-mix(in srgb, var(--gc) 16%, var(--surface)); }
+  .exlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+  .ex { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; background: var(--surface); border-radius: 18px; padding: 12px; text-decoration: none; border: 1px solid transparent; }
+  @media (hover: hover) { .ex:hover { border-color: var(--line); } }
+  .thumb { width: 72px; height: 72px; border-radius: 12px; background: var(--bg); display: block; }
+  .ex b { display: block; font-size: 16px; line-height: 1.3; }
+  .ex .tags { margin-top: 6px; }
+</style>
