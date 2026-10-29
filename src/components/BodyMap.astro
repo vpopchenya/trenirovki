@@ -32,6 +32,7 @@ const figures = compact
     <svg class="fig" viewBox={f.viewBox} data-sex={f.sex} data-side={f.side} hidden={!(f.sex === "m" && f.side === side)}
          data-testid={`figure-${f.sex}-${f.side}`} role="img" aria-label={compact ? `Схема тела: работает ${groupName}` : "Схема тела: нажми на мышцу"}>
       <path class="outline" d={f.outline} />
+      {clickable && f.parts.map(([g, ds]) => g && (ds as string[]).map(d => <path class="hit" data-g={g} d={d} />))}
       {f.parts.map(([g, ds]) => (ds as string[]).map(d => g
         ? <path class:list={["m", { sel: g === selected }]} data-g={g} data-testid={`muscle-${g}`} style={`--gc: var(--g-${g})`} d={d} />
         : <path class="base" d={d} />))}
@@ -60,7 +61,8 @@ const figures = compact
     // Спрятана в разметке, чтобы не мигала у тех, кто уже нажимал.
     try { if (hint && !localStorage.getItem(HINT_KEY)) hint.hidden = false; } catch {}
     map.addEventListener("click", ev => {
-      const m = (ev.target as Element).closest<SVGElement>(".m");
+      // Ловим и саму мышцу, и невидимую полосу вокруг неё (.hit) — по тонким рукам легко промахнуться.
+      const m = (ev.target as Element).closest<SVGElement>("[data-g]");
       if (!m) return;
       const g = m.dataset.g!;
       map.querySelectorAll<SVGElement>(".m").forEach(p => p.classList.toggle("sel", p.dataset.g === g));
@@ -77,14 +79,25 @@ const figures = compact
   .seg { display: flex; gap: 4px; background: var(--bg); border-radius: 999px; padding: 4px; }
   .seg button { font-weight: 700; font-size: 13px; color: var(--muted); background: transparent; border: 0; border-radius: 999px; padding: 0 16px; min-height: 40px; cursor: pointer; }
   .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
-  .fig { display: block; width: 100%; max-width: 100%; height: clamp(320px, 52vh, 520px); margin-top: 8px; }
+  .fig { display: block; width: 100%; max-width: 100%; height: clamp(380px, 64vh, 620px); margin-top: 8px; }
   .compact .fig { height: 240px; margin-top: 0; }
   .outline { fill: var(--skin); stroke: var(--line); stroke-width: 2; }
   .m { fill: var(--muscle); stroke: var(--skin); stroke-width: 1; transition: fill .15s; }
+  /* Невидимая полоса вокруг мышцы ловит нажатие (40 единиц схемы ≈ 7 px с каждой стороны на телефоне). Лежит под мышцами, так что сама мышца главнее соседней полосы. */
+  .hit { fill: none; stroke: transparent; stroke-width: 40; stroke-linejoin: round; pointer-events: stroke; cursor: pointer; }
+  /* На главной у каждой группы бледный оттенок её цвета — видно, где кончается одна группа и начинается другая. */
+  /* :not(.sel) — иначе Astro добавляет к правилу лишний атрибут, и оно перебивает цвет выбранной. */
   [data-clickable] .m { cursor: pointer; }
+  [data-clickable] .m:not(.sel) { fill: color-mix(in srgb, var(--gc) 20%, var(--muscle)); }
   /* Только там, где есть мышь: на телефоне hover «залипает» и перекрывает цвет выбранной мышцы. */
-  @media (hover: hover) { [data-clickable] .m:not(.sel):hover { fill: var(--muscle-hi); } }
-  .m.sel { fill: var(--gc); }
+  @media (hover: hover) { [data-clickable] .m:not(.sel):hover { fill: color-mix(in srgb, var(--gc) 35%, var(--muscle)); } }
+  /* Выбранная — приглушённый цвет группы, а не чистый цвет блина: тот слишком яркий на тёмном. */
+  .m.sel { fill: color-mix(in srgb, var(--gc) 72%, var(--muscle)); }
+  /* Старые iPhone (iOS 15) не знают color-mix: без запасного цвета мышцы стали бы чёрными. */
+  @supports not (color: color-mix(in srgb, red 50%, blue)) {
+    [data-clickable] .m:not(.sel) { fill: var(--muscle); }
+    .m.sel { fill: var(--gc); }
+  }
   .base { fill: var(--muscle); opacity: .55; }
   /* Тихая подсказка для новичка — до первого нажатия на мышцу. */
   .bodymap { position: relative; }

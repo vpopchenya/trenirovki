@@ -12,7 +12,7 @@
   --bg: #121417; --surface: #1c1f24; --surface2: #23272d; --fg: #eef0f2; --text: #e2e5e9; --fg2: #c9cdd3; --muted: #8a9099; --line: #2b2f36;
   --accent: #ff7a1a; --accent-ink: #121417;
   --paper: #f1f2f4; --paper-ink: #4a505a; /* светлая капсула нижнего меню */
-  --muscle: #3c424c; --muscle-hi: #5a6370; --skin: #262a31;
+  --muscle: #3c424c; --skin: #262a31;
   --g-chest: #e5322d; --g-back: #2f6fe0; --g-shoulders: #f2c230; --g-arms: #e9ecef; --g-legs: #2e9e4f; --g-glutes: #ff7a1a; --g-core: #9aa3ad;
   /* Цвет текста поверх цвета группы (цифры в кружках): на тёмных — белый, на светлых — тёмный. */
   --gi-chest: #fff; --gi-back: #fff; --gi-shoulders: #121417; --gi-arms: #121417; --gi-legs: #121417; --gi-glutes: #121417; --gi-core: #121417;
