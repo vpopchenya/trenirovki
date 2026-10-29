@@ -7,6 +7,7 @@ import MuscleIcon from "../components/MuscleIcon.astro";
 import { getCollection } from "astro:content";
 import groups from "../data/groups.json";
 import { plural } from "../lib/catalog";
+import { subsText } from "../lib/groups";
 
 const all = await getCollection("exercises");
 const count = (id: string) => all.filter(e => e.data.group === id).length;
@@ -23,7 +24,7 @@ const first = groups[0];
     <section class="map" aria-label="Выбор мышцы">
       <BodyMap selected={first.id} clickable />
       <div class="pick" data-testid="picked-group" style={`--gc: var(--g-${first.id})`}>
-        <span><b class="pn">{first.name}</b><small class="ps">{first.subs.join(" · ")}</small></span>
+        <span><b class="pn">{first.name}</b><small class="ps">{subsText(first)}</small></span>
         <a class="btn main" href={`${base}myshcy/${first.slug}/`}>Упражнения →</a>
       </div>
     </section>
@@ -37,7 +38,7 @@ const first = groups[0];
           <a class:list={["gcard", { sel: g.id === first.id }]} style={`--gc: var(--g-${g.id}); --gi: var(--gi-${g.id})`} href={`${base}myshcy/${g.slug}/`} data-g={g.id} data-testid={`group-${g.id}`}>
             <span class="disc"><MuscleIcon group={g} class="gmuscle" /></span>
             {count(g.id) > 0 && <span class="big" aria-hidden="true">{count(g.id)}</span>}
-            <b>{g.name}</b><span class="subs">{g.subs.join(" · ")}</span><em>{count(g.id) ? `${count(g.id)} ${plural(count(g.id))}` : "скоро"}</em>
+            <b>{g.name}</b><span class="subs">{subsText(g)}</span><em>{count(g.id) ? `${count(g.id)} ${plural(count(g.id))}` : "скоро"}</em>
           </a>
         ))}
       </nav>
@@ -54,6 +55,7 @@ const first = groups[0];
 
 <script>
   import groups from "../data/groups.json";
+  import { subsText } from "../lib/groups";
   const byId = Object.fromEntries(groups.map(g => [g.id, g]));
   const base = import.meta.env.BASE_URL;
   const pick = document.querySelector<HTMLElement>(".pick")!;
@@ -62,7 +64,7 @@ const first = groups[0];
     const g = byId[(ev as CustomEvent<string>).detail];
     pick.style.setProperty("--gc", `var(--g-${g.id})`);
     pick.querySelector(".pn")!.textContent = g.name;
-    pick.querySelector(".ps")!.textContent = g.subs.join(" · ");
+    pick.querySelector(".ps")!.textContent = subsText(g);
     pick.querySelector("a")!.href = `${base}myshcy/${g.slug}/`;
     document.querySelectorAll<HTMLElement>(".gcard").forEach(c => c.classList.toggle("sel", c.dataset.g === g.id));
   });
@@ -79,9 +81,12 @@ const first = groups[0];
     .home { grid-template-columns: minmax(0, 1fr) minmax(0, 460px); grid-template-areas: "title map" "left map"; column-gap: 48px; }
     .map { position: sticky; top: 76px; }
   }
-  .pick { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; background: var(--bg); border-radius: 16px; padding: 12px 14px; border-left: 6px solid var(--gc); }
-  .pick b { font: 800 19px var(--f-display); letter-spacing: -.02em; display: block; }
-  .pick small { color: var(--muted); font-size: 12px; }
+  /* Мелкие группы — отдельной строкой на всю ширину: рядом с кнопкой они ломались по одному слову. */
+  .pick { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; margin-top: 8px; background: var(--bg); border-radius: 16px; padding: 12px 14px; border-left: 6px solid var(--gc); }
+  .pick > span { display: contents; }
+  .pick b { font: 800 19px var(--f-display); letter-spacing: -.02em; }
+  .pick .btn { grid-row: 1; grid-column: 2; }
+  .pick small { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
   /* Группы — плитки целиком в цвете блина: мышца в тёмном «диске», крупная бледная цифра — сколько упражнений. */
   .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
   .gcard { display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; min-height: 150px; background: var(--gc); color: var(--gi);

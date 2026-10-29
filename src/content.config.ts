@@ -5,6 +5,9 @@ import groups from "./data/groups.json";
 
 const groupIds = groups.map(g => g.id) as [string, ...string[]];
 const subsOf = Object.fromEntries(groups.map(g => [g.id, g.subs]));
+// Опечатка в backSubs молча показала бы фигуру не той стороной — пусть лучше падает сборка.
+for (const g of groups) for (const s of g.backSubs ?? [])
+  if (!g.subs.includes(s)) throw new Error(`groups.json: у «${g.name}» в backSubs нет такой мелкой группы: «${s}»`);
 
 // Одно упражнение — один файл src/content/exercises/<адрес>.json. Имя файла становится адресом страницы.
 // Схема строгая: нет техники, ошибок или мелкой группы не из своей группы — сборка падает.

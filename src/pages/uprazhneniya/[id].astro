@@ -4,6 +4,7 @@ import Base from "../../layouts/Base.astro";
 import BodyMap from "../../components/BodyMap.astro";
 import groups from "../../data/groups.json";
 import { levelClass, slugify, breadcrumbs } from "../../lib/catalog";
+import { sideOf } from "../../lib/groups";
 
 export async function getStaticPaths() {
   const all = await getCollection("exercises");
@@ -62,7 +63,7 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
 
       <aside class="side">
         <div class="box">
-          <BodyMap selected={group.id} compact />
+          <BodyMap selected={group.id} side={sideOf(group, e.sub)} compact />
           <div class="mus">
             <div><i></i>{group.name} · {e.sub.toLowerCase()} — основная</div>
             {e.helpers.map(h => <div class="sec"><i></i>{h} — помогает</div>)}

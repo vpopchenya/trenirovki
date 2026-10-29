@@ -8,10 +8,11 @@ interface Props {
   selected: string;   // id группы, которая подсвечена
   clickable?: boolean; // нажатие на мышцу выбирает группу
   compact?: boolean;   // одна мужская фигура нужной стороны, без переключателей (страница упражнения)
+  side?: "front" | "back"; // какой стороной показать; по умолчанию — сторона группы из groups.json
 }
 const { selected, clickable = false, compact = false } = Astro.props;
 const group = groups.find(g => g.id === selected);
-const side = (group?.side ?? "front") as "front" | "back";
+const side = Astro.props.side ?? (group?.side ?? "front") as "front" | "back";
 const groupName = group?.name.toLowerCase() ?? "";
 const figures = compact
   ? [{ sex: "m" as const, side, ...body.m[side] }]
