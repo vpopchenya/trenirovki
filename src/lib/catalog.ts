@@ -39,6 +39,24 @@ export const breadcrumbs = (site: URL, items: [string, string][]) => ({
   itemListElement: items.map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: new URL(path, site).href })),
 });
 
+/** Разметка статьи для поисковиков. */
+export const articleLd = (site: URL, a: { title: string; description: string; published: Date; path: string }) => ({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: a.title,
+  description: a.description,
+  inLanguage: "ru",
+  datePublished: a.published.toISOString().slice(0, 10),
+  image: new URL(`${import.meta.env.BASE_URL}og.png`, site).href,
+  mainEntityOfPage: new URL(a.path, site).href,
+  author: { "@type": "Organization", name: "Карманный тренер", url: new URL(import.meta.env.BASE_URL, site).href },
+});
+
+/** Статьи «Основ» по порядку. */
+export async function allBasics() {
+  return (await getCollection("osnovy")).sort((a, b) => a.data.order - b.data.order);
+}
+
 /** Что бывает дома и в дороге: по этому списку работает фильтр «Без зала». */
 export const HOME_EQUIPMENT = ["Резинка", "Свой вес"];
 export const isHome = (equipment: string[]) => equipment.every(x => HOME_EQUIPMENT.includes(x));
@@ -56,8 +74,9 @@ export const HOME_PROGRESS_RULE = "Сделал все подходы на ве�
 export const NO_BAND_NOTE = "Нет резинки? На странице каждого такого упражнения написано, чем его заменить.";
 export const REST_RULE = "Между тренировками — минимум день отдыха: мышцы растут и восстанавливаются, пока ты отдыхаешь.";
 export const HEAVY_WARNING = "Тяжёлые веса — только со страховкой.";
-/** У всех программ на похудение: на шаге «Основы» сюда добавится ссылка на питание. */
+/** У всех программ на похудение. Сразу за текстом страница ставит ссылку на статью о питании. */
 export const FAT_LOSS_NOTE = "Честно: сами тренировки вес почти не снижают, результат даёт питание. Программа помогает сохранить мышцы, пока худеешь.";
+export const FAT_LOSS_LINK = "Как питаться →";
 
 /** Ключ localStorage: имя файла выбранной программы. Хранится только на телефоне, на сервер не уходит. */
 export const MY_PROGRAM_KEY = "my-program";

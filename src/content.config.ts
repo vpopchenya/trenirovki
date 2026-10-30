@@ -68,4 +68,19 @@ const programs = defineCollection({
   }).refine(p => p.days.length === p.daysPerWeek, { message: "days: число дней должно совпадать с daysPerWeek" }),
 });
 
-export const collections = { exercises, programs };
+// Одна статья «Основ» — один файл src/content/osnovy/<адрес>.md. Цифры в тексте — только с источником, поэтому
+// список источников обязателен: без него статья не соберётся.
+const osnovy = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/osnovy" }),
+  schema: z.object({
+    name: z.string().min(3),               // короткое название для карточек и пути: «Сон»
+    title: z.string().min(3),              // заголовок статьи
+    description: z.string().min(20),       // для поиска и подписи под заголовком
+    short: z.string().min(10),             // подпись на карточке
+    published: z.coerce.date(),
+    sources: z.array(z.object({ title: z.string().min(3), url: z.url() })).min(1),
+    order: z.number().int(),               // порядок карточек
+  }),
+});
+
+export const collections = { exercises, programs, osnovy };

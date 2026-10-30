@@ -1,0 +1,22 @@
+---
+// Карточки статей «Основ»: на главной и на странице раздела. Подписи — из файлов статей.
+import { allBasics } from "../lib/catalog";
+
+const base = import.meta.env.BASE_URL;
+const articles = await allBasics();
+---
+<nav class="basics" aria-label="Статьи раздела «Основы»">
+  {articles.map(a => (
+    <a href={`${base}osnovy/${a.id}/`} data-testid={`basics-${a.id}`}><b>{a.data.name}</b><span>{a.data.short}</span></a>
+  ))}
+</nav>
+
+<style>
+  .basics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  .basics a { background: var(--surface); border-radius: 22px; padding: 16px; display: grid; gap: 2px; text-decoration: none; transition: transform .1s; -webkit-tap-highlight-color: transparent; }
+  .basics a:active { transform: scale(.97); }
+  .basics b { font: 800 17px var(--f-display); letter-spacing: -.02em; }
+  .basics span { color: var(--muted); font-size: 14px; }
+  @media (hover: hover) { .basics a:hover { background: var(--surface2); } }
+  @media (prefers-reduced-motion: reduce) { .basics a { transition: none; } }
+</style>

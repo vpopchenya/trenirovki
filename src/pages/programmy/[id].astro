@@ -1,7 +1,8 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Barbell from "../../components/Barbell.astro";
-import { allPrograms, breadcrumbs, plural, pluralWeeks, BAND_SAFETY, FAT_LOSS_NOTE, HEALTH_WARNING, HEAVY_WARNING, HOME_PROGRESS_RULE, MY_PROGRAM_KEY, NO_BAND_NOTE, PROGRESS_RULE, REST_RULE } from "../../lib/catalog";
+import HealthWarning from "../../components/HealthWarning.astro";
+import { allPrograms, breadcrumbs, plural, pluralWeeks, BAND_SAFETY, FAT_LOSS_LINK, FAT_LOSS_NOTE, HEAVY_WARNING, HOME_PROGRESS_RULE, MY_PROGRAM_KEY, NO_BAND_NOTE, PROGRESS_RULE, REST_RULE } from "../../lib/catalog";
 
 export async function getStaticPaths() {
   return (await allPrograms()).map(p => ({ params: { id: p.id }, props: { p } }));
@@ -50,7 +51,9 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
     show();
     addEventListener("pageshow", show);
   </script>
-  {p.goal === "похудение" && <p class="how" data-testid="fat-loss-note">{FAT_LOSS_NOTE}</p>}
+  {p.goal === "похудение" && (
+    <p class="how" data-testid="fat-loss-note">{FAT_LOSS_NOTE} <a href={`${base}osnovy/pitanie/`} data-testid="fat-loss-link">{FAT_LOSS_LINK}</a></p>
+  )}
   {p.home && <p class="how" data-testid="no-band-note">{NO_BAND_NOTE}</p>}
 
   <div class="days">
@@ -93,7 +96,7 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
     <h2>Когда тренироваться</h2>
     <p>{REST_RULE}</p>
   </section>
-  <p class="warn" data-testid="health-warning">{HEALTH_WARNING} {p.home ? `${BAND_SAFETY}.` : HEAVY_WARNING}</p>
+  <HealthWarning>{p.home ? `${BAND_SAFETY}.` : HEAVY_WARNING}</HealthWarning>
 </Base>
 
 <style>
@@ -130,5 +133,6 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
   .ex small { display: block; font: 500 15px var(--f-body); color: var(--muted); }
   .how { background: var(--surface); border-radius: 22px; padding: 16px; margin-top: 12px; max-width: 70ch; }
   .how p { margin: 6px 0 0; color: var(--text); }
-  .warn { font-size: 13px; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; margin: 12px 0 0; max-width: 70ch; }
+  .how a { display: inline-block; padding: 6px 0; font-weight: 800; color: var(--accent); text-underline-offset: 3px; white-space: nowrap; }
+  .how + :global(.warn) { margin-top: 12px; max-width: 70ch; }
 </style>

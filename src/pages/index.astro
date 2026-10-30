@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import BasicsCards from "../components/BasicsCards.astro";
 import BodyMap from "../components/BodyMap.astro";
 import InstallCard from "../components/InstallCard.astro";
 import BodyDefs from "../components/BodyDefs.astro";
@@ -69,10 +70,7 @@ const programNames = Object.fromEntries((await allPrograms()).map(p => [p.id, p.
       </nav>
       <div>
         <p class="eyebrow">Основы</p>
-        <div class="basics">
-          <div><b>Сон</b><span>Сколько спать, чтобы росли мышцы</span><span class="soon">скоро</span></div>
-          <div><b>Питание</b><span>Белок, калории, вода — без диет</span><span class="soon">скоро</span></div>
-        </div>
+        <BasicsCards />
       </div>
     </div>
   </div>
@@ -133,8 +131,4 @@ const programNames = Object.fromEntries((await allPrograms()).map(p => [p.id, p.
   @media (max-width: 559px) { .gcard:last-child:nth-child(odd) { grid-column: 1 / -1; min-height: 120px; } }
   .gcard.sel { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--gc); }
   @media (prefers-reduced-motion: reduce) { .gcard { transition: none; } }
-  .basics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
-  .basics div { background: var(--surface); border-radius: 22px; padding: 16px; display: grid; gap: 2px; justify-items: start; }
-  .basics span:not(.soon) { color: var(--muted); font-size: 14px; }
-  .basics .soon { margin: 6px 0 0; }
 </style>

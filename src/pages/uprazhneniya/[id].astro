@@ -3,7 +3,8 @@ import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import BodyMap from "../../components/BodyMap.astro";
 import groups from "../../data/groups.json";
-import { levelClass, slugify, breadcrumbs, BAND_SAFETY, HEALTH_WARNING, HEAVY_WARNING } from "../../lib/catalog";
+import HealthWarning from "../../components/HealthWarning.astro";
+import { levelClass, slugify, breadcrumbs, BAND_SAFETY, HEAVY_WARNING } from "../../lib/catalog";
 import { sideOf } from "../../lib/groups";
 
 export async function getStaticPaths() {
@@ -84,7 +85,7 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
             <dt>Отдых</dt><dd>обычно {e.rest}</dd>
           </dl>
         </div>
-        <p class="warn" data-testid="health-warning">{HEALTH_WARNING} {HEAVY_WARNING}</p>
+        <HealthWarning>{HEAVY_WARNING}</HealthWarning>
       </aside>
     </div>
   </div>
@@ -177,5 +178,4 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
   .kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 14px; margin: 0; }
   .kv dt { color: var(--muted); }
   .kv dd { margin: 0; font-weight: 700; }
-  .warn { font-size: 13px; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; margin: 0; }
 </style>
