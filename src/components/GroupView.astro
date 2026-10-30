@@ -4,7 +4,7 @@
 import Base from "../layouts/Base.astro";
 import BodyDefs from "./BodyDefs.astro";
 import MuscleIcon from "./MuscleIcon.astro";
-import { exercisesOf, subsWithExercises, slugify, plural, levelClass, breadcrumbs, type Group, type Side } from "../lib/catalog";
+import { exercisesOf, subsWithExercises, slugify, plural, levelClass, breadcrumbs, isHome, type Group, type Side } from "../lib/catalog";
 
 interface Props { group: Group; sub?: string }
 const { group, sub } = Astro.props;
@@ -13,11 +13,16 @@ const groupUrl = `${base}myshcy/${group.slug}/`;
 const list = (await exercisesOf(group.id)).filter(e => !sub || e.data.sub === sub);
 const subs = await subsWithExercises(group);
 const equipment = [...new Set(list.flatMap(e => e.data.equipment))];
+// «Без зала» нужен, только когда он что-то отсекает: есть и домашние упражнения, и зальные.
+const homeCount = list.filter(e => isHome(e.data.equipment)).length;
+const homeChip = homeCount > 0 && homeCount < list.length;
 
+// «и дома» в описании для поиска — только там, где домашние упражнения правда есть.
+const where = homeCount > 0 ? "в зале и дома" : "в зале";
 const title = sub ? `Упражнения на ${group.acc}: ${sub.toLowerCase()}` : `Упражнения на ${group.acc}`;
 const description = sub
-  ? `${sub} — упражнения на ${group.acc} в зале. Техника по шагам и частые ошибки.`
-  : `Упражнения на ${group.acc} в зале: ${group.subs.join(", ").toLowerCase()}. Техника по шагам и частые ошибки.`;
+  ? `${sub} — упражнения на ${group.acc} ${where}. Техника по шагам и частые ошибки.`
+  : `Упражнения на ${group.acc} ${where}: ${group.subs.join(", ").toLowerCase()}. Техника по шагам и частые ошибки.`;
 ---
 <Base title={title} description={description} back={sub ? { href: groupUrl, label: group.name, group: group.id } : { href: base, label: "Каталог" }} jsonLd={breadcrumbs(Astro.site!, [
   ["Каталог", base], [group.name, groupUrl], ...(sub ? [[sub, `${groupUrl}${slugify(sub)}/`] as [string, string]] : []),
@@ -50,13 +55,14 @@ const description = sub
           {equipment.length > 1 && (
             <div class="chips" data-f="eq" role="group" aria-label="Оборудование">
               <button class="chip" type="button" aria-pressed="true" data-v="" data-testid="filter-eq-all">Любое</button>
+              {homeChip && <button class="chip" type="button" aria-pressed="false" data-v="home" data-testid="filter-eq-home">🏠 Без зала</button>}
               {equipment.map(s => <button class="chip" type="button" aria-pressed="false" data-v={s} data-testid={`filter-eq-${slugify(s)}`}>{s}</button>)}
             </div>
           )}
         </div>
         <div class="exlist">
           {list.map(e => (
-            <a class="ex" href={`${base}uprazhneniya/${e.id}/`} data-eq={e.data.equipment.join("|")} data-ex={e.id} data-testid="exercise-card">
+            <a class="ex" href={`${base}uprazhneniya/${e.id}/`} data-eq={e.data.equipment.join("|")} data-home={String(isHome(e.data.equipment))} data-ex={e.id} data-testid="exercise-card">
               <MuscleIcon group={group} class="thumb" />
               <span>
                 <b>{e.data.name}</b>
@@ -85,7 +91,7 @@ const description = sub
     row.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
     let shown = 0;
     cards.forEach(c => {
-      c.hidden = !!eq && !c.dataset.eq!.split("|").includes(eq);
+      c.hidden = eq === "home" ? c.dataset.home !== "true" : !!eq && !c.dataset.eq!.split("|").includes(eq);
       if (!c.hidden) shown++;
     });
     if (nothing) nothing.hidden = shown > 0;

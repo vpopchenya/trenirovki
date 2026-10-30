@@ -18,7 +18,9 @@ const exercises = defineCollection({
     group: z.enum(groupIds),
     sub: z.string(),                       // мелкая группа, которую грузит сильнее всего
     helpers: z.array(z.string()).default([]), // какие мышцы помогают
-    equipment: z.array(z.enum(["Штанга", "Гантели", "Скамья", "Турник", "Брусья", "Свой вес"])).min(1),
+    equipment: z.array(z.enum(["Штанга", "Гантели", "Скамья", "Турник", "Брусья", "Свой вес", "Резинка"])).min(1),
+    // Как сделать то же без резинки — у тех, кто только начинает дома, её часто нет.
+    noBand: z.string().min(10).optional(),
     level: z.enum(["новичок", "опытный"]),
     sets: z.string(),                      // «3–4 × 6–12»
     rest: z.string(),                      // «1,5–3 мин»
@@ -34,7 +36,9 @@ const exercises = defineCollection({
       lang: z.enum(["ru", "en"]),
     })).min(1).max(3),
     order: z.number().int(),               // порядок в списке группы
-  }).refine(e => subsOf[e.group].includes(e.sub), { message: "sub: такой мелкой группы нет в groups.json у этой группы" }),
+  }).refine(e => subsOf[e.group].includes(e.sub), { message: "sub: такой мелкой группы нет в groups.json у этой группы" })
+    // Замена резинке нужна ровно тем, кому нужна резинка: забыли или поставили штанге — пусть падает сборка.
+    .refine(e => e.equipment.includes("Резинка") === !!e.noBand, { message: "noBand: нужен у упражнений с резинкой и только у них" }),
 });
 
 export const collections = { exercises };

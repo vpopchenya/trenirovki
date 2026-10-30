@@ -35,4 +35,10 @@ export const breadcrumbs = (site: URL, items: [string, string][]) => ({
   itemListElement: items.map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: new URL(path, site).href })),
 });
 
+/** Что бывает дома и в дороге: по этому списку работает фильтр «Без зала». */
+export const HOME_EQUIPMENT = ["Резинка", "Свой вес"];
+export const isHome = (equipment: string[]) => equipment.every(x => HOME_EQUIPMENT.includes(x));
+/** Общая для всех упражнений с резинкой ошибка: страница добавляет её сама, в файлах упражнений не повторяем. */
+export const BAND_SAFETY = "Плохо закреплённая или надорванная резинка — может сорваться и ударить. Перед подходом проверь узел и саму резинку";
+
 export const levelClass = (level: string) => (level === "новичок" ? "lvl1" : "lvl2");

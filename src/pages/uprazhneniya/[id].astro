@@ -3,7 +3,7 @@ import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import BodyMap from "../../components/BodyMap.astro";
 import groups from "../../data/groups.json";
-import { levelClass, slugify, breadcrumbs } from "../../lib/catalog";
+import { levelClass, slugify, breadcrumbs, BAND_SAFETY } from "../../lib/catalog";
 import { sideOf } from "../../lib/groups";
 
 export async function getStaticPaths() {
@@ -15,6 +15,7 @@ const e = ex.data;
 const group = groups.find(g => g.id === e.group)!;
 const base = import.meta.env.BASE_URL;
 const [v] = e.videos;
+const errors = e.equipment.includes("Резинка") ? [...e.errors, BAND_SAFETY] : e.errors;
 // Последнее слово названия — цветом группы («Жим штанги <лёжа>»), чтобы заголовок был живее.
 const cut = e.name.lastIndexOf(" ");
 const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)] : ["", e.name];
@@ -55,9 +56,15 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
           <h2>Как делать</h2>
           <ol class="steps" data-testid="steps">{e.steps.map(s => <li>{s}</li>)}</ol>
         </section>
+        {e.noBand && (
+          <section class="sect">
+            <h2>Нет резинки?</h2>
+            <p class="noband" data-testid="no-band">{e.noBand}</p>
+          </section>
+        )}
         <section class="sect">
           <h2>Частые ошибки</h2>
-          <ul class="errs" data-testid="errors">{e.errors.map(s => <li>{s}</li>)}</ul>
+          <ul class="errs" data-testid="errors">{errors.map(s => <li>{s}</li>)}</ul>
         </section>
       </div>
 
@@ -160,6 +167,7 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
     border-radius: 18px; padding: 10px 12px; color: var(--fg); }
   .errs li::before { content: "!"; width: 24px; height: 24px; border-radius: 50%; background: var(--g-chest); color: #fff; font-weight: 800;
     display: grid; place-items: center; font-size: 14px; }
+  .noband { margin: 0; background: var(--surface); border-radius: 20px; padding: 12px 14px; color: var(--fg); font-size: 16.5px; }
   .side { display: grid; gap: 12px; }
   .box { background: var(--surface); border-radius: 24px; padding: 16px; }
   .mus { display: grid; gap: 6px; margin-top: 12px; font-size: 14px; }
