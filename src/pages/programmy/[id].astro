@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Barbell from "../../components/Barbell.astro";
-import { allPrograms, breadcrumbs, plural, HEALTH_WARNING, PROGRESS_RULE } from "../../lib/catalog";
+import { allPrograms, breadcrumbs, plural, HEALTH_WARNING, HEAVY_WARNING, PROGRESS_RULE } from "../../lib/catalog";
 
 export async function getStaticPaths() {
   return (await allPrograms()).map(p => ({ params: { id: p.id }, props: { p } }));
@@ -50,7 +50,7 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
     <h2>Как прибавлять</h2>
     <p>{PROGRESS_RULE}</p>
   </section>
-  <p class="warn" data-testid="health-warning">{HEALTH_WARNING}</p>
+  <p class="warn" data-testid="health-warning">{HEALTH_WARNING} {HEAVY_WARNING}</p>
 </Base>
 
 <style>
@@ -65,7 +65,11 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
   }
   .days { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 12px; align-items: start; margin-top: 20px; }
   .day { background: var(--surface); border-radius: 22px; padding: 10px 16px 14px; }
-  summary { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; }
+  /* Своя галочка: у summary с display: flex стандартная стрелка пропадает, и день не выглядит раскрывающимся. */
+  summary { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: ""; width: 9px; height: 9px; margin-right: 3px; border: solid var(--fg); border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg); }
+  .day[open] summary::after { transform: translateY(2px) rotate(-135deg); }
   summary b { font-weight: 800; font-size: 17px; }
   summary span { font: 500 12px var(--f-mono); color: var(--muted); margin-left: auto; }
   .mus { margin: 6px 0 4px; font-size: 13px; color: var(--muted); }

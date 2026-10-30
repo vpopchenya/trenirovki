@@ -23,7 +23,7 @@
       "items": [
         { "exercise": "yagodichnyj-most-so-shtangoj", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
         { "exercise": "zhim-shtangi-lezha", "sets": 3, "reps": "8–12", "rest": "2 мин" },
-        { "exercise": "tyaga-ganteli-v-naklone", "sets": 3, "reps": "8–12", "rest": "1,5 мин" },
+        { "exercise": "tyaga-ganteli-v-naklone", "sets": 3, "reps": "8–12", "rest": "1,5 мин", "note": "на каждую руку" },
         { "exercise": "mahi-gantelyami-v-storony", "sets": 3, "reps": "10–12", "rest": "1 мин" },
         { "exercise": "sgibanie-ruk-s-gantelyami", "sets": 3, "reps": "10–12", "rest": "1 мин" }
       ]
@@ -31,7 +31,7 @@
     {
       "name": "День В",
       "items": [
-        { "exercise": "vypady-s-gantelyami", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
+        { "exercise": "vypady-s-gantelyami", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин", "note": "на каждую ногу" },
         { "exercise": "zhim-gantelej-naklon", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
         { "exercise": "tyaga-gantelej-lezha", "sets": 3, "reps": "8–12", "rest": "1,5 мин" },
         { "exercise": "molotki", "sets": 3, "reps": "10–12", "rest": "1 мин" },

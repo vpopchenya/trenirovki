@@ -3,7 +3,7 @@ import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import BodyMap from "../../components/BodyMap.astro";
 import groups from "../../data/groups.json";
-import { levelClass, slugify, breadcrumbs, BAND_SAFETY, HEALTH_WARNING } from "../../lib/catalog";
+import { levelClass, slugify, breadcrumbs, BAND_SAFETY, HEALTH_WARNING, HEAVY_WARNING } from "../../lib/catalog";
 import { sideOf } from "../../lib/groups";
 
 export async function getStaticPaths() {
@@ -20,7 +20,7 @@ const errors = e.equipment.includes("Резинка") ? [...e.errors, BAND_SAFET
 const cut = e.name.lastIndexOf(" ");
 const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)] : ["", e.name];
 ---
-<Base back={{ href: `${base}myshcy/${group.slug}/`, label: group.name, group: group.id }} jsonLd={breadcrumbs(Astro.site!, [
+<Base back={{ href: `${base}myshcy/${group.slug}/`, label: group.name, group: group.id, alsoFrom: { path: `${base}programmy/`, label: "Программа" } }} jsonLd={breadcrumbs(Astro.site!, [
   ["Каталог", base], [group.name, `${base}myshcy/${group.slug}/`],
   [e.sub, `${base}myshcy/${group.slug}/${slugify(e.sub)}/`], [e.name, `${base}uprazhneniya/${ex.id}/`],
 ])} title={`${e.name}: техника`} description={`${e.name}: как делать по шагам и частые ошибки. Работает ${group.acc} (${e.sub.toLowerCase()}), помогают: ${e.helpers.join(", ").toLowerCase() || "—"}.`}>
@@ -84,7 +84,7 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
             <dt>Отдых</dt><dd>{e.rest}</dd>
           </dl>
         </div>
-        <p class="warn" data-testid="health-warning">{HEALTH_WARNING} Тяжёлые веса — только со страховкой.</p>
+        <p class="warn" data-testid="health-warning">{HEALTH_WARNING} {HEAVY_WARNING}</p>
       </aside>
     </div>
   </div>

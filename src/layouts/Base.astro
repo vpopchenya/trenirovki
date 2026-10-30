@@ -10,7 +10,8 @@ interface Props {
   noindex?: boolean;  // для 404: не показывать в поиске
   jsonLd?: object;     // разметка для поисковиков (хлебные крошки и т.п.)
   // Кнопка «Назад» на внутренних страницах: куда ведёт, если пришли не с нашего сайта, и подпись (группа — точка её цвета).
-  back?: { href: string; label: string; group?: string };
+  // alsoFrom — раздел, откуда тоже возвращаемся по истории: упражнение открыли из программы — назад в программу, а не в группу.
+  back?: { href: string; label: string; group?: string; alsoFrom?: { path: string; label: string } };
 }
 const { title, description, nav = "catalog", noindex = false, jsonLd, back } = Astro.props;
 const base = import.meta.env.BASE_URL;
@@ -57,7 +58,7 @@ const items = [
 <body>
   <header class="bar gut"><div class="wrap">
     {back && (
-      <a class="back" href={back.href} data-testid="back" style={back.group && `--gc: var(--g-${back.group})`}>
+      <a class="back" href={back.href} data-testid="back" data-also-path={back.alsoFrom?.path} data-also-label={back.alsoFrom?.label} style={back.group && `--gc: var(--g-${back.group})`}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>{back.group && <i></i>}<span>{back.label}</span>
       </a>
     )}
@@ -88,16 +89,24 @@ const items = [
     // «Назад»: пришли именно с той страницы, куда ведёт кнопка, — возвращаемся по истории (сохранятся прокрутка
     // и фильтры); иначе (ссылка извне, другая наша страница) — обычный переход по href на уровень выше.
     // В установленном на iPhone приложении другой кнопки «назад» нет.
-    document.querySelector<HTMLAnchorElement>(".back")?.addEventListener("click", ev => {
-      const link = ev.currentTarget as HTMLAnchorElement;
-      try {
-        const from = new URL(document.referrer);
-        if (from.origin === location.origin && from.pathname === new URL(link.href).pathname && history.length > 1) {
+    const link = document.querySelector<HTMLAnchorElement>(".back");
+    if (link) {
+      let from: URL | null = null;
+      try { from = new URL(document.referrer); } catch {} // referrer пустой — обычный переход по ссылке
+      const same = from?.origin === location.origin;
+      const { alsoPath, alsoLabel } = link.dataset;
+      const viaOther = same && !!alsoPath && from!.pathname.startsWith(alsoPath);
+      if (viaOther) {
+        link.querySelector("span")!.textContent = alsoLabel!;
+        link.querySelector("i")?.remove(); // точка цвета группы про группу, а ведём уже не туда
+      }
+      link.addEventListener("click", ev => {
+        if ((viaOther || (same && from!.pathname === new URL(link.href).pathname)) && history.length > 1) {
           ev.preventDefault();
           history.back();
         }
-      } catch {} // referrer пустой — обычный переход по ссылке
-    });
+      });
+    }
   </script>
 </body>
 </html>

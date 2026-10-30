@@ -53,3 +53,12 @@ h2 { font-size: clamp(19px, 2.2vw, 24px); letter-spacing: -.02em; }
 .tag { font: 500 12px var(--f-mono); color: var(--muted); background: var(--bg); border-radius: 6px; padding: 2px 8px; }
 .tag.lvl1 { color: #7fd99a; }
 .tag.lvl2 { color: #ffb36b; }
+/* Фильтры чипами: на странице группы выбранный — цвета группы (--gc), в остальных местах оранжевый. */
+.frow { display: grid; gap: 6px; min-width: 0; }
+.flabel { margin: 0; font: 500 12px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.chip { flex: none; display: inline-flex; align-items: center; font-weight: 800; font-size: 14px; text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0 14px; min-height: 40px; cursor: pointer;
+  transition: transform .1s; -webkit-tap-highlight-color: transparent; }
+.chip:active { transform: scale(.95); }
+.chip[aria-pressed="true"], .chip[aria-current="page"] { border-color: var(--gc, var(--accent)); background: var(--gc, var(--accent)); color: var(--gi, var(--accent-ink)); }
+@media (prefers-reduced-motion: reduce) { .chip { transition: none; } }

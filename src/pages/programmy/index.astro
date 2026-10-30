@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Barbell from "../../components/Barbell.astro";
-import { allPrograms, breadcrumbs, levelClass } from "../../lib/catalog";
+import { allPrograms, breadcrumbs, levelClass, slugify } from "../../lib/catalog";
 
 const base = import.meta.env.BASE_URL;
 const programs = await allPrograms();
@@ -15,7 +15,7 @@ const filters = [
 const capital = (s: string | number) => String(s).replace(/^./, c => c.toUpperCase());
 ---
 <Base nav="programs" back={{ href: base, label: "Каталог" }} title="Программы тренировок"
-  description="Готовые программы тренировок в зале: набор мышц, сила и похудение для новичков и опытных, 2 и 3 раза в неделю."
+  description="Готовые программы тренировок в зале по шагам: что делать в каждый день, сколько подходов и как прибавлять вес."
   jsonLd={breadcrumbs(Astro.site!, [["Каталог", base], ["Программы", `${base}programmy/`]])}>
   <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><span>Программы</span></nav>
   <h1 data-testid="programs-title">Выбери <em class="wave">программу</em></h1>
@@ -27,7 +27,7 @@ const capital = (s: string | number) => String(s).replace(/^./, c => c.toUpperCa
           <p class="flabel" id={`lbl-${f.key}`}>{f.label}</p>
           <div class="chips" data-f={f.key} role="group" aria-labelledby={`lbl-${f.key}`}>
             <button class="chip" type="button" aria-pressed="true" data-v="" data-testid={`filter-${f.key}-all`}>Все</button>
-            {f.values.map(v => <button class="chip" type="button" aria-pressed="false" data-v={v} data-testid={`filter-${f.key}-${v}`}>{capital(v)}</button>)}
+            {f.values.map(v => <button class="chip" type="button" aria-pressed="false" data-v={v} data-testid={`filter-${f.key}-${slugify(String(v))}`}>{capital(v)}</button>)}
           </div>
         </div>
       ))}
@@ -72,18 +72,12 @@ const capital = (s: string | number) => String(s).replace(/^./, c => c.toUpperCa
 <style>
   h1 { margin-bottom: 20px; }
   .filters { display: grid; gap: 12px; margin-bottom: 20px; }
-  .frow { min-width: 0; }
   @media (min-width: 768px) { .filters { display: flex; flex-wrap: wrap; gap: 12px 28px; } .frow { max-width: 100%; } }
-  .flabel { margin: 0 0 6px; font: 500 12px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-  .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-  .chip { flex: none; font-weight: 800; font-size: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0 14px; min-height: 40px; cursor: pointer; transition: transform .1s; -webkit-tap-highlight-color: transparent; }
-  .chip:active { transform: scale(.95); }
-  .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
   .plist { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 12px; }
   .pcard { display: grid; gap: 8px; align-content: start; background: var(--surface); border: 1px solid transparent; border-radius: 24px; padding: 16px; text-decoration: none; transition: transform .15s cubic-bezier(.3, 1.5, .5, 1); -webkit-tap-highlight-color: transparent; }
   .pcard:active { transform: scale(.98); }
   @media (hover: hover) { .pcard:hover { border-color: var(--line); } }
   .pcard b { font-weight: 800; font-size: 17px; line-height: 1.3; }
-  @media (prefers-reduced-motion: reduce) { .pcard, .chip { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .pcard { transition: none; } }
   .nothing { margin-top: 20px; }
 </style>
