@@ -5,20 +5,29 @@ const base = import.meta.env.BASE_URL;
 ---
 <Base title="О проекте" description="Карманный тренер — бесплатный каталог упражнений с техникой на русском. Кто делает, откуда материалы." nav="none" back={{ href: base, label: "Каталог" }}>
   <div class="about">
-    <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><span>О проекте</span></nav>
     <h1>О <em class="wave">проекте</em></h1>
-    <p>Бесплатный каталог упражнений и готовые программы тренировок с техникой на русском. Скоро — дневник тренировок.</p>
+    <p class="lead">Карманный тренер — бесплатный помощник для зала и дома: упражнения с техникой на русском и готовые программы. Скоро появится дневник тренировок.</p>
     <p class="warn" data-testid="health-warning">Мы не врачи и не тренеры. Есть болезни или травмы — сначала к врачу.</p>
-    <h2>Чужие материалы</h2>
-    <p>Схема тела — <a href="https://github.com/HichamELBSI/react-native-body-highlighter">react-native-body-highlighter</a>, © 2022 ELABBASSI Hicham, <a href={`${base}licenses/body-highlighter.txt`}>лицензия MIT</a>.</p>
-    <h2 id="privacy">Конфиденциальность</h2>
-    <p>Регистрации и форм нет — мы не просим имя, телефон, почту и другие личные данные.</p>
-    <p>Сайт размещён на GitHub Pages. GitHub, как любой хостинг, видит IP-адрес посетителя — дальше действуют <a href="https://docs.github.com/ru/site-policy/privacy-policies/github-general-privacy-statement">правила GitHub</a>.</p>
-    <p>Сайт сохраняется в памяти твоего телефона или браузера, чтобы открываться без интернета. Эти файлы никуда не отправляются, удалить их можно в настройках браузера.</p>
-    <p>Выбранная программа хранится только на твоём телефоне или в браузере и никуда не отправляется. Удалить её можно той же кнопкой «Моя программа» или очисткой данных сайта.</p>
-    <p>Картинки-превью роликов загружаются с серверов YouTube, а сам ролик — только после нажатия ▶, в режиме повышенной конфиденциальности YouTube (youtube-nocookie.com). После запуска ролика YouTube может сохранять свои данные в браузере и видит твой IP-адрес. Дальше действуют <a href="https://policies.google.com/privacy?hl=ru">правила Google</a>.</p>
-    <p>Если подключим Яндекс Метрику, она будет работать только после твоего согласия в плашке внизу экрана, и здесь появится подробный текст.</p>
-    {METRIKA_ID && <p><button class="btn reset" type="button" data-key={CONSENT_KEY} data-testid="consent-reset">Изменить выбор по аналитике</button></p>}
+
+    <section class="card" data-testid="sources">
+      <h2>Откуда материалы</h2>
+      <h3>Схема тела</h3>
+      <p>Рисунок мышц взят из проекта react-native-body-highlighter, © 2022 ELABBASSI Hicham, <a href={`${base}licenses/body-highlighter.txt`}>лицензия MIT</a>.</p>
+      <h3>Ролики</h3>
+      <p>Ролики принадлежат их авторам: имя указано под плеером. Мы их не копируем, а показываем через плеер YouTube, когда ты нажимаешь ▶.</p>
+    </section>
+
+    <section class="card" id="privacy" data-testid="privacy">
+      <h2>Конфиденциальность</h2>
+      <p class="sub">Мы не собираем личные данные. Регистрации нет, имя, телефон и почта не нужны.</p>
+      <h3>Что хранится у тебя</h3>
+      <p>Сайт сохраняется на телефоне или в браузере, чтобы открываться без интернета. Там же лежит выбранная программа. Всё это никуда не отправляется. Удалить можно очисткой данных сайта в браузере, а программу — ещё и кнопкой «Моя программа».</p>
+      <h3>Что видят другие сервисы</h3>
+      <p>Сайт лежит на GitHub Pages, поэтому GitHub видит IP-адрес посетителя, как любой хостинг. Превью роликов загружаются с YouTube, поэтому он тоже видит IP-адрес. Сам ролик запускается только после нажатия ▶, в режиме повышенной конфиденциальности, но после запуска YouTube может сохранять свои данные в браузере. Дальше действуют правила GitHub и Google.</p>
+      <h3>Аналитика</h3>
+      <p>Если подключим Яндекс Метрику, она заработает только после твоего согласия в плашке внизу экрана, и здесь появится подробный текст.</p>
+      {METRIKA_ID && <p><button class="btn reset" type="button" data-key={CONSENT_KEY} data-testid="consent-reset">Изменить выбор по аналитике</button></p>}
+    </section>
   </div>
 </Base>
 
@@ -33,6 +42,11 @@ const base = import.meta.env.BASE_URL;
 <style>
   .about { max-width: 70ch; display: grid; gap: 16px; }
   .about p { margin: 0; color: var(--fg2); }
+  .about .lead { color: var(--text); }
+  .card { background: var(--surface); border-radius: 20px; padding: 20px 18px; display: grid; gap: 8px; }
+  .card h2 { margin: 0; }
+  .card .sub { color: var(--text); }
+  .card h3 { margin: 12px 0 0; font-size: 16px; color: var(--fg); }
   .reset { background: transparent; border: 1px solid var(--line); }
   .warn { font-size: 14px; border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; }
 </style>
