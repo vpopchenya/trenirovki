@@ -89,9 +89,9 @@ const figures = compact
   /* На главной у каждой группы бледный оттенок её цвета — видно, где кончается одна группа и начинается другая. */
   /* :not(.sel) — иначе Astro добавляет к правилу лишний атрибут, и оно перебивает цвет выбранной. */
   [data-clickable] .m { cursor: pointer; }
-  [data-clickable] .m:not(.sel) { fill: color-mix(in srgb, var(--gc) 20%, var(--muscle)); }
+  [data-clickable] .m:not(.sel) { fill: color-mix(in srgb, var(--gc) 32%, var(--muscle)); }
   /* Только там, где есть мышь: на телефоне hover «залипает» и перекрывает цвет выбранной мышцы. */
-  @media (hover: hover) { [data-clickable] .m:not(.sel):hover { fill: color-mix(in srgb, var(--gc) 35%, var(--muscle)); } }
+  @media (hover: hover) { [data-clickable] .m:not(.sel):hover { fill: color-mix(in srgb, var(--gc) 48%, var(--muscle)); } }
   /* Выбранная — приглушённый цвет группы, а не чистый цвет блина: тот слишком яркий на тёмном. */
   .m.sel { fill: color-mix(in srgb, var(--gc) 72%, var(--muscle)); }
   /* Старые iPhone (iOS 15) не знают color-mix: без запасного цвета мышцы стали бы чёрными. */

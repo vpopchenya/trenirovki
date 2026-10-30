@@ -47,16 +47,22 @@ const description = sub
       <>
         <div class="filters">
           {subs.length > 1 && (
-            <nav class="chips" aria-label="Мелкая группа">
-              <a class="chip" href={groupUrl} aria-current={!sub ? "page" : undefined} data-testid="filter-sub-all">Все</a>
-              {subs.map(s => <a class="chip" href={`${groupUrl}${slugify(s)}/`} aria-current={s === sub ? "page" : undefined} data-testid={`filter-sub-${slugify(s)}`}>{s}</a>)}
-            </nav>
+            <div class="frow">
+              <p class="flabel" id="lbl-sub" data-testid="filter-sub-label">Часть тела</p>
+              <nav class="chips" aria-labelledby="lbl-sub">
+                <a class="chip" href={groupUrl} aria-current={!sub ? "page" : undefined} data-testid="filter-sub-all">Все</a>
+                {subs.map(s => <a class="chip" href={`${groupUrl}${slugify(s)}/`} aria-current={s === sub ? "page" : undefined} data-testid={`filter-sub-${slugify(s)}`}>{s}</a>)}
+              </nav>
+            </div>
           )}
           {equipment.length > 1 && (
-            <div class="chips" data-f="eq" role="group" aria-label="Оборудование">
-              <button class="chip" type="button" aria-pressed="true" data-v="" data-testid="filter-eq-all">Любое</button>
-              {homeChip && <button class="chip" type="button" aria-pressed="false" data-v="home" data-testid="filter-eq-home">🏠 Без зала</button>}
-              {equipment.map(s => <button class="chip" type="button" aria-pressed="false" data-v={s} data-testid={`filter-eq-${slugify(s)}`}>{s}</button>)}
+            <div class="frow">
+              <p class="flabel" id="lbl-eq" data-testid="filter-eq-label">Инвентарь</p>
+              <div class="chips" data-f="eq" role="group" aria-labelledby="lbl-eq">
+                <button class="chip" type="button" aria-pressed="true" data-v="" data-testid="filter-eq-all">Любое</button>
+                {homeChip && <button class="chip" type="button" aria-pressed="false" data-v="home" data-testid="filter-eq-home">🏠 Без зала</button>}
+                {equipment.map(s => <button class="chip" type="button" aria-pressed="false" data-v={s} data-testid={`filter-eq-${slugify(s)}`}>{s}</button>)}
+              </div>
             </div>
           )}
         </div>
@@ -75,7 +81,7 @@ const description = sub
             </a>
           ))}
         </div>
-        <p class="lead nothing" data-testid="filter-empty" hidden>С таким оборудованием упражнений нет. Нажми «Любое».</p>
+        <p class="lead nothing" data-testid="filter-empty" hidden>С таким инвентарём упражнений нет. Нажми «Любое».</p>
       </>
     )}
   </div>
@@ -104,7 +110,9 @@ const description = sub
   .ghead .eyebrow { margin: 12px 0 0; } /* место под волнистое подчёркивание заголовка */
   .ghead :global(.gicon) { width: 68px; height: 68px; flex: none; border-radius: 50%; display: block; background: var(--bg); box-shadow: 0 0 0 4px var(--gc); }
   .empty, .nothing { margin-top: 24px; }
-  .filters { display: grid; gap: 10px; margin: 24px 0 20px; }
+  .filters { display: grid; gap: 14px; margin: 24px 0 20px; }
+  .frow { display: grid; gap: 6px; }
+  .flabel { margin: 0; font: 500 12px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
   .chip { flex: none; display: inline-flex; align-items: center; font-weight: 800; font-size: 14px; text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0 14px; min-height: 40px; cursor: pointer; }
   .chip { transition: transform .1s; -webkit-tap-highlight-color: transparent; }
