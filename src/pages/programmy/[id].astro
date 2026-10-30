@@ -1,0 +1,81 @@
+---
+import Base from "../../layouts/Base.astro";
+import Barbell from "../../components/Barbell.astro";
+import { allPrograms, breadcrumbs, plural, HEALTH_WARNING, PROGRESS_RULE } from "../../lib/catalog";
+
+export async function getStaticPaths() {
+  return (await allPrograms()).map(p => ({ params: { id: p.id }, props: { p } }));
+}
+const { p } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const perDay = Math.max(...p.days.map(d => d.items.length));
+---
+<Base nav="programs" back={{ href: `${base}programmy/`, label: "Программы" }} title={p.name} description={p.description}
+  jsonLd={breadcrumbs(Astro.site!, [["Каталог", base], ["Программы", `${base}programmy/`], [p.name, `${base}programmy/${p.id}/`]])}>
+  <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><a href={`${base}programmy/`}>Программы</a><span>/</span><span>{p.name}</span></nav>
+  <div class="phead">
+    <h1 data-testid="program-title">{p.name}</h1>
+    <div class="facts">
+      <div><b>{p.daysPerWeek}</b>раза в неделю</div>
+      <div><b>{p.weeks}</b>недель</div>
+      <div><b>{perDay}</b>{plural(perDay)}</div>
+    </div>
+    <p class="lead">{p.description}</p>
+  </div>
+
+  <div class="days">
+    {p.days.map(d => (
+      <details class="day" open data-testid="program-day">
+        <summary><b>{d.name}</b><span>{d.items.length} упр.</span></summary>
+        <Barbell groups={d.groups} />
+        <p class="mus">{d.muscles}</p>
+        <div>
+          {d.items.map(i => (
+            <a class="ex" href={`${base}uprazhneniya/${i.ex.id}/`} style={`--gc: var(--g-${i.ex.data.group})`} data-testid="program-exercise">
+              <i></i>
+              <b>{i.ex.data.name}{i.note && <small>{i.note}</small>}</b>
+              <span>{i.sets} × {i.reps}<small>отдых {i.rest}</small></span>
+            </a>
+          ))}
+        </div>
+      </details>
+    ))}
+  </div>
+  {/* На телефоне открыт первый день, остальные свёрнуты. В разметке открыты все: для поиска и без JavaScript. */}
+  <script is:inline>
+    if (matchMedia("(max-width: 1023px)").matches) document.querySelectorAll(".day").forEach((d, i) => { if (i) d.open = false; });
+  </script>
+
+  <section class="how">
+    <h2>Как прибавлять</h2>
+    <p>{PROGRESS_RULE}</p>
+  </section>
+  <p class="warn" data-testid="health-warning">{HEALTH_WARNING}</p>
+</Base>
+
+<style>
+  .phead { display: grid; gap: 14px; }
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 480px; }
+  .facts div { background: var(--surface); border-radius: 16px; padding: 10px 6px; text-align: center; font-size: 13px; color: var(--muted); }
+  .facts b { display: block; font: 800 20px var(--f-display); color: var(--fg); }
+  @media (min-width: 1024px) {
+    .phead { grid-template-columns: minmax(0, 1fr) minmax(300px, 420px); column-gap: 40px; align-items: end; }
+    .facts { grid-column: 2; grid-row: 1; width: 100%; }
+    .lead { grid-column: 1; }
+  }
+  .days { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 12px; align-items: start; margin-top: 20px; }
+  .day { background: var(--surface); border-radius: 22px; padding: 10px 16px 14px; }
+  summary { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; }
+  summary b { font-weight: 800; font-size: 17px; }
+  summary span { font: 500 12px var(--f-mono); color: var(--muted); margin-left: auto; }
+  .mus { margin: 6px 0 4px; font-size: 13px; color: var(--muted); }
+  .ex { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 48px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 15px; text-decoration: none; }
+  .ex:last-child { border-bottom: 0; }
+  .ex i { width: 12px; height: 12px; border-radius: 50%; background: var(--gc); }
+  .ex b { font-weight: 700; line-height: 1.25; }
+  .ex > span { font: 500 13px var(--f-mono); color: var(--text); text-align: right; white-space: nowrap; }
+  .ex small { display: block; font: 500 12px var(--f-body); color: var(--muted); }
+  .how { background: var(--surface); border-radius: 22px; padding: 16px; margin-top: 12px; max-width: 70ch; }
+  .how p { margin: 6px 0 0; color: var(--text); }
+  .warn { font-size: 13px; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; margin: 12px 0 0; max-width: 70ch; }
+</style>

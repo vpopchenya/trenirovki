@@ -3,7 +3,7 @@ import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import BodyMap from "../../components/BodyMap.astro";
 import groups from "../../data/groups.json";
-import { levelClass, slugify, breadcrumbs, BAND_SAFETY } from "../../lib/catalog";
+import { levelClass, slugify, breadcrumbs, BAND_SAFETY, HEALTH_WARNING } from "../../lib/catalog";
 import { sideOf } from "../../lib/groups";
 
 export async function getStaticPaths() {
@@ -84,7 +84,7 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
             <dt>Отдых</dt><dd>{e.rest}</dd>
           </dl>
         </div>
-        <p class="warn" data-testid="health-warning">Мы не врачи. Есть болезни или травмы — сначала к врачу или тренеру. Тяжёлые веса — только со страховкой.</p>
+        <p class="warn" data-testid="health-warning">{HEALTH_WARNING} Тяжёлые веса — только со страховкой.</p>
       </aside>
     </div>
   </div>

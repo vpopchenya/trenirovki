@@ -1,4 +1,4 @@
-import { defineCollection } from "astro:content";
+import { defineCollection, reference } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 import groups from "./data/groups.json";
@@ -41,4 +41,31 @@ const exercises = defineCollection({
     .refine(e => e.equipment.includes("Резинка") === !!e.noBand, { message: "noBand: нужен у упражнений с резинкой и только у них" }),
 });
 
-export const collections = { exercises };
+// Одна программа — один файл src/content/programs/<адрес>.json. Имя файла менять нельзя: это адрес страницы,
+// а на этапе 3 на него сошлётся дневник. Подходы и повторы живут здесь, а не в упражнении: у силы и набора они разные.
+const programs = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/content/programs" }),
+  schema: z.object({
+    name: z.string().min(3),
+    description: z.string().min(20),       // для поиска и подписи на странице программы
+    goal: z.enum(["набор", "сила", "похудение"]),
+    level: z.enum(["новичок", "опытный"]),
+    daysPerWeek: z.union([z.literal(2), z.literal(3)]),
+    focus: z.enum(groupIds).optional(),    // программа с упором на группу мышц
+    tier: z.enum(["free", "pro"]),         // заранее отмечаем платное; пока нигде не показываем и не закрываем
+    weeks: z.number().int().positive(),
+    days: z.array(z.object({
+      name: z.string().min(1),
+      items: z.array(z.object({
+        exercise: reference("exercises"),  // опечатка в имени упражнения — сборка падает
+        sets: z.number().int().positive(),
+        reps: z.string().min(1),           // «8–12» или «30–45 сек»
+        rest: z.string().min(1),
+        note: z.string().optional(),
+      })).min(1),
+    })).min(1),
+    order: z.number().int(),               // порядок в списке программ
+  }).refine(p => p.days.length === p.daysPerWeek, { message: "days: число дней должно совпадать с daysPerWeek" }),
+});
+
+export const collections = { exercises, programs };

@@ -1,4 +1,4 @@
-import { getCollection } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import groups from "../data/groups.json";
 
 export type Group = (typeof groups)[number];
@@ -42,3 +42,24 @@ export const isHome = (equipment: string[]) => equipment.every(x => HOME_EQUIPME
 export const BAND_SAFETY = "Плохо закреплённая или надорванная резинка — может сорваться и ударить. Перед подходом проверь узел и саму резинку";
 
 export const levelClass = (level: string) => (level === "новичок" ? "lvl1" : "lvl2");
+
+export const HEALTH_WARNING = "Мы не врачи. Есть болезни или травмы — сначала к врачу или тренеру.";
+/** Общее для всех программ правило: на странице одно на всех, в файлах программ не повторяем. */
+export const PROGRESS_RULE = "Сделал все подходы на верхней границе повторений — в следующий раз возьми чуть больше вес.";
+
+/** Программы по порядку, с упражнениями вместо ссылок. Сюда же — проверки, которых не выразить схемой. */
+export async function allPrograms() {
+  const list = await getCollection("programs");
+  const views = await Promise.all(list.map(async p => {
+    const days = await Promise.all(p.data.days.map(async day => {
+      const items = await Promise.all(day.items.map(async item => ({ ...item, ex: (await getEntry(item.exercise))! })));
+      // Новичку нельзя выдать опытное упражнение: страховки и опыта у него нет, а текст программы этого не остановит.
+      const hard = items.find(i => p.data.level === "новичок" && i.ex.data.level === "опытный");
+      if (hard) throw new Error(`Программа «${p.data.name}»: упражнение «${hard.ex.data.name}» только для опытных`);
+      const dayGroups = items.map(i => i.ex.data.group);
+      return { name: day.name, items, groups: dayGroups, muscles: [...new Set(dayGroups)].map(id => groups.find(g => g.id === id)!.name.toLowerCase()).join(" · ") };
+    }));
+    return { id: p.id, ...p.data, days };
+  }));
+  return views.sort((a, b) => a.order - b.order);
+}

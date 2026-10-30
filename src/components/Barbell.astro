@@ -1,0 +1,18 @@
+---
+// День программы штангой: блин на каждое упражнение в цвете его группы мышц. Ближе к грифу блины меньше,
+// как на настоящей штанге; порядок — порядок упражнений. Только картинка: мышцы словами подписаны рядом.
+interface Props { groups: string[] }
+const { groups } = Astro.props;
+const plates = groups.map((g, i) => ({ g, h: 36 - i * 4 }));
+---
+<div class="barbell" aria-hidden="true" data-testid="barbell">
+  {plates.map(p => <i style={`--gc: var(--g-${p.g}); height: ${p.h}px`}></i>)}
+  <span></span>
+  {plates.toReversed().map(p => <i style={`--gc: var(--g-${p.g}); height: ${p.h}px`}></i>)}
+</div>
+
+<style>
+  .barbell { display: flex; align-items: center; gap: 2px; height: 36px; max-width: 340px; }
+  span { flex: 1 1 10px; min-width: 8px; height: 4px; border-radius: 2px; background: var(--muted); }
+  i { flex: none; width: 12px; border-radius: 3px; background: var(--gc); }
+</style>
