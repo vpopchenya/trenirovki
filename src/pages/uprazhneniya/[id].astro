@@ -4,14 +4,17 @@ import Base from "../../layouts/Base.astro";
 import BodyMap from "../../components/BodyMap.astro";
 import groups from "../../data/groups.json";
 import HealthWarning from "../../components/HealthWarning.astro";
-import { levelClass, slugify, breadcrumbs, BAND_SAFETY, HEAVY_WARNING } from "../../lib/catalog";
+import { allPrograms, levelClass, slugify, breadcrumbs, BAND_SAFETY, HEAVY_WARNING } from "../../lib/catalog";
 import { sideOf } from "../../lib/groups";
 
 export async function getStaticPaths() {
-  const all = await getCollection("exercises");
-  return all.map(e => ({ params: { id: e.id }, props: { ex: e } }));
+  const [all, programs] = await Promise.all([getCollection("exercises"), allPrograms()]);
+  return all.map(e => ({
+    params: { id: e.id },
+    props: { ex: e, inPrograms: programs.filter(p => p.days.some(d => d.items.some(i => i.ex.id === e.id))) },
+  }));
 }
-const { ex } = Astro.props;
+const { ex, inPrograms } = Astro.props;
 const e = ex.data;
 const group = groups.find(g => g.id === e.group)!;
 const base = import.meta.env.BASE_URL;
@@ -67,6 +70,14 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
           <h2>Частые ошибки</h2>
           <ul class="errs" data-testid="errors">{errors.map(s => <li>{s}</li>)}</ul>
         </section>
+        {inPrograms.length > 0 && (
+          <section class="sect" data-testid="in-programs">
+            <h2>Входит в программы</h2>
+            <ul class="inprog">
+              {inPrograms.map(p => <li><a href={`${base}programmy/${p.id}/`} data-testid="in-program-link">{p.name}</a></li>)}
+            </ul>
+          </section>
+        )}
       </div>
 
       <aside class="side">
@@ -168,6 +179,12 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
     border-radius: 18px; padding: 10px 12px; color: var(--fg); }
   .errs li::before { content: "!"; width: 24px; height: 24px; border-radius: 50%; background: var(--g-chest); color: #fff; font-weight: 800;
     display: grid; place-items: center; font-size: 14px; }
+  /* Программ у базовых упражнений больше десяти: на широком экране — в две колонки, чтобы блок не тянулся на экран. */
+  .inprog { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 8px; }
+  .inprog a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; height: 100%; box-sizing: border-box; padding: 8px 14px; background: var(--surface); border-radius: 16px; color: var(--fg); font-weight: 700; text-decoration: none; }
+  /* На телефоне наведения нет: без стрелки плашка не отличается от простого текста. */
+  .inprog a::after { content: "→"; color: var(--accent); }
+  @media (hover: hover) { .inprog a:hover { background: var(--surface2); } }
   .noband { margin: 0; background: var(--surface); border-radius: 20px; padding: 12px 14px; color: var(--fg); font-size: 16.5px; }
   .side { display: grid; gap: 12px; }
   .box { background: var(--surface); border-radius: 24px; padding: 16px; }

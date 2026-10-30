@@ -41,8 +41,11 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
     };
     btn.addEventListener("click", () => {
       try {
-        if (read() === id) localStorage.removeItem(KEY); else localStorage.setItem(KEY, id);
+        const chosen = read() !== id;
+        if (chosen) localStorage.setItem(KEY, id); else localStorage.removeItem(KEY);
         show();
+        // Цель — только на выбор: снятие отметки программу не выбирает.
+        if (chosen) dispatchEvent(new CustomEvent("goal", { detail: "program_chosen" }));
       } catch {
         hint.textContent = "Браузер не дал запомнить программу.";
       }
@@ -98,6 +101,10 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
   </section>
   <HealthWarning>{p.home ? `${BAND_SAFETY}.` : HEAVY_WARNING}</HealthWarning>
 </Base>
+
+<script>
+  dispatchEvent(new CustomEvent("goal", { detail: "program_open" }));
+</script>
 
 <style>
   .phead { display: grid; gap: 14px; }
