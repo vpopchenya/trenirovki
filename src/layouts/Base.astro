@@ -18,12 +18,12 @@ const base = import.meta.env.BASE_URL;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const fullTitle = title === "Карманный тренер" ? title : `${title} — Карманный тренер`;
 
-// «Тренировка» появится на этапе 3, пока видна с пометкой «скоро».
+// «Основы» появятся на этапе 2, «Тренировка» — на этапе 3, пока видны с пометкой «скоро».
 const items = [
   { id: "catalog", label: "Каталог", href: base, icon: '<path d="M4 6h16M4 12h16M4 18h10"/>' },
   { id: "programs", label: "Программы", href: `${base}programmy/`, icon: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/>' },
   { id: "workout", label: "Тренировка", icon: '<path d="M3 12h3m12 0h3M6 8v8m12-8v8M9 10v4m6-4v4M9 12h6"/>' },
-  { id: "basics", label: "Основы", href: `${base}osnovy/`, icon: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>' },
+  { id: "basics", label: "Основы", icon: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>' },
 ];
 ---
 <!doctype html>
