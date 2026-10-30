@@ -1,0 +1,33 @@
+{
+  "name": "Набор мышц для опытных, 2 раза в неделю",
+  "description": "Всё тело дважды в неделю: тяжёлый день со штангой на 6–8 повторений и день полегче. Для тех, кто уверенно делает присед, жим и тягу.",
+  "goal": "набор",
+  "level": "опытный",
+  "daysPerWeek": 2,
+  "tier": "free",
+  "weeks": 8,
+  "order": 4,
+  "days": [
+    {
+      "name": "Тяжёлый день",
+      "items": [
+        { "exercise": "prisedaniya-so-shtangoj", "sets": 4, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "zhim-shtangi-lezha", "sets": 4, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "tyaga-shtangi-v-naklone", "sets": 4, "reps": "6–8", "rest": "2 мин" },
+        { "exercise": "zhim-shtangi-stoya", "sets": 3, "reps": "6–8", "rest": "2 мин" },
+        { "exercise": "podem-nog-v-vise", "sets": 3, "reps": "10–15", "rest": "1,5 мин" }
+      ]
+    },
+    {
+      "name": "Лёгкий день",
+      "items": [
+        { "exercise": "stanovaya-na-pryamyh-nogah", "sets": 3, "reps": "10–12", "rest": "2 мин" },
+        { "exercise": "bolgarskie-prisedaniya", "sets": 3, "reps": "10–12", "rest": "1,5–2 мин", "note": "на каждую ногу" },
+        { "exercise": "zhim-gantelej-naklon", "sets": 3, "reps": "10–12", "rest": "1,5–2 мин" },
+        { "exercise": "podtyagivaniya-shirokim-hvatom", "sets": 3, "reps": "6–12", "rest": "2 мин" },
+        { "exercise": "mahi-gantelyami-v-storony", "sets": 3, "reps": "12–15", "rest": "1 мин" },
+        { "exercise": "sgibanie-ruk-so-shtangoj", "sets": 3, "reps": "10–12", "rest": "1–1,5 мин" }
+      ]
+    }
+  ]
+}

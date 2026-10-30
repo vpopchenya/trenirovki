@@ -30,7 +30,7 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
     <div class="tags">
       <span class="tag eq">{e.equipment.join(", ")}</span>
       <span class:list={["tag", levelClass(e.level)]}><span aria-hidden="true">● </span>{e.level}</span>
-      <span class="tag sets">{e.sets}</span>
+      <span class="tag sets">обычно {e.sets}</span>
     </div>
 
     <div class="exgrid">
@@ -80,8 +80,8 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
           <dl class="kv">
             <dt>Инвентарь</dt><dd>{e.equipment.join(", ")}</dd>
             <dt>Уровень</dt><dd>{e.level}</dd>
-            <dt>Подходы</dt><dd>{e.sets}</dd>
-            <dt>Отдых</dt><dd>{e.rest}</dd>
+            <dt>Подходы</dt><dd>обычно {e.sets}</dd>
+            <dt>Отдых</dt><dd>обычно {e.rest}</dd>
           </dl>
         </div>
         <p class="warn" data-testid="health-warning">{HEALTH_WARNING} {HEAVY_WARNING}</p>

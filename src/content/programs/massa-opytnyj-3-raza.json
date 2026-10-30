@@ -1,0 +1,45 @@
+{
+  "name": "Набор мышц для опытных, 3 раза в неделю",
+  "description": "Верх, низ и всё тело: каждую крупную мышцу грузишь минимум дважды в неделю. Для тех, кто уверенно делает присед, жим и тягу со штангой.",
+  "goal": "набор",
+  "level": "опытный",
+  "daysPerWeek": 3,
+  "tier": "free",
+  "weeks": 8,
+  "order": 3,
+  "days": [
+    {
+      "name": "Верх",
+      "items": [
+        { "exercise": "zhim-shtangi-lezha", "sets": 4, "reps": "6–10", "rest": "2–3 мин" },
+        { "exercise": "tyaga-shtangi-v-naklone", "sets": 4, "reps": "6–10", "rest": "2 мин" },
+        { "exercise": "zhim-shtangi-stoya", "sets": 3, "reps": "8–10", "rest": "2 мин" },
+        { "exercise": "podtyagivaniya-shirokim-hvatom", "sets": 3, "reps": "6–12", "rest": "2 мин" },
+        { "exercise": "francuzskij-zhim-lezha", "sets": 3, "reps": "8–12", "rest": "1,5 мин" },
+        { "exercise": "sgibanie-ruk-so-shtangoj", "sets": 3, "reps": "8–12", "rest": "1–1,5 мин" }
+      ]
+    },
+    {
+      "name": "Низ",
+      "items": [
+        { "exercise": "prisedaniya-so-shtangoj", "sets": 4, "reps": "6–10", "rest": "2–3 мин" },
+        { "exercise": "stanovaya-na-pryamyh-nogah", "sets": 3, "reps": "8–12", "rest": "2 мин" },
+        { "exercise": "bolgarskie-prisedaniya", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин", "note": "на каждую ногу" },
+        { "exercise": "yagodichnyj-most-so-shtangoj", "sets": 3, "reps": "10–12", "rest": "1,5–2 мин" },
+        { "exercise": "podem-na-noski", "sets": 4, "reps": "15–20", "rest": "1 мин" },
+        { "exercise": "podem-nog-v-vise", "sets": 3, "reps": "10–15", "rest": "1,5 мин" }
+      ]
+    },
+    {
+      "name": "Всё тело",
+      "items": [
+        { "exercise": "stanovaya-tyaga", "sets": 3, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "zhim-gantelej-naklon", "sets": 4, "reps": "8–12", "rest": "1,5–2 мин" },
+        { "exercise": "tyaga-ganteli-v-naklone", "sets": 3, "reps": "8–12", "rest": "1,5 мин", "note": "на каждую руку" },
+        { "exercise": "otzhimaniya-na-brusyah", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
+        { "exercise": "vypady-s-gantelyami", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин", "note": "на каждую ногу" },
+        { "exercise": "planka", "sets": 3, "reps": "45–60 сек", "rest": "1 мин" }
+      ]
+    }
+  ]
+}

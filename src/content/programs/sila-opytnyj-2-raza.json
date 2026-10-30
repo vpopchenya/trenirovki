@@ -1,0 +1,32 @@
+{
+  "name": "Сила для опытных, 2 раза в неделю",
+  "description": "Всё тело дважды в неделю: тяжёлый день на 3–5 повторений и день полегче на 5–8.",
+  "goal": "сила",
+  "level": "опытный",
+  "daysPerWeek": 2,
+  "tier": "free",
+  "weeks": 10,
+  "order": 8,
+  "days": [
+    {
+      "name": "Тяжёлый день",
+      "items": [
+        { "exercise": "prisedaniya-so-shtangoj", "sets": 4, "reps": "3–5", "rest": "3 мин", "note": "со страховкой" },
+        { "exercise": "zhim-shtangi-lezha", "sets": 4, "reps": "3–5", "rest": "3 мин", "note": "со страховкой" },
+        { "exercise": "tyaga-shtangi-v-naklone", "sets": 4, "reps": "5–6", "rest": "2–3 мин" },
+        { "exercise": "podem-nog-v-vise", "sets": 3, "reps": "8–10", "rest": "1,5 мин" }
+      ]
+    },
+    {
+      "name": "Лёгкий день",
+      "items": [
+        { "exercise": "stanovaya-tyaga", "sets": 3, "reps": "5–6", "rest": "3 мин" },
+        { "exercise": "zhim-shtangi-stoya", "sets": 3, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "zhim-gantelej-naklon", "sets": 3, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "podtyagivaniya-shirokim-hvatom", "sets": 3, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "bolgarskie-prisedaniya", "sets": 3, "reps": "8–10", "rest": "2 мин", "note": "на каждую ногу" },
+        { "exercise": "planka", "sets": 3, "reps": "45–60 сек", "rest": "1 мин" }
+      ]
+    }
+  ]
+}

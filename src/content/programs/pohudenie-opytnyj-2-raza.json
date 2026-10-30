@@ -1,0 +1,33 @@
+{
+  "name": "Похудение для опытных, 2 раза в неделю",
+  "description": "День потяжелее и день полегче, в каждом всё тело, отдых короткий. Для тех, кто уверенно делает базовые упражнения.",
+  "goal": "похудение",
+  "level": "опытный",
+  "daysPerWeek": 2,
+  "tier": "free",
+  "weeks": 8,
+  "order": 12,
+  "days": [
+    {
+      "name": "Тяжёлый день",
+      "items": [
+        { "exercise": "prisedaniya-so-shtangoj", "sets": 3, "reps": "10–12", "rest": "1,5 мин" },
+        { "exercise": "zhim-shtangi-lezha", "sets": 3, "reps": "10–12", "rest": "1–1,5 мин" },
+        { "exercise": "tyaga-shtangi-v-naklone", "sets": 3, "reps": "10–12", "rest": "1–1,5 мин" },
+        { "exercise": "zhim-gantelej-sidya", "sets": 3, "reps": "10–12", "rest": "1 мин" },
+        { "exercise": "podem-nog-v-vise", "sets": 3, "reps": "10–15", "rest": "1 мин" }
+      ]
+    },
+    {
+      "name": "Лёгкий день",
+      "items": [
+        { "exercise": "stanovaya-na-pryamyh-nogah", "sets": 3, "reps": "10–12", "rest": "1–1,5 мин" },
+        { "exercise": "bolgarskie-prisedaniya", "sets": 3, "reps": "10–12", "rest": "1 мин", "note": "на каждую ногу" },
+        { "exercise": "otzhimaniya-na-brusyah", "sets": 3, "reps": "8–12", "rest": "1–1,5 мин" },
+        { "exercise": "podtyagivaniya-shirokim-hvatom", "sets": 3, "reps": "6–12", "rest": "1,5 мин" },
+        { "exercise": "mahi-gantelyami-v-storony", "sets": 3, "reps": "12–15", "rest": "45–60 сек" },
+        { "exercise": "planka", "sets": 3, "reps": "45–60 сек", "rest": "45–60 сек" }
+      ]
+    }
+  ]
+}

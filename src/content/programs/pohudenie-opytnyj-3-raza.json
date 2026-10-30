@@ -1,0 +1,43 @@
+{
+  "name": "Похудение для опытных, 3 раза в неделю",
+  "description": "Верх, низ и всё тело: штанга, гантели и турник с коротким отдыхом. Для тех, кто уверенно делает базовые упражнения.",
+  "goal": "похудение",
+  "level": "опытный",
+  "daysPerWeek": 3,
+  "tier": "free",
+  "weeks": 8,
+  "order": 11,
+  "days": [
+    {
+      "name": "Верх",
+      "items": [
+        { "exercise": "zhim-shtangi-lezha", "sets": 3, "reps": "10–12", "rest": "1–1,5 мин" },
+        { "exercise": "tyaga-shtangi-v-naklone", "sets": 3, "reps": "10–12", "rest": "1–1,5 мин" },
+        { "exercise": "zhim-gantelej-sidya", "sets": 3, "reps": "10–12", "rest": "1 мин" },
+        { "exercise": "podtyagivaniya-shirokim-hvatom", "sets": 3, "reps": "6–12", "rest": "1,5 мин" },
+        { "exercise": "sgibanie-ruk-s-gantelyami", "sets": 3, "reps": "12–15", "rest": "45–60 сек" },
+        { "exercise": "razgibanie-ganteli-iz-za-golovy", "sets": 3, "reps": "12–15", "rest": "45–60 сек" }
+      ]
+    },
+    {
+      "name": "Низ",
+      "items": [
+        { "exercise": "prisedaniya-so-shtangoj", "sets": 3, "reps": "10–12", "rest": "1,5 мин" },
+        { "exercise": "stanovaya-na-pryamyh-nogah", "sets": 3, "reps": "10–12", "rest": "1–1,5 мин" },
+        { "exercise": "vypady-s-gantelyami", "sets": 3, "reps": "10–12", "rest": "1 мин", "note": "на каждую ногу" },
+        { "exercise": "podem-na-noski", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "skruchivaniya", "sets": 3, "reps": "15–20", "rest": "45–60 сек" }
+      ]
+    },
+    {
+      "name": "Всё тело",
+      "items": [
+        { "exercise": "bolgarskie-prisedaniya", "sets": 3, "reps": "10–12", "rest": "1 мин", "note": "на каждую ногу" },
+        { "exercise": "zhim-gantelej-naklon", "sets": 3, "reps": "12–15", "rest": "1 мин" },
+        { "exercise": "tyaga-ganteli-v-naklone", "sets": 3, "reps": "12–15", "rest": "1 мин", "note": "на каждую руку" },
+        { "exercise": "otzhimaniya-ot-pola", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "podem-nog-v-vise", "sets": 3, "reps": "10–15", "rest": "1 мин" }
+      ]
+    }
+  ]
+}

@@ -25,8 +25,12 @@ export async function subsWithExercises(group: Group) {
   return group.subs.filter(s => list.some(e => e.data.sub === s));
 }
 
-export const plural = (n: number) =>
-  n % 10 === 1 && n % 100 !== 11 ? "упражнение" : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? "упражнения" : "упражнений";
+/** Слово в нужной форме для числа: 1 неделя, 2 недели, 5 недель. */
+const pluralize = (n: number, one: string, few: string, many: string) =>
+  n % 10 === 1 && n % 100 !== 11 ? one : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? few : many;
+
+export const plural = (n: number) => pluralize(n, "упражнение", "упражнения", "упражнений");
+export const pluralWeeks = (n: number) => pluralize(n, "неделя", "недели", "недель");
 
 /** Разметка «хлебных крошек» для поисковиков: [название, путь от корня сайта]. */
 export const breadcrumbs = (site: URL, items: [string, string][]) => ({
@@ -46,7 +50,10 @@ export const levelClass = (level: string) => (level === "новичок" ? "lvl1
 export const HEALTH_WARNING = "Мы не врачи. Есть болезни или травмы — сначала к врачу или тренеру.";
 /** Общее для всех программ правило: на странице одно на всех, в файлах программ не повторяем. */
 export const PROGRESS_RULE = "Сделал все подходы на верхней границе повторений — в следующий раз возьми чуть больше вес. Упражнения без веса: добавь повторы или секунды.";
+export const REST_RULE = "Между тренировками — минимум день отдыха: мышцы растут и восстанавливаются, пока ты отдыхаешь.";
 export const HEAVY_WARNING = "Тяжёлые веса — только со страховкой.";
+/** У всех программ на похудение: на шаге «Основы» сюда добавится ссылка на питание. */
+export const FAT_LOSS_NOTE = "Честно: сами тренировки вес почти не снижают, результат даёт питание. Программа помогает сохранить мышцы, пока худеешь.";
 
 /** Программы по порядку, с упражнениями вместо ссылок. Сюда же — проверки, которых не выразить схемой. */
 export async function allPrograms() {

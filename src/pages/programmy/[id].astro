@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Barbell from "../../components/Barbell.astro";
-import { allPrograms, breadcrumbs, plural, HEALTH_WARNING, HEAVY_WARNING, PROGRESS_RULE } from "../../lib/catalog";
+import { allPrograms, breadcrumbs, plural, pluralWeeks, FAT_LOSS_NOTE, HEALTH_WARNING, HEAVY_WARNING, PROGRESS_RULE, REST_RULE } from "../../lib/catalog";
 
 export async function getStaticPaths() {
   return (await allPrograms()).map(p => ({ params: { id: p.id }, props: { p } }));
@@ -17,11 +17,12 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
     <h1 data-testid="program-title">{p.name}</h1>
     <div class="facts">
       <div><b>{p.daysPerWeek}</b>раза в неделю</div>
-      <div><b>{p.weeks}</b>недель</div>
+      <div><b>{p.weeks}</b>{pluralWeeks(p.weeks)}</div>
       <div><b>{perDay}</b>{plural(perDay)}</div>
     </div>
     <p class="lead">{p.description}</p>
   </div>
+  {p.goal === "похудение" && <p class="how" data-testid="fat-loss-note">{FAT_LOSS_NOTE}</p>}
 
   <div class="days">
     {p.days.map(d => (
@@ -58,6 +59,10 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
   <section class="how">
     <h2>Как прибавлять</h2>
     <p>{PROGRESS_RULE}</p>
+  </section>
+  <section class="how">
+    <h2>Когда тренироваться</h2>
+    <p>{REST_RULE}</p>
   </section>
   <p class="warn" data-testid="health-warning">{HEALTH_WARNING} {HEAVY_WARNING}</p>
 </Base>

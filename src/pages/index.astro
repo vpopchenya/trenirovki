@@ -31,6 +31,10 @@ const first = groups[0];
 
     <div class="left">
       <InstallCard />
+      <a class="programs" href={`${base}programmy/`} data-testid="home-programs">
+        <span><b>Готовые программы</b><small>Набор, сила, похудение: что делать в каждый день</small></span>
+        <span class="btn main" aria-hidden="true">Выбрать →</span>
+      </a>
       <p class="lead">Нажми на мышцу на схеме или выбери группу. У каждого упражнения — техника по шагам и частые ошибки.</p>
       <BodyDefs sides={["front", "back"]} />
       <nav class="groups" aria-label="Группы мышц">
@@ -87,6 +91,9 @@ const first = groups[0];
   .pick b { font: 800 19px var(--f-display); letter-spacing: -.02em; }
   .pick .btn { grid-row: 1; grid-column: 2; }
   .pick small { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
+  .programs { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border-radius: 24px; padding: 16px; text-decoration: none; }
+  .programs b { display: block; font: 800 18px var(--f-display); letter-spacing: -.02em; }
+  .programs small { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; }
   /* Группы — плитки целиком в цвете блина: мышца в тёмном «диске», крупная бледная цифра — сколько упражнений. */
   .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
   .gcard { display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; min-height: 150px; background: var(--gc); color: var(--gi);

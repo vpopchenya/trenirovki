@@ -1,0 +1,41 @@
+{
+  "name": "Сила для опытных, 3 раза в неделю",
+  "description": "Верх, низ и всё тело. В начале каждого дня тяжёлая база на 3–5 повторений с долгим отдыхом, потом подсобная работа.",
+  "goal": "сила",
+  "level": "опытный",
+  "daysPerWeek": 3,
+  "tier": "free",
+  "weeks": 10,
+  "order": 7,
+  "days": [
+    {
+      "name": "Верх",
+      "items": [
+        { "exercise": "zhim-shtangi-lezha", "sets": 4, "reps": "3–5", "rest": "3 мин", "note": "со страховкой" },
+        { "exercise": "tyaga-shtangi-v-naklone", "sets": 4, "reps": "5–6", "rest": "2–3 мин" },
+        { "exercise": "zhim-shtangi-stoya", "sets": 3, "reps": "5–6", "rest": "3 мин" },
+        { "exercise": "podtyagivaniya-shirokim-hvatom", "sets": 3, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "zhim-uzkim-hvatom", "sets": 3, "reps": "8–10", "rest": "2 мин", "note": "со страховкой" }
+      ]
+    },
+    {
+      "name": "Низ",
+      "items": [
+        { "exercise": "prisedaniya-so-shtangoj", "sets": 4, "reps": "3–5", "rest": "3 мин", "note": "со страховкой" },
+        { "exercise": "stanovaya-na-pryamyh-nogah", "sets": 3, "reps": "8–10", "rest": "2 мин" },
+        { "exercise": "bolgarskie-prisedaniya", "sets": 3, "reps": "8–10", "rest": "2 мин", "note": "на каждую ногу" },
+        { "exercise": "podem-nog-v-vise", "sets": 3, "reps": "8–10", "rest": "1,5 мин" }
+      ]
+    },
+    {
+      "name": "Всё тело",
+      "items": [
+        { "exercise": "stanovaya-tyaga", "sets": 4, "reps": "3–5", "rest": "3 мин" },
+        { "exercise": "zhim-shtangi-naklon", "sets": 3, "reps": "5–6", "rest": "3 мин", "note": "со страховкой" },
+        { "exercise": "tyaga-ganteli-v-naklone", "sets": 3, "reps": "8–10", "rest": "2 мин", "note": "на каждую руку" },
+        { "exercise": "vypady-s-gantelyami", "sets": 3, "reps": "8–10", "rest": "2 мин", "note": "на каждую ногу" },
+        { "exercise": "planka", "sets": 3, "reps": "45–60 сек", "rest": "1 мин" }
+      ]
+    }
+  ]
+}

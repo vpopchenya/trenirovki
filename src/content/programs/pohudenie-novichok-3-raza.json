@@ -1,0 +1,42 @@
+{
+  "name": "Похудение для новичка, 3 раза в неделю",
+  "description": "Три дня на всё тело с коротким отдыхом: простые упражнения с гантелями и своим весом. Для первых месяцев в зале.",
+  "goal": "похудение",
+  "level": "новичок",
+  "daysPerWeek": 3,
+  "tier": "free",
+  "weeks": 8,
+  "order": 9,
+  "days": [
+    {
+      "name": "День 1",
+      "items": [
+        { "exercise": "goblet-prisedaniya", "sets": 3, "reps": "10–15", "rest": "45–60 сек" },
+        { "exercise": "zhim-gantelej-lezha", "sets": 3, "reps": "10–15", "rest": "45–60 сек" },
+        { "exercise": "tyaga-gantelej-lezha", "sets": 3, "reps": "10–15", "rest": "45–60 сек" },
+        { "exercise": "zhim-gantelej-sidya", "sets": 3, "reps": "10–15", "rest": "45–60 сек" },
+        { "exercise": "planka", "sets": 3, "reps": "30–45 сек", "rest": "45–60 сек" }
+      ]
+    },
+    {
+      "name": "День 2",
+      "items": [
+        { "exercise": "zashagivaniya-na-skamyu", "sets": 3, "reps": "10–12", "rest": "1–1,5 мин", "note": "на каждую ногу" },
+        { "exercise": "zhim-gantelej-naklon", "sets": 3, "reps": "10–15", "rest": "45–60 сек" },
+        { "exercise": "tyaga-ganteli-v-naklone", "sets": 3, "reps": "10–15", "rest": "45–60 сек", "note": "на каждую руку" },
+        { "exercise": "mahi-gantelyami-v-storony", "sets": 3, "reps": "12–15", "rest": "45–60 сек" },
+        { "exercise": "skruchivaniya", "sets": 3, "reps": "15–20", "rest": "45–60 сек" }
+      ]
+    },
+    {
+      "name": "День 3",
+      "items": [
+        { "exercise": "vypady-s-gantelyami", "sets": 3, "reps": "10–12", "rest": "45–60 сек", "note": "на каждую ногу" },
+        { "exercise": "otzhimaniya-ot-pola", "sets": 3, "reps": "10–15", "rest": "45–60 сек" },
+        { "exercise": "tyaga-gantelej-lezha", "sets": 3, "reps": "10–15", "rest": "45–60 сек" },
+        { "exercise": "yagodichnyj-mostik", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "bokovaya-planka", "sets": 3, "reps": "20–30 сек", "rest": "45–60 сек", "note": "на каждую сторону" }
+      ]
+    }
+  ]
+}

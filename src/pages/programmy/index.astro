@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Barbell from "../../components/Barbell.astro";
-import { allPrograms, breadcrumbs, levelClass, slugify } from "../../lib/catalog";
+import { allPrograms, breadcrumbs, levelClass, pluralWeeks, slugify } from "../../lib/catalog";
 
 const base = import.meta.env.BASE_URL;
 const programs = await allPrograms();
@@ -38,12 +38,13 @@ const capital = (s: string | number) => String(s).replace(/^./, c => c.toUpperCa
     {programs.map(p => (
       <a class="pcard" href={`${base}programmy/${p.id}/`} data-goal={p.goal} data-level={p.level} data-days={p.daysPerWeek} data-testid="program-card">
         <b>{p.name}</b>
-        <Barbell groups={p.days[0].groups} />
+        {/* Все дни, а не только первый: иначе у программы «верх / низ» на карточке виден один верх. */}
+        <div class="bars">{p.days.map(d => <Barbell groups={d.groups} small />)}</div>
         <span class="tags">
           <span class="tag">{p.goal}</span>
           <span class:list={["tag", levelClass(p.level)]}>{p.level}</span>
           <span class="tag">{p.daysPerWeek} раза в неделю</span>
-          <span class="tag">{p.weeks} недель</span>
+          <span class="tag">{p.weeks} {pluralWeeks(p.weeks)}</span>
         </span>
       </a>
     ))}
@@ -78,6 +79,8 @@ const capital = (s: string | number) => String(s).replace(/^./, c => c.toUpperCa
   .pcard:active { transform: scale(.98); }
   @media (hover: hover) { .pcard:hover { border-color: var(--line); } }
   .pcard b { font-weight: 800; font-size: 17px; line-height: 1.3; }
+  .bars { display: flex; gap: 14px; }
+  .bars > :global(*) { flex: 1 1 0; min-width: 0; }
   @media (prefers-reduced-motion: reduce) { .pcard { transition: none; } }
   .nothing { margin-top: 20px; }
 </style>

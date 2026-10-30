@@ -1,6 +1,6 @@
 {
   "name": "Набор мышц для новичка, 3 раза в неделю",
-  "description": "Всё тело за тренировку, три разных дня. Подойдёт, если ходишь в зал первые месяцы. Между тренировками — день отдыха.",
+  "description": "Всё тело за тренировку, три разных дня. Подойдёт, если ходишь в зал первые месяцы.",
   "goal": "набор",
   "level": "новичок",
   "daysPerWeek": 3,
@@ -22,7 +22,7 @@
       "name": "День 2",
       "items": [
         { "exercise": "yagodichnyj-most-so-shtangoj", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
-        { "exercise": "zhim-shtangi-lezha", "sets": 3, "reps": "8–12", "rest": "2 мин" },
+        { "exercise": "zhim-shtangi-lezha", "sets": 3, "reps": "8–12", "rest": "2 мин", "note": "со страховкой" },
         { "exercise": "tyaga-ganteli-v-naklone", "sets": 3, "reps": "8–12", "rest": "1,5 мин", "note": "на каждую руку" },
         { "exercise": "mahi-gantelyami-v-storony", "sets": 3, "reps": "10–12", "rest": "1 мин" },
         { "exercise": "sgibanie-ruk-s-gantelyami", "sets": 3, "reps": "10–12", "rest": "1 мин" }

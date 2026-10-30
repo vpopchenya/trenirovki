@@ -1,0 +1,32 @@
+{
+  "name": "Сила для новичка, 2 раза в неделю",
+  "description": "Два дня, в каждом всё тело. Мало повторений, долгий отдых. Вес бери такой, чтобы оставалось ещё 2–3 повтора в запасе: сначала техника, предельные веса потом.",
+  "goal": "сила",
+  "level": "новичок",
+  "daysPerWeek": 2,
+  "tier": "free",
+  "weeks": 8,
+  "order": 6,
+  "days": [
+    {
+      "name": "День 1",
+      "items": [
+        { "exercise": "goblet-prisedaniya", "sets": 3, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "zhim-shtangi-lezha", "sets": 3, "reps": "6–8", "rest": "2–3 мин", "note": "со страховкой" },
+        { "exercise": "tyaga-gantelej-lezha", "sets": 3, "reps": "6–8", "rest": "2 мин" },
+        { "exercise": "zhim-gantelej-sidya", "sets": 3, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "planka", "sets": 3, "reps": "30–45 сек", "rest": "1 мин" }
+      ]
+    },
+    {
+      "name": "День 2",
+      "items": [
+        { "exercise": "yagodichnyj-most-so-shtangoj", "sets": 3, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "vypady-s-gantelyami", "sets": 3, "reps": "6–8", "rest": "2–3 мин", "note": "на каждую ногу" },
+        { "exercise": "zhim-gantelej-naklon", "sets": 3, "reps": "6–8", "rest": "2–3 мин" },
+        { "exercise": "tyaga-ganteli-v-naklone", "sets": 3, "reps": "6–8", "rest": "2 мин", "note": "на каждую руку" },
+        { "exercise": "skruchivaniya", "sets": 3, "reps": "12–15", "rest": "1 мин" }
+      ]
+    }
+  ]
+}
