@@ -9,7 +9,7 @@
   "order": 1,
   "days": [
     {
-      "name": "День А",
+      "name": "День 1",
       "items": [
         { "exercise": "goblet-prisedaniya", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
         { "exercise": "zhim-gantelej-lezha", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
@@ -19,7 +19,7 @@
       ]
     },
     {
-      "name": "День Б",
+      "name": "День 2",
       "items": [
         { "exercise": "yagodichnyj-most-so-shtangoj", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
         { "exercise": "zhim-shtangi-lezha", "sets": 3, "reps": "8–12", "rest": "2 мин" },
@@ -29,7 +29,7 @@
       ]
     },
     {
-      "name": "День В",
+      "name": "День 3",
       "items": [
         { "exercise": "vypady-s-gantelyami", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин", "note": "на каждую ногу" },
         { "exercise": "zhim-gantelej-naklon", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
