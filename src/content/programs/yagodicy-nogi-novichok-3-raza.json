@@ -1,0 +1,44 @@
+{
+  "name": "Ягодицы и ноги для новичка, 3 раза в неделю",
+  "description": "Упор на ягодицы и ноги: с них начинается каждый день, а верх тела поддерживаем. Подойдёт, если ходишь в зал первые месяцы.",
+  "goal": "набор",
+  "level": "новичок",
+  "daysPerWeek": 3,
+  "focus": "glutes",
+  "tier": "free",
+  "weeks": 8,
+  "order": 13,
+  "days": [
+    {
+      "name": "День 1",
+      "items": [
+        { "exercise": "yagodichnyj-most-so-shtangoj", "sets": 4, "reps": "8–12", "rest": "1,5–2 мин" },
+        { "exercise": "goblet-prisedaniya", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
+        { "exercise": "otvedenie-nogi-lezha-na-boku", "sets": 3, "reps": "12–15", "rest": "1 мин", "note": "на каждую ногу" },
+        { "exercise": "zhim-gantelej-lezha", "sets": 3, "reps": "8–12", "rest": "1,5 мин" },
+        { "exercise": "tyaga-gantelej-lezha", "sets": 3, "reps": "8–12", "rest": "1,5 мин" },
+        { "exercise": "skruchivaniya", "sets": 3, "reps": "12–15", "rest": "1 мин" }
+      ]
+    },
+    {
+      "name": "День 2",
+      "items": [
+        { "exercise": "vypady-s-gantelyami", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин", "note": "на каждую ногу" },
+        { "exercise": "sumo-prisedaniya-s-ganteley", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
+        { "exercise": "podem-na-noski", "sets": 3, "reps": "12–15", "rest": "1 мин" },
+        { "exercise": "zhim-gantelej-sidya", "sets": 3, "reps": "8–12", "rest": "1,5 мин" },
+        { "exercise": "tyaga-ganteli-v-naklone", "sets": 3, "reps": "8–12", "rest": "1,5 мин", "note": "на каждую руку" }
+      ]
+    },
+    {
+      "name": "День 3",
+      "items": [
+        { "exercise": "zashagivaniya-na-skamyu", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин", "note": "на каждую ногу" },
+        { "exercise": "yagodichnyj-most-so-shtangoj", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
+        { "exercise": "zhim-gantelej-naklon", "sets": 3, "reps": "8–12", "rest": "1,5 мин" },
+        { "exercise": "mahi-gantelyami-v-storony", "sets": 3, "reps": "10–12", "rest": "1 мин" },
+        { "exercise": "planka", "sets": 3, "reps": "30–45 сек", "rest": "1 мин" }
+      ]
+    }
+  ]
+}

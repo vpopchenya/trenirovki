@@ -55,6 +55,9 @@ export const HEAVY_WARNING = "Тяжёлые веса — только со ст
 /** У всех программ на похудение: на шаге «Основы» сюда добавится ссылка на питание. */
 export const FAT_LOSS_NOTE = "Честно: сами тренировки вес почти не снижают, результат даёт питание. Программа помогает сохранить мышцы, пока худеешь.";
 
+/** Ключ localStorage: имя файла выбранной программы. Хранится только на телефоне, на сервер не уходит. */
+export const MY_PROGRAM_KEY = "my-program";
+
 /** Программы по порядку, с упражнениями вместо ссылок. Сюда же — проверки, которых не выразить схемой. */
 export async function allPrograms() {
   const list = await getCollection("programs");
@@ -67,7 +70,8 @@ export async function allPrograms() {
       const dayGroups = items.map(i => i.ex.data.group);
       return { name: day.name, items, groups: dayGroups, muscles: [...new Set(dayGroups)].map(id => groups.find(g => g.id === id)!.name.toLowerCase()).join(" · ") };
     }));
-    return { id: p.id, ...p.data, days };
+    const focusGroup = groups.find(g => g.id === p.data.focus);
+    return { id: p.id, ...p.data, days, focusText: focusGroup && `упор на ${focusGroup.acc}` };
   }));
   return views.sort((a, b) => a.order - b.order);
 }

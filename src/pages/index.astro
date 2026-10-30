@@ -6,19 +6,40 @@ import BodyDefs from "../components/BodyDefs.astro";
 import MuscleIcon from "../components/MuscleIcon.astro";
 import { getCollection } from "astro:content";
 import groups from "../data/groups.json";
-import { plural } from "../lib/catalog";
+import { allPrograms, plural, MY_PROGRAM_KEY } from "../lib/catalog";
 import { subsText } from "../lib/groups";
 
 const all = await getCollection("exercises");
 const count = (id: string) => all.filter(e => e.data.group === id).length;
 const base = import.meta.env.BASE_URL;
 const first = groups[0];
+const programNames = Object.fromEntries((await allPrograms()).map(p => [p.id, p.name]));
 ---
 <Base jsonLd={{ "@context": "https://schema.org", "@type": "WebSite", name: "Карманный тренер", inLanguage: "ru", url: new URL(base, Astro.site).href }} title="Карманный тренер" description="Бесплатный каталог упражнений для зала и дома: 7 групп мышц, техника по шагам на русском и частые ошибки. Работает на телефоне.">
   <div class="home">
     <div class="hello">
       <p class="hi">Привет! Начнём?</p>
       <h1 data-testid="home-title">Что качаем <em class="wave">сегодня?</em></h1>
+      <a class="programs mine" data-testid="home-my-program" hidden>
+        <span><b>Моя программа</b><small></small></span>
+        <span class="btn main" aria-hidden="true">Открыть →</span>
+      </a>
+      {/* Сразу за разметкой, чтобы карточка не прыгала. Имени нет в списке (программу убрали) — главная как обычно.
+          pageshow — вернулись «Назад» из кэша браузера, а выбор мог поменяться. */}
+      <script is:inline define:vars={{ KEY: MY_PROGRAM_KEY, names: programNames, base }}>
+        const mine = document.querySelector(".mine");
+        const show = () => {
+          let id = null;
+          try { id = localStorage.getItem(KEY); } catch {}
+          const known = Object.keys(names).includes(id);
+          mine.hidden = !known;
+          if (!known) return;
+          mine.href = `${base}programmy/${id}/`;
+          mine.querySelector("small").textContent = names[id];
+        };
+        show();
+        addEventListener("pageshow", show);
+      </script>
     </div>
 
     <section class="map" aria-label="Выбор мышцы">
@@ -94,6 +115,7 @@ const first = groups[0];
   .programs { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border-radius: 24px; padding: 16px; text-decoration: none; }
   .programs b { display: block; font: 800 18px var(--f-display); letter-spacing: -.02em; }
   .programs small { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; }
+  .mine { margin-top: 16px; }
   /* Группы — плитки целиком в цвете блина: мышца в тёмном «диске», крупная бледная цифра — сколько упражнений. */
   .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
   .gcard { display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; min-height: 150px; background: var(--gc); color: var(--gi);

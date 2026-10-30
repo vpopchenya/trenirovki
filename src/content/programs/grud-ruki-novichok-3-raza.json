@@ -1,0 +1,45 @@
+{
+  "name": "Грудь и руки для новичка, 3 раза в неделю",
+  "description": "Упор на грудь и руки: каждый день начинается с жима и в каждом есть работа на руки, а остальное тело поддерживаем. Подойдёт, если ходишь в зал первые месяцы.",
+  "goal": "набор",
+  "level": "новичок",
+  "daysPerWeek": 3,
+  "focus": "chest",
+  "tier": "free",
+  "weeks": 8,
+  "order": 14,
+  "days": [
+    {
+      "name": "День 1",
+      "items": [
+        { "exercise": "zhim-shtangi-lezha", "sets": 4, "reps": "8–12", "rest": "2 мин", "note": "со страховкой" },
+        { "exercise": "tyaga-gantelej-lezha", "sets": 3, "reps": "8–12", "rest": "1,5 мин" },
+        { "exercise": "goblet-prisedaniya", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
+        { "exercise": "mahi-gantelyami-v-storony", "sets": 3, "reps": "10–12", "rest": "1 мин" },
+        { "exercise": "sgibanie-ruk-s-gantelyami", "sets": 3, "reps": "10–12", "rest": "1 мин" },
+        { "exercise": "planka", "sets": 3, "reps": "30–45 сек", "rest": "1 мин" }
+      ]
+    },
+    {
+      "name": "День 2",
+      "items": [
+        { "exercise": "zhim-gantelej-lezha", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
+        { "exercise": "tyaga-ganteli-v-naklone", "sets": 3, "reps": "8–12", "rest": "1,5 мин", "note": "на каждую руку" },
+        { "exercise": "vypady-s-gantelyami", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин", "note": "на каждую ногу" },
+        { "exercise": "sgibanie-ruk-so-shtangoj", "sets": 3, "reps": "8–12", "rest": "1,5 мин" },
+        { "exercise": "razgibanie-ganteli-iz-za-golovy", "sets": 3, "reps": "10–12", "rest": "1 мин" }
+      ]
+    },
+    {
+      "name": "День 3",
+      "items": [
+        { "exercise": "zhim-shtangi-naklon", "sets": 3, "reps": "8–12", "rest": "2 мин", "note": "со страховкой" },
+        { "exercise": "otzhimaniya-ot-pola", "sets": 3, "reps": "10–15", "rest": "1,5 мин" },
+        { "exercise": "yagodichnyj-most-so-shtangoj", "sets": 3, "reps": "8–12", "rest": "1,5–2 мин" },
+        { "exercise": "mahi-gantelyami-v-storony", "sets": 3, "reps": "10–12", "rest": "1 мин" },
+        { "exercise": "obratnye-otzhimaniya", "sets": 3, "reps": "10–12", "rest": "1 мин" },
+        { "exercise": "skruchivaniya", "sets": 3, "reps": "12–15", "rest": "1 мин" }
+      ]
+    }
+  ]
+}

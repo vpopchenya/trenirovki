@@ -41,6 +41,7 @@ const capital = (s: string | number) => String(s).replace(/^./, c => c.toUpperCa
         {/* Все дни, а не только первый: иначе у программы «верх / низ» на карточке виден один верх. */}
         <div class="bars">{p.days.map(d => <Barbell groups={d.groups} small />)}</div>
         <span class="tags">
+          {p.focusText && <span class="tag">{p.focusText}</span>}
           <span class="tag">{p.goal}</span>
           <span class:list={["tag", levelClass(p.level)]}>{p.level}</span>
           <span class="tag">{p.daysPerWeek} раза в неделю</span>
