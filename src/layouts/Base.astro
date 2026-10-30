@@ -87,7 +87,7 @@ const items = [
       navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
     }
     // «Назад»: пришли именно с той страницы, куда ведёт кнопка, — возвращаемся по истории (сохранятся прокрутка
-    // и фильтры); иначе (ссылка извне, другая наша страница) — обычный переход по href на уровень выше.
+    // и фильтры), то же из раздела alsoFrom; иначе (ссылка извне, другая наша страница) — обычный переход по href на уровень выше.
     // В установленном на iPhone приложении другой кнопки «назад» нет.
     const link = document.querySelector<HTMLAnchorElement>(".back");
     if (link) {
@@ -97,6 +97,7 @@ const items = [
       const { alsoPath, alsoLabel } = link.dataset;
       const viaOther = same && !!alsoPath && from!.pathname.startsWith(alsoPath);
       if (viaOther) {
+        link.href = from!.href; // открыли в новой вкладке — истории нет, но подпись всё равно не должна обманывать
         link.querySelector("span")!.textContent = alsoLabel!;
         link.querySelector("i")?.remove(); // точка цвета группы про группу, а ведём уже не туда
       }

@@ -41,9 +41,18 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
       </details>
     ))}
   </div>
-  {/* На телефоне открыт первый день, остальные свёрнуты. В разметке открыты все: для поиска и без JavaScript. */}
+  {/* На телефоне открыт первый день, остальные свёрнуты. В разметке открыты все: для поиска и без JavaScript.
+      Какие дни открыты, помним до закрытия вкладки: сходил посмотреть технику, вернулся — твой день не свернулся. */}
   <script is:inline>
-    if (matchMedia("(max-width: 1023px)").matches) document.querySelectorAll(".day").forEach((d, i) => { if (i) d.open = false; });
+    if (matchMedia("(max-width: 1023px)").matches) {
+      const days = [...document.querySelectorAll(".day")], key = "days:" + location.pathname;
+      let saved = null;
+      try { saved = JSON.parse(sessionStorage.getItem(key)); } catch {}
+      days.forEach((d, i) => { d.open = saved ? saved.includes(i) : i === 0; });
+      days.forEach(d => d.addEventListener("toggle", () => {
+        try { sessionStorage.setItem(key, JSON.stringify(days.flatMap((x, i) => x.open ? [i] : []))); } catch {}
+      }));
+    }
   </script>
 
   <section class="how">
