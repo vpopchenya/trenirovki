@@ -42,6 +42,7 @@ export const breadcrumbs = (site: URL, items: [string, string][]) => ({
 /** Что бывает дома и в дороге: по этому списку работает фильтр «Без зала». */
 export const HOME_EQUIPMENT = ["Резинка", "Свой вес"];
 export const isHome = (equipment: string[]) => equipment.every(x => HOME_EQUIPMENT.includes(x));
+export const HOME_LABEL = "🏠 Без зала";
 /** Общая для всех упражнений с резинкой ошибка: страница добавляет её сама, в файлах упражнений не повторяем. */
 export const BAND_SAFETY = "Плохо закреплённая или надорванная резинка — может сорваться и ударить. Перед подходом проверь узел и саму резинку";
 
@@ -50,6 +51,9 @@ export const levelClass = (level: string) => (level === "новичок" ? "lvl1
 export const HEALTH_WARNING = "Мы не врачи. Есть болезни или травмы — сначала к врачу или тренеру.";
 /** Общее для всех программ правило: на странице одно на всех, в файлах программ не повторяем. */
 export const PROGRESS_RULE = "Сделал все подходы на верхней границе повторений — в следующий раз возьми чуть больше вес. Упражнения без веса: добавь повторы или секунды.";
+/** То же для программ без зала: штанги нет, нагрузку прибавляют резинкой. */
+export const HOME_PROGRESS_RULE = "Сделал все подходы на верхней границе повторений — в следующий раз возьми резинку потуже или перехвати её короче, а если она закреплена — встань дальше от крепления. Упражнения без резинки: добавь повторы или секунды.";
+export const NO_BAND_NOTE = "Нет резинки? На странице каждого такого упражнения написано, чем его заменить.";
 export const REST_RULE = "Между тренировками — минимум день отдыха: мышцы растут и восстанавливаются, пока ты отдыхаешь.";
 export const HEAVY_WARNING = "Тяжёлые веса — только со страховкой.";
 /** У всех программ на похудение: на шаге «Основы» сюда добавится ссылка на питание. */
@@ -71,7 +75,9 @@ export async function allPrograms() {
       return { name: day.name, items, groups: dayGroups, muscles: [...new Set(dayGroups)].map(id => groups.find(g => g.id === id)!.name.toLowerCase()).join(" · ") };
     }));
     const focusGroup = groups.find(g => g.id === p.data.focus);
-    return { id: p.id, ...p.data, days, focusText: focusGroup && `упор на ${focusGroup.acc}` };
+    // Считаем по упражнениям, а не отдельным полем: зальное упражнение в «домашней» программе сразу снимет метку.
+    const home = days.every(d => d.items.every(i => isHome(i.ex.data.equipment)));
+    return { id: p.id, ...p.data, days, home, focusText: focusGroup && `упор на ${focusGroup.acc}` };
   }));
   return views.sort((a, b) => a.order - b.order);
 }

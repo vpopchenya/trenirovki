@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Barbell from "../../components/Barbell.astro";
-import { allPrograms, breadcrumbs, plural, pluralWeeks, FAT_LOSS_NOTE, HEALTH_WARNING, HEAVY_WARNING, MY_PROGRAM_KEY, PROGRESS_RULE, REST_RULE } from "../../lib/catalog";
+import { allPrograms, breadcrumbs, plural, pluralWeeks, BAND_SAFETY, FAT_LOSS_NOTE, HEALTH_WARNING, HEAVY_WARNING, HOME_PROGRESS_RULE, MY_PROGRAM_KEY, NO_BAND_NOTE, PROGRESS_RULE, REST_RULE } from "../../lib/catalog";
 
 export async function getStaticPaths() {
   return (await allPrograms()).map(p => ({ params: { id: p.id }, props: { p } }));
@@ -51,6 +51,7 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
     addEventListener("pageshow", show);
   </script>
   {p.goal === "похудение" && <p class="how" data-testid="fat-loss-note">{FAT_LOSS_NOTE}</p>}
+  {p.home && <p class="how" data-testid="no-band-note">{NO_BAND_NOTE}</p>}
 
   <div class="days">
     {p.days.map(d => (
@@ -86,13 +87,13 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
 
   <section class="how">
     <h2>Как прибавлять</h2>
-    <p>{PROGRESS_RULE}</p>
+    <p>{p.home ? HOME_PROGRESS_RULE : PROGRESS_RULE}</p>
   </section>
   <section class="how">
     <h2>Когда тренироваться</h2>
     <p>{REST_RULE}</p>
   </section>
-  <p class="warn" data-testid="health-warning">{HEALTH_WARNING} {HEAVY_WARNING}</p>
+  <p class="warn" data-testid="health-warning">{HEALTH_WARNING} {p.home ? `${BAND_SAFETY}.` : HEAVY_WARNING}</p>
 </Base>
 
 <style>

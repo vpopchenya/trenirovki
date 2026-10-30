@@ -1,0 +1,45 @@
+{
+  "name": "Дома: набор мышц для новичка, 3 раза в неделю",
+  "description": "Всё тело за тренировку без зала: резинка и свой вес. Подойдёт дома и в дороге, если занимаешься первые месяцы.",
+  "goal": "набор",
+  "level": "новичок",
+  "daysPerWeek": 3,
+  "tier": "free",
+  "weeks": 8,
+  "order": 15,
+  "days": [
+    {
+      "name": "День 1",
+      "items": [
+        { "exercise": "prisedaniya-s-rezinkoj", "sets": 3, "reps": "15–20", "rest": "1–1,5 мин" },
+        { "exercise": "otzhimaniya-ot-pola", "sets": 3, "reps": "10–20", "rest": "1–1,5 мин", "note": "тяжело — от края дивана" },
+        { "exercise": "tyaga-rezinki-k-poyasu", "sets": 3, "reps": "12–20", "rest": "1–1,5 мин" },
+        { "exercise": "zhim-rezinki-vverh", "sets": 3, "reps": "12–15", "rest": "1 мин" },
+        { "exercise": "yagodichnyj-mostik-s-rezinkoj", "sets": 3, "reps": "15–20", "rest": "1 мин" },
+        { "exercise": "planka", "sets": 3, "reps": "30–45 сек", "rest": "1 мин" }
+      ]
+    },
+    {
+      "name": "День 2",
+      "items": [
+        { "exercise": "vypady", "sets": 3, "reps": "10–15", "rest": "1–1,5 мин", "note": "на каждую ногу" },
+        { "exercise": "zhim-rezinki-stoya", "sets": 3, "reps": "12–20", "rest": "1–1,5 мин" },
+        { "exercise": "tyaga-rezinki-sverhu", "sets": 3, "reps": "12–20", "rest": "1–1,5 мин" },
+        { "exercise": "mahi-s-rezinkoj-v-storony", "sets": 3, "reps": "15–20", "rest": "1 мин" },
+        { "exercise": "sgibanie-ruk-s-rezinkoj", "sets": 3, "reps": "12–20", "rest": "1 мин" },
+        { "exercise": "skruchivaniya", "sets": 3, "reps": "15–20", "rest": "1 мин" }
+      ]
+    },
+    {
+      "name": "День 3",
+      "items": [
+        { "exercise": "rumynskaya-tyaga-s-rezinkoj", "sets": 3, "reps": "12–20", "rest": "1–1,5 мин" },
+        { "exercise": "otzhimaniya-ot-pola", "sets": 3, "reps": "10–20", "rest": "1–1,5 мин", "note": "тяжело — от края дивана" },
+        { "exercise": "tyaga-rezinki-k-poyasu", "sets": 3, "reps": "12–20", "rest": "1–1,5 мин" },
+        { "exercise": "razvedenie-rezinki-pered-grudyu", "sets": 3, "reps": "15–20", "rest": "1 мин" },
+        { "exercise": "shagi-v-storonu-s-rezinkoj", "sets": 3, "reps": "10–15", "rest": "1 мин", "note": "шагов в каждую сторону" },
+        { "exercise": "razgibanie-ruk-s-rezinkoj", "sets": 3, "reps": "12–20", "rest": "1 мин" }
+      ]
+    }
+  ]
+}

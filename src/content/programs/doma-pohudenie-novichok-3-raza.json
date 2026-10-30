@@ -1,0 +1,42 @@
+{
+  "name": "Дома: похудение для новичка, 3 раза в неделю",
+  "description": "Три дня на всё тело без зала, с коротким отдыхом: резинка и свой вес. Подойдёт дома и в дороге.",
+  "goal": "похудение",
+  "level": "новичок",
+  "daysPerWeek": 3,
+  "tier": "free",
+  "weeks": 8,
+  "order": 16,
+  "days": [
+    {
+      "name": "День 1",
+      "items": [
+        { "exercise": "vypady", "sets": 3, "reps": "10–15", "rest": "45–60 сек", "note": "на каждую ногу" },
+        { "exercise": "otzhimaniya-ot-pola", "sets": 3, "reps": "10–15", "rest": "45–60 сек", "note": "тяжело — от края дивана" },
+        { "exercise": "tyaga-rezinki-k-poyasu", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "mahi-s-rezinkoj-v-storony", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "planka", "sets": 3, "reps": "30–45 сек", "rest": "45–60 сек" }
+      ]
+    },
+    {
+      "name": "День 2",
+      "items": [
+        { "exercise": "prisedaniya-s-rezinkoj", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "zhim-rezinki-stoya", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "tyaga-rezinki-sverhu", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "yagodichnyj-mostik", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "bokovaya-planka", "sets": 3, "reps": "20–30 сек", "rest": "45–60 сек", "note": "на каждую сторону" }
+      ]
+    },
+    {
+      "name": "День 3",
+      "items": [
+        { "exercise": "rumynskaya-tyaga-s-rezinkoj", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "otzhimaniya-ot-pola", "sets": 3, "reps": "10–15", "rest": "45–60 сек", "note": "тяжело — от края дивана" },
+        { "exercise": "tyaga-rezinki-k-poyasu", "sets": 3, "reps": "15–20", "rest": "45–60 сек" },
+        { "exercise": "zhim-rezinki-vverh", "sets": 3, "reps": "12–15", "rest": "45–60 сек" },
+        { "exercise": "shagi-v-storonu-s-rezinkoj", "sets": 3, "reps": "10–15", "rest": "45–60 сек", "note": "шагов в каждую сторону" }
+      ]
+    }
+  ]
+}

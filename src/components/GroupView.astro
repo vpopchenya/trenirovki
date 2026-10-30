@@ -4,7 +4,7 @@
 import Base from "../layouts/Base.astro";
 import BodyDefs from "./BodyDefs.astro";
 import MuscleIcon from "./MuscleIcon.astro";
-import { exercisesOf, subsWithExercises, slugify, plural, levelClass, breadcrumbs, isHome, type Group, type Side } from "../lib/catalog";
+import { exercisesOf, subsWithExercises, slugify, plural, levelClass, breadcrumbs, isHome, HOME_LABEL, type Group, type Side } from "../lib/catalog";
 
 interface Props { group: Group; sub?: string }
 const { group, sub } = Astro.props;
@@ -60,7 +60,7 @@ const description = sub
               <p class="flabel" id="lbl-eq" data-testid="filter-eq-label">Инвентарь</p>
               <div class="chips" data-f="eq" role="group" aria-labelledby="lbl-eq">
                 <button class="chip" type="button" aria-pressed="true" data-v="" data-testid="filter-eq-all">Любое</button>
-                {homeChip && <button class="chip" type="button" aria-pressed="false" data-v="home" data-testid="filter-eq-home">🏠 Без зала</button>}
+                {homeChip && <button class="chip" type="button" aria-pressed="false" data-v="home" data-testid="filter-eq-home">{HOME_LABEL}</button>}
                 {equipment.map(s => <button class="chip" type="button" aria-pressed="false" data-v={s} data-testid={`filter-eq-${slugify(s)}`}>{s}</button>)}
               </div>
             </div>
