@@ -79,15 +79,16 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
   summary::-webkit-details-marker { display: none; }
   summary::after { content: ""; width: 9px; height: 9px; margin-right: 3px; border: solid var(--fg); border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg); }
   .day[open] summary::after { transform: translateY(2px) rotate(-135deg); }
-  summary b { font-weight: 800; font-size: 17px; }
-  summary span { font: 500 12px var(--f-mono); color: var(--muted); margin-left: auto; }
-  .mus { margin: 6px 0 4px; font-size: 13px; color: var(--muted); }
-  .ex { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 48px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 15px; text-decoration: none; }
+  summary b { font-weight: 800; font-size: 20px; }
+  summary span { font: 500 14px var(--f-mono); color: var(--muted); margin-left: auto; }
+  .mus { margin: 6px 0 4px; font-size: 15px; color: var(--muted); }
+  /* В зале на экран смотрят мельком: подходы — отдельной крупной строкой под названием, а не мелко сбоку. */
+  .ex { display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 4px 12px; align-items: center; min-height: 48px; padding: 12px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
   .ex:last-child { border-bottom: 0; }
-  .ex i { width: 12px; height: 12px; border-radius: 50%; background: var(--gc); }
-  .ex b { font-weight: 700; line-height: 1.25; }
-  .ex > span { font: 500 13px var(--f-mono); color: var(--text); text-align: right; white-space: nowrap; }
-  .ex small { display: block; font: 500 12px var(--f-body); color: var(--muted); }
+  .ex i { width: 12px; height: 12px; margin-top: 5px; align-self: start; border-radius: 50%; background: var(--gc); }
+  .ex b { font-weight: 800; font-size: 18px; line-height: 1.25; }
+  .ex > span { grid-column: 2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font: 500 17px var(--f-mono); color: var(--fg); }
+  .ex small { display: block; font: 500 15px var(--f-body); color: var(--muted); }
   .how { background: var(--surface); border-radius: 22px; padding: 16px; margin-top: 12px; max-width: 70ch; }
   .how p { margin: 6px 0 0; color: var(--text); }
   .warn { font-size: 13px; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; margin: 12px 0 0; max-width: 70ch; }
