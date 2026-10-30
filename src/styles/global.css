@@ -43,10 +43,13 @@ h2 { font-size: clamp(19px, 2.2vw, 24px); letter-spacing: -.02em; }
 .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 11px 18px; font-weight: 800; font-size: 15px; cursor: pointer; text-decoration: none; white-space: nowrap; }
 .btn.main { background: var(--accent); color: var(--accent-ink); }
 .soon { font: 500 10px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; margin-left: 4px; }
-.crumbs { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+/* Ссылки пути светлые, текущая страница — белая и жирная, разделители тусклые: путь читается с первого взгляда. */
+.crumbs { display: flex; flex-wrap: wrap; gap: 8px; font-size: 15px; font-weight: 700; color: var(--fg); margin-bottom: 16px; }
 /* На телефоне путь заменяет кнопка «Назад» в шапке — длинная строка ссылок там только мешает. */
 @media (max-width: 767px) { .crumbs { display: none; } }
-.crumbs a { color: var(--muted); }
+.crumbs a { color: var(--fg2); text-decoration: none; }
+.crumbs a + span:not(:last-child) { color: var(--muted); font-weight: 400; }
+@media (hover: hover) { .crumbs a:hover { color: var(--accent); } }
 .stub { color: #ffb36b; }
 /* Метки упражнения: мелкая группа, оборудование, уровень (lvl1 — новичок, lvl2 — опытный). */
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }

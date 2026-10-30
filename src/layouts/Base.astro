@@ -128,11 +128,11 @@ const items = [
   @media (max-width: 1023px) { .logo.has-back { display: none; } }
   .logo em { font-style: normal; color: var(--accent); }
   /* Меню живое: светлый текст, активный раздел — оранжевый, нажатие «проседает», наведение подсвечивает. */
-  .topnav { display: none; gap: 6px; margin-left: auto; font-weight: 800; font-size: 15px; color: var(--fg2); align-items: center; }
+  .topnav { display: none; gap: 6px; margin-left: auto; font-weight: 800; font-size: 16px; color: var(--fg); align-items: center; }
   .topnav > * { padding: 8px 14px; border-radius: 999px; text-decoration: none; transition: background .15s, color .15s, transform .1s; }
   .topnav a.on { background: var(--accent); color: var(--accent-ink); }
   .topnav a:active { transform: scale(.95); }
-  .topnav > span { color: var(--muted); }
+  .topnav > span { color: var(--fg2); opacity: .7; }
   @media (hover: hover) { .topnav a:not(.on):hover { background: var(--surface2); color: var(--fg); } }
 
   main { padding-top: 28px; }
