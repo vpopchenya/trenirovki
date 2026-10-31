@@ -2,9 +2,7 @@
 // Страница группы мышц и страница её мелкой группы — одна вёрстка. Мелкие группы — ссылки на свои страницы
 // (они нужны для поиска: «упражнения на верх груди»), оборудование фильтруется прямо на странице.
 import Base from "../layouts/Base.astro";
-import BodyDefs from "./BodyDefs.astro";
-import MuscleIcon from "./MuscleIcon.astro";
-import { exercisesOf, subsWithExercises, slugify, plural, levelClass, breadcrumbs, isHome, HOME_LABEL, type Group, type Side } from "../lib/catalog";
+import { exercisesOf, subsWithExercises, slugify, plural, levelClass, levelLabel, equipmentIcon, equipmentText, breadcrumbs, isHome, HOME_LABEL, type Group } from "../lib/catalog";
 
 interface Props { group: Group; sub?: string }
 const { group, sub } = Astro.props;
@@ -32,14 +30,13 @@ const description = sub
       <a href={base}>Каталог</a><span>/</span>
       {sub ? <><a href={groupUrl}>{group.name}</a><span>/</span><span>{sub}</span></> : <span>{group.name}</span>}
     </nav>
-    <div class="ghead">
-      <BodyDefs sides={[group.side as Side]} />
-      <MuscleIcon group={group} class="gicon" />
+    <section class="ghead tinted">
+      <img src={`${base}img/m-${group.id}.webp`} alt="" width="438" height="360" />
       <div>
-        <h1 data-testid="group-title">{sub ? <>{group.name}: <em class="wave">{sub.toLowerCase()}</em></> : group.name}</h1>
-        <p class="eyebrow">{list.length > 0 && `${list.length} ${plural(list.length)} · `}{group.subs.join(" · ")}</p>
+        <h1 data-testid="group-title">{sub ? `${group.name}: ${sub.toLowerCase()}` : group.name}</h1>
+        {list.length > 0 && <p>{list.length} {plural(list.length)}</p>}
       </div>
-    </div>
+    </section>
 
     {list.length === 0 ? (
       <p class="lead empty" data-testid="group-empty">Упражнения на эту группу скоро появятся.</p>
@@ -59,7 +56,7 @@ const description = sub
             <div class="frow">
               <p class="flabel" id="lbl-eq" data-testid="filter-eq-label">Инвентарь</p>
               <div class="chips" data-f="eq" role="group" aria-labelledby="lbl-eq">
-                <button class="chip" type="button" aria-pressed="true" data-v="" data-testid="filter-eq-all">Любое</button>
+                <button class="chip" type="button" aria-pressed="true" data-v="" data-testid="filter-eq-all">Любой</button>
                 {homeChip && <button class="chip" type="button" aria-pressed="false" data-v="home" data-testid="filter-eq-home">{HOME_LABEL}</button>}
                 {equipment.map(s => <button class="chip" type="button" aria-pressed="false" data-v={s} data-testid={`filter-eq-${slugify(s)}`}>{s}</button>)}
               </div>
@@ -69,19 +66,16 @@ const description = sub
         <div class="exlist">
           {list.map(e => (
             <a class="ex" href={`${base}uprazhneniya/${e.id}/`} data-eq={e.data.equipment.join("|")} data-home={String(isHome(e.data.equipment))} data-ex={e.id} data-testid="exercise-card">
-              <MuscleIcon group={group} class="thumb" />
-              <span>
+              <span class="iconbox"><img src={`${base}img/${equipmentIcon(e.data.equipment)}.webp`} alt="" width="58" height="58" loading="lazy" /></span>
+              <span class="txt">
                 <b>{e.data.name}</b>
-                <span class="tags">
-                  <span class="tag">{e.data.sub}</span>
-                  <span class="tag">{e.data.equipment.join(", ")}</span>
-                  <span class:list={["tag", levelClass(e.data.level)]}>{e.data.level}</span>
-                </span>
+                <span class="info">{e.data.sub} · {equipmentText(e.data.equipment)}</span>
+                <span class:list={["level", levelClass(e.data.level)]}>{levelLabel(e.data.level)}</span>
               </span>
             </a>
           ))}
         </div>
-        <p class="lead nothing" data-testid="filter-empty" hidden>С таким инвентарём упражнений нет. Нажми «Любое».</p>
+        <p class="lead nothing" data-testid="filter-empty" hidden>С таким инвентарём упражнений нет. Нажми «Любой».</p>
       </>
     )}
   </div>
@@ -105,19 +99,21 @@ const description = sub
 </script>
 
 <style>
-  .ghead { display: flex; align-items: center; gap: 14px; }
+  .ghead { display: flex; align-items: center; gap: 14px; padding: 10px; border-radius: 28px; color: var(--gi); }
+  .ghead img { flex: none; display: block; width: 146px; height: 120px; object-fit: cover; border-radius: 20px; background: var(--bg); }
   .ghead > div { min-width: 0; }
-  .ghead .eyebrow { margin: 12px 0 0; } /* место под волнистое подчёркивание заголовка */
-  .ghead :global(.gicon) { width: 68px; height: 68px; flex: none; border-radius: 50%; display: block; background: var(--bg); box-shadow: 0 0 0 4px var(--gc); }
+  .ghead h1 { font-size: clamp(22px, 3.4vw, 34px); overflow-wrap: anywhere; }
+  .ghead p { margin: 2px 0 0; font-size: 14px; font-weight: 800; }
   .empty, .nothing { margin-top: 24px; }
-  .filters { display: grid; gap: 14px; margin: 24px 0 20px; }
-  .exlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
-  .ex { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; background: color-mix(in srgb, var(--gc) 10%, var(--surface));
-    border-radius: 24px; padding: 12px; text-decoration: none; border: 1px solid transparent; transition: transform .15s cubic-bezier(.3, 1.5, .5, 1); -webkit-tap-highlight-color: transparent; }
-  .ex:active { transform: scale(.97); }
-  @media (hover: hover) { .ex:hover { border-color: color-mix(in srgb, var(--gc) 50%, transparent); } }
-  .ex :global(.thumb) { width: 72px; height: 72px; border-radius: 50%; background: var(--bg); display: block; box-shadow: 0 0 0 3px var(--gc); }
-  .ex b { display: block; font-weight: 800; font-size: 17px; line-height: 1.3; }
+  .filters { display: grid; gap: 14px; margin: 14px 0; }
+  .exlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+  .ex { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: center; gap: 14px; min-height: 92px; padding: 10px 14px 10px 10px; border-radius: 22px; background: var(--surface); text-decoration: none;
+    transition: transform .15s; -webkit-tap-highlight-color: transparent; }
+  .ex:active { transform: scale(.98); }
+  @media (hover: hover) { .ex:hover { background: var(--surface2); } }
   @media (prefers-reduced-motion: reduce) { .ex { transition: none; } }
-  .ex .tags { margin-top: 6px; }
+  .txt { display: grid; gap: 2px; min-width: 0; }
+  .txt b { font-size: 16px; line-height: 1.25; font-weight: 800; }
+  .info { font-size: 13px; line-height: 1.35; font-weight: 700; color: var(--soft); }
+  .level { font-size: 13px; line-height: 1.3; font-weight: 800; }
 </style>

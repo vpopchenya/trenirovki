@@ -5,11 +5,10 @@
 @import "@fontsource/nunito/700.css";
 @import "@fontsource/nunito/800.css";
 @import "@fontsource/unbounded/800.css";
-@import "@fontsource/ibm-plex-mono/500.css";
 
 :root {
   color-scheme: dark;
-  --bg: #121417; --surface: #1c1f24; --surface2: #23272d; --fg: #eef0f2; --text: #e2e5e9; --fg2: #c9cdd3; --muted: #8a9099; --line: #2b2f36;
+  --bg: #121417; --surface: #1c1f24; --surface2: #23272d; --fg: #eef0f2; --text: #e2e5e9; --fg2: #c9cdd3; --muted: #8a9099; --soft: #a9afb8; --line: #2b2f36;
   --accent: #ff7a1a; --accent-ink: #121417;
   --paper: #f1f2f4; --paper-ink: #4a505a; /* светлая капсула нижнего меню */
   --muscle: #3c424c; --skin: #262a31;
@@ -19,7 +18,6 @@
   /* У Unbounded подключено только начертание 800 — пишем его явно (font: 800 …), иначе браузер дорисует жирность сам. */
   --f-display: "Unbounded", "Arial Black", system-ui, sans-serif;
   --f-body: "Nunito", "Segoe UI", system-ui, sans-serif;
-  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -34,10 +32,9 @@ button { font: inherit; color: inherit; }
 h1, h2 { font-family: var(--f-display); font-weight: 800; letter-spacing: -.03em; margin: 0; text-wrap: balance; line-height: 1.12; }
 h1 { font-size: clamp(27px, 4.6vw, 52px); }
 h2 { font-size: clamp(19px, 2.2vw, 24px); letter-spacing: -.02em; }
-/* Главное слово заголовка — цветом группы (или оранжевым) с волнистым подчёркиванием. */
-.wave { font-style: normal; color: var(--gc, var(--accent)); text-decoration: underline wavy var(--gc, var(--accent));
-  text-decoration-thickness: 3px; text-underline-offset: .22em; text-decoration-skip-ink: none; }
-.eyebrow { font: 500 12px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+/* Главное слово заголовка — оранжевым. */
+.hl { font-style: normal; color: var(--accent); }
+.eyebrow { font-weight: 800; font-size: 13px; color: var(--muted); }
 .lead { color: var(--text); font-size: 17px; max-width: 54ch; margin: 0; }
 
 .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 11px 18px; font-weight: 800; font-size: 15px; cursor: pointer; text-decoration: none; white-space: nowrap; }
@@ -49,18 +46,28 @@ h2 { font-size: clamp(19px, 2.2vw, 24px); letter-spacing: -.02em; }
 .crumbs a { text-decoration: none; }
 .crumbs a + span:not(:last-child) { color: var(--muted); font-weight: 400; }
 @media (hover: hover) { .crumbs a:hover { color: var(--accent); } }
-.stub { color: #ffb36b; }
-/* Метки упражнения: мелкая группа, оборудование, уровень (lvl1 — новичок, lvl2 — опытный). */
-.tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.tag { font: 500 12px var(--f-mono); color: var(--muted); background: var(--bg); border-radius: 6px; padding: 2px 8px; }
-.tag.lvl1 { color: #7fd99a; }
-.tag.lvl2 { color: #ffb36b; }
+/* Уровень упражнения: lvl1 — новичок, lvl2 — опытный. */
+.lvl1 { color: #7fd99a; }
+.lvl2 { color: #ffb36b; }
+/* Фон цвета группы с мелким текстом: чуть темнее чистого блина, иначе белый на красном не дотягивает до 4,5:1. */
+.tinted { background: var(--gc); background: color-mix(in srgb, var(--gc) 92%, #000); }
+/* Значок инвентаря на тёмной плашке: на цветном фоне видны огрехи по краю картинки. */
+.iconbox { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 18px; background: var(--bg); }
+.iconbox img { display: block; width: 58px; height: 58px; }
+/* Карточка программы и статьи: текст слева, большой значок справа. */
+.icard { display: grid; grid-template-columns: minmax(0, 1fr) 96px; align-items: center; gap: 10px; background: var(--surface); border-radius: 24px; padding: 16px 12px 16px 18px; text-decoration: none;
+  transition: transform .15s; -webkit-tap-highlight-color: transparent; }
+.icard:active { transform: scale(.98); }
+.icard img { display: block; width: 96px; height: 96px; }
+@media (hover: hover) { .icard:hover { background: var(--surface2); } }
+@media (prefers-reduced-motion: reduce) { .icard { transition: none; } }
+
 /* Фильтры чипами: на странице группы выбранный — цвета группы (--gc), в остальных местах оранжевый. */
 .frow { display: grid; gap: 6px; min-width: 0; }
-.flabel { margin: 0; font: 500 12px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.flabel { margin: 0; font-weight: 800; font-size: 13px; color: var(--muted); }
 .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-.chip { flex: none; display: inline-flex; align-items: center; font-weight: 800; font-size: 14px; text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0 14px; min-height: 40px; cursor: pointer;
+.chip { flex: none; display: inline-flex; align-items: center; font-weight: 800; font-size: 14px; text-decoration: none; background: var(--surface); border: 0; border-radius: 999px; padding: 0 14px; min-height: 44px; cursor: pointer;
   transition: transform .1s; -webkit-tap-highlight-color: transparent; }
 .chip:active { transform: scale(.95); }
-.chip[aria-pressed="true"], .chip[aria-current="page"] { border-color: var(--gc, var(--accent)); background: var(--gc, var(--accent)); color: var(--gi, var(--accent-ink)); }
+.chip[aria-pressed="true"], .chip[aria-current="page"] { background: var(--gc, var(--accent)); background: color-mix(in srgb, var(--gc, var(--accent)) 92%, #000); color: var(--gi, var(--accent-ink)); }
 @media (prefers-reduced-motion: reduce) { .chip { transition: none; } }

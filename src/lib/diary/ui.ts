@@ -59,14 +59,10 @@ export function backIcon() {
   return icon;
 }
 
-/** День штангой: cur — до какого упражнения блины цветные, будущие серые. */
-export function barbell(items: Pick<WorkoutItem, "group">[], { cur = Infinity, small = false } = {}) {
-  const plate = (x: Pick<WorkoutItem, "group">, i: number) => el("i", {
-    class: i > cur ? "off" : "",
-    style: `${groupColor(x.group)};height:${Math.max((small ? 26 : 34) - i * (small ? 3 : 4), 6)}px`,
-  });
-  return el("div", { class: small ? "bb small" : "bb", "aria-hidden": "true", "data-testid": "barbell" },
-    ...items.map(plate), el("span"), ...items.map(plate).reverse());
+/** Прогресс дня полоской: сегмент на упражнение, lit — какие цветные, остальные серые. */
+export function dayBar<T extends Pick<WorkoutItem, "group">>(items: T[], { lit = (_x: T, _i: number): boolean => true, small = false } = {}) {
+  return el("div", { class: small ? "segs small" : "segs", "aria-hidden": "true", "data-testid": "day-bar", style: `--n:${items.length}` },
+    ...items.map((x, i) => el("i", { class: lit(x, i) ? "" : "off", style: groupColor(x.group) })));
 }
 
 const FIELD_LABEL: Record<SetField, string> = { weight: "Вес, кг", reps: "Повторы", seconds: "Секунды" };

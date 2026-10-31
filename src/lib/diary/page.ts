@@ -1,7 +1,7 @@
 // Экран дневника: список, подробности, исправление, удаление, файл.
 import { clearWorkouts, deleteWorkout, getMeta, getWorkout, listWorkouts, updateSet, type Meta, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
 import { filesReminder, LIMITS, loadDiaryFile, saveDiaryFile } from "./file";
-import { backIcon, barbell, button, countSets, dayMonth, el, goal, groupColor, minutes, numberField, plural, present, setText, type Child, type SetValues } from "./ui";
+import { backIcon, button, countSets, dayBar, dayMonth, el, goal, groupColor, minutes, numberField, plural, present, setText, type Child, type SetValues } from "./ui";
 
 const setsWord = (n: number) => `${n} ${plural(n, "подход", "подхода", "подходов")}`;
 const workoutsWord = (n: number) => `${n} ${plural(n, "тренировка", "тренировки", "тренировок")}`;
@@ -98,7 +98,7 @@ function workoutRow(w: Workout) {
   const details = [setsWord(countSets(w)), minutes(w) ? `${minutes(w)} мин` : "не закончена", w.items.some(x => x.skipped) && "есть пропуск"].filter(Boolean).join(" · ");
   return button("wrow", "workout-row", [
     el("span", { class: "wdate" }, day, el("small", {}, weekday)),
-    el("span", {}, el("b", {}, w.dayName), el("span", { class: "sub" }, details), barbell(w.items, { small: true })),
+    el("span", {}, el("b", {}, w.dayName), el("span", { class: "sub" }, details), dayBar(w.items, { small: true })),
   ], () => { location.hash = encodeURIComponent(w.id); });
 }
 
@@ -115,7 +115,7 @@ function workoutList(workouts: Workout[]) {
 
 function emptyView() {
   return [
-    el("h1", { "data-testid": "diary-title" }, el("em", { class: "wave" }, "Дневник")),
+    el("h1", { "data-testid": "diary-title" }, "Дневник"),
     el("p", { "data-testid": "diary-empty" }, "Записей пока нет. Первая появится после тренировки."),
     errorCard(),
     messageCard(),
@@ -128,7 +128,7 @@ async function listView() {
   const [workouts, meta, persisted] = await Promise.all([listWorkouts(), getMeta(), navigator.storage?.persisted?.() ?? true]);
   if (!workouts.length) return emptyView();
   return [
-    el("h1", { "data-testid": "diary-title" }, el("em", { class: "wave" }, "Дневник")),
+    el("h1", { "data-testid": "diary-title" }, "Дневник"),
     el("div", { class: "diarygrid" },
       el("div", { class: "side" }, errorCard(), messageCard("o1"), reminderCard(workouts, meta), fileCard(persisted), clearBlock()),
       workoutList(workouts)),
@@ -183,7 +183,7 @@ async function detailView(id: string) {
   const done = w.items.filter(x => x.sets.length).length;
   return [
     button("pill", "diary-back", [backIcon(), "Дневник"], () => { location.hash = ""; }),
-    el("h1", {}, `${w.dayName}, `, el("em", { class: "wave" }, dayMonth)),
+    el("h1", {}, `${w.dayName}, `, el("em", { class: "hl" }, dayMonth)),
     el("p", {}, w.programName),
     errorCard(),
     el("div", { class: "stats" },
@@ -208,7 +208,7 @@ async function draw() {
     view = id ? await detailView(id) : await listView();
   } catch (err) {
     console.warn(err);
-    view = [el("h1", { "data-testid": "diary-title" }, el("em", { class: "wave" }, "Дневник")),
+    view = [el("h1", { "data-testid": "diary-title" }, "Дневник"),
       el("div", { class: "card bad", "data-testid": "storage-error", role: "alert" }, el("p", {}, el("b", {}, STORAGE_ERROR)))];
   }
   root.className = id ? "dv narrow" : "dv";

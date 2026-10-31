@@ -63,7 +63,7 @@ def test_unknown_program_is_like_none(page):
 
 
 def test_day_screen_has_warning_and_diary(day):
-    expect(day.get_by_test_id("health-warning")).to_be_visible()
+    expect(day.get_by_test_id("care-note")).to_be_visible()
     expect(day.get_by_test_id("open-diary")).to_be_visible()
     expect(day.get_by_test_id("other-day")).to_have_count(1)
 
@@ -79,7 +79,7 @@ def test_set_survives_reload(work):
     work.get_by_test_id("set-reps-plus").click()
     done(work)
     work.reload()
-    expect(work.get_by_test_id("resume")).to_contain_text("сделано подходов: 1")
+    expect(work.get_by_test_id("resume")).to_contain_text("подходов: 1")
     work.get_by_test_id("resume-continue").click()
     expect(work.get_by_test_id("set-chip").first).to_contain_text("17,5 кг × 7")
 
@@ -155,13 +155,13 @@ def test_next_day_goes_round(work):
     done(work)
     finish_early(work)
     work.goto("trenirovka/")
-    expect(work.get_by_text("Сегодня День 2")).to_be_visible()
+    expect(work.get_by_role("heading", name="День 2", exact=True)).to_be_visible()
     work.get_by_test_id("start-workout").click()
     expect(work.get_by_test_id("exercise-name")).to_have_text("Ягодичный мост со штангой")
     done(work)
     finish_early(work)
     work.goto("trenirovka/")
-    expect(work.get_by_text("Сегодня День 1")).to_be_visible()
+    expect(work.get_by_role("heading", name="День 1", exact=True)).to_be_visible()
 
 
 def test_last_time_comes_from_another_program(work):
@@ -198,6 +198,16 @@ def test_storage_closed_says_so(page):
     expect(page.get_by_test_id("storage-error")).to_be_visible()
 
 
+def test_resume_shows_skipped_exercise(work):
+    work.get_by_test_id("skip-exercise").click()
+    done(work)
+    work.reload()
+    rows = work.get_by_test_id("resume").get_by_test_id("route-row")
+    expect(rows.nth(0)).to_contain_text("Пропущено")
+    expect(rows.nth(1)).to_contain_text("Подходов: 1 из 3")
+    assert work.locator(".segs i:not(.off)").count() == 0
+
+
 def test_works_without_network(page, context):
     open_with(page)
     page.evaluate("navigator.serviceWorker.ready")
@@ -207,7 +217,7 @@ def test_works_without_network(page, context):
     page.get_by_test_id("start-workout").click()
     done(page)
     page.reload()
-    expect(page.get_by_test_id("resume")).to_contain_text("сделано подходов: 1")
+    expect(page.get_by_test_id("resume")).to_contain_text("подходов: 1")
 
 
 @pytest.mark.parametrize("name", NAMES["programs"])

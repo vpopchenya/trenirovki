@@ -15,7 +15,7 @@ export interface WorkoutSet {
 export interface WorkoutItem {
   exerciseId: string;
   exerciseName: string;
-  group: string; // группа мышц: цвет точки и блина на штанге
+  group: string; // группа мышц: цвет кружка и полоски дня
   fields: SetField[];
   weightLabel: string | null; // подпись веса: «Вес с грифом», «Вес одной гантели»
   note: string | null; // пометка из программы: «на каждую руку»

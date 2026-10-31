@@ -1,22 +1,27 @@
 ---
-// Карточки статей «Основ»: на главной и на странице раздела. Подписи — из файлов статей.
+// Карточки статей на странице «Основы». Подписи — из файлов статей, значок — по имени файла.
 import { allBasics } from "../lib/catalog";
 
 const base = import.meta.env.BASE_URL;
 const articles = await allBasics();
+const ICONS: Record<string, string> = { son: "moon", pitanie: "food" };
+const missing = articles.find(a => !ICONS[a.id]);
+if (missing) throw new Error(`Нет значка для статьи «${missing.id}»`);
 ---
 <nav class="basics" aria-label="Статьи раздела «Основы»">
   {articles.map(a => (
-    <a href={`${base}osnovy/${a.id}/`} data-testid={`basics-${a.id}`}><b>{a.data.name}</b><span>{a.data.short}</span></a>
+    <a class="icard" href={`${base}osnovy/${a.id}/`} data-testid={`basics-${a.id}`}>
+      <span><b>{a.data.name}</b><small>{a.data.short}</small></span>
+      <img src={`${base}img/${ICONS[a.id]}.webp`} alt="" width="112" height="112" />
+    </a>
   ))}
 </nav>
 
 <style>
-  .basics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
-  .basics a { background: var(--surface); border-radius: 22px; padding: 16px; display: grid; gap: 2px; text-decoration: none; transition: transform .1s; -webkit-tap-highlight-color: transparent; }
-  .basics a:active { transform: scale(.97); }
-  .basics b { font: 800 17px var(--f-display); letter-spacing: -.02em; }
-  .basics span { color: var(--muted); font-size: 14px; }
-  @media (hover: hover) { .basics a:hover { background: var(--surface2); } }
-  @media (prefers-reduced-motion: reduce) { .basics a { transition: none; } }
+  .basics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+  .icard { grid-template-columns: minmax(0, 1fr) 112px; gap: 8px; min-height: 144px; border-radius: 26px; }
+  .icard img { width: 112px; height: 112px; }
+  .icard span { display: grid; gap: 4px; min-width: 0; }
+  .icard b { font: 800 20px/1.2 var(--f-display); letter-spacing: -.02em; }
+  .icard small { color: var(--soft); font-size: 14px; line-height: 1.35; font-weight: 700; }
 </style>

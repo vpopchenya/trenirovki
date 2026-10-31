@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import "../../styles/diary.css";
-import { allPrograms, setFields, HEALTH_WARNING } from "../../lib/catalog";
+import { allPrograms, setFields, CARE_NOTE } from "../../lib/catalog";
 
 // Данные встроены в страницу, а не лежат отдельным .json: он не попал бы в список сохранённых для работы без сети.
 const programs = (await allPrograms()).map(p => ({
@@ -16,7 +16,7 @@ const programs = (await allPrograms()).map(p => ({
     })),
   })),
 }));
-const data = JSON.stringify({ programs, health: HEALTH_WARNING }).replace(/</g, "\\u003c");
+const data = JSON.stringify({ programs, care: CARE_NOTE }).replace(/</g, "\\u003c");
 ---
 <Base title="Тренировка" description="Тренировка по выбранной программе. Записи хранятся только в этом браузере." nav="workout" noindex>
   <div id="workout" class="dv" data-testid="workout"></div>

@@ -1,8 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
-import Barbell from "../../components/Barbell.astro";
-import HealthWarning from "../../components/HealthWarning.astro";
-import { allPrograms, breadcrumbs, plural, pluralWeeks, BAND_SAFETY, FAT_LOSS_LINK, FAT_LOSS_NOTE, HEAVY_WARNING, HOME_PROGRESS_RULE, MY_PROGRAM_KEY, NO_BAND_NOTE, PROGRESS_RULE, REST_RULE } from "../../lib/catalog";
+import CareNote from "../../components/CareNote.astro";
+import { allPrograms, breadcrumbs, plural, pluralWeeks, BAND_CHECK, FAT_LOSS_LINK, FAT_LOSS_NOTE, HOME_PROGRESS_RULE, MY_PROGRAM_KEY, NO_BAND_NOTE, PROGRESS_RULE, REST_RULE } from "../../lib/catalog";
 
 export async function getStaticPaths() {
   return (await allPrograms()).map(p => ({ params: { id: p.id }, props: { p } }));
@@ -14,21 +13,27 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
 <Base nav="programs" back={{ href: `${base}programmy/`, label: "Программы" }} title={p.name} description={p.description}
   jsonLd={breadcrumbs(Astro.site!, [["Каталог", base], ["Программы", `${base}programmy/`], [p.name, `${base}programmy/${p.id}/`]])}>
   <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><a href={`${base}programmy/`}>Программы</a><span>/</span><span>{p.name}</span></nav>
-  <div class="phead">
-    <h1 data-testid="program-title">{p.name}</h1>
+  <section class="phead">
+    <div class="ptop">
+      <div>
+        <h1 data-testid="program-title">{p.short}</h1>
+        <p class="who">{p.forWhom}</p>
+      </div>
+      <img src={`${base}img/${p.icon}.webp`} alt="" width="104" height="104" />
+    </div>
     <div class="facts">
       <div><b>{p.daysPerWeek}</b>раза в неделю</div>
       <div><b>{p.weeks}</b>{pluralWeeks(p.weeks)}</div>
-      <div><b>{perDay}</b>{plural(perDay)}</div>
+      <div><b>{perDay}</b>{plural(perDay)} в день</div>
     </div>
-    <p class="lead">{p.description}</p>
+    <p class="desc">{p.description}</p>
     {/* Без JavaScript выбрать нечем, поэтому кнопку показывает скрипт. */}
     <div class="mine" hidden>
       <a class="btn main" href={`${base}trenirovka/`} data-testid="start-workout-link" hidden>Начать тренировку</a>
-      <button class="btn main" type="button" aria-pressed="false" data-testid="my-program-btn">Моя программа</button>
+      <button class="btn main" type="button" aria-pressed="false" data-testid="my-program-btn">Сделать моей программой</button>
       <p role="status" data-testid="my-program-hint"></p>
     </div>
-  </div>
+  </section>
   {/* Сразу за разметкой, а не в конце страницы: кнопка не прыгает. pageshow — вернулись «Назад» из кэша браузера,
       а там могла быть выбрана другая программа. */}
   <script is:inline define:vars={{ KEY: MY_PROGRAM_KEY, id: p.id }}>
@@ -38,7 +43,7 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
       const mine = read() === id;
       start.hidden = !mine;
       btn.setAttribute("aria-pressed", String(mine));
-      btn.textContent = mine ? "✓ Моя программа" : "Моя программа";
+      btn.textContent = mine ? "Это моя программа" : "Сделать моей программой";
       hint.textContent = mine ? "Откроется сразу с главной. Нажми ещё раз, чтобы убрать." : "";
     };
     btn.addEventListener("click", () => {
@@ -61,47 +66,60 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
   )}
   {p.home && <p class="how" data-testid="no-band-note">{NO_BAND_NOTE}</p>}
 
+  {/* Вкладки дней — только на телефоне и планшете. В разметке видны все дни: для поиска и без JavaScript. */}
+  <div class="tabs" role="group" aria-label="Дни программы" data-testid="day-tabs" hidden style={`--n: ${p.days.length}`}>
+    {p.days.map((d, i) => <button type="button" aria-pressed={String(i === 0)} data-testid="day-tab">{d.name}</button>)}
+  </div>
   <div class="days">
     {p.days.map(d => (
-      <details class="day" open data-testid="program-day">
-        <summary><b>{d.name}</b><span>{d.items.length} упр.</span></summary>
-        <Barbell groups={d.groups} />
-        <p class="mus">{d.muscles}</p>
-        <div>
-          {d.items.map(i => (
-            <a class="ex" href={`${base}uprazhneniya/${i.ex.id}/`} style={`--gc: var(--g-${i.ex.data.group})`} data-testid="program-exercise">
-              <i></i>
-              <b>{i.ex.data.name}{i.note && <small>{i.note}</small>}</b>
-              <span>{i.sets} × {i.reps}<small>отдых {i.rest}</small></span>
-            </a>
-          ))}
+      <section class="day" data-testid="program-day">
+        <h2>{d.name}</h2>
+        <div class="pills" data-testid="day-pills">
+          {d.groups.map(g => <span><i style={`background: var(--g-${g.id})`}></i>{g.name}</span>)}
         </div>
-      </details>
+        <ol class="route">
+          {d.items.map((i, k) => (
+            <li style={`--gc: var(--g-${i.ex.data.group}); --gi: var(--gi-${i.ex.data.group})`}>
+              <span class="mark"><span class="tinted">{k + 1}</span></span>
+              <a href={`${base}uprazhneniya/${i.ex.id}/`} data-testid="program-exercise">
+                <b>{i.ex.data.name}</b>
+                <small>{i.sets} × {i.reps} · отдых {i.rest}{i.note && ` · ${i.note}`}</small>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
     ))}
   </div>
-  {/* На телефоне открыт первый день, остальные свёрнуты. В разметке открыты все: для поиска и без JavaScript.
-      Какие дни открыты, помним до закрытия вкладки: сходил посмотреть технику, вернулся — твой день не свернулся. */}
+  {/* Выбранный день помним до закрытия вкладки: сходил посмотреть технику, вернулся — день тот же. */}
   <script is:inline>
-    if (matchMedia("(max-width: 1023px)").matches) {
-      const days = [...document.querySelectorAll(".day")], key = "days:" + location.pathname;
-      let saved = null;
-      try { saved = JSON.parse(sessionStorage.getItem(key)); } catch {}
-      days.forEach((d, i) => { d.open = saved ? saved.includes(i) : i === 0; });
-      days.forEach(d => d.addEventListener("toggle", () => {
-        try { sessionStorage.setItem(key, JSON.stringify(days.flatMap((x, i) => x.open ? [i] : []))); } catch {}
+    {
+      const tabs = document.querySelector(".tabs"), buttons = [...tabs.children], panels = [...document.querySelectorAll(".day")];
+      const key = "day:" + location.pathname;
+      const showDay = i => {
+        buttons.forEach((b, k) => b.setAttribute("aria-pressed", String(k === i)));
+        panels.forEach((d, k) => d.classList.toggle("off", k !== i));
+      };
+      let saved = 0;
+      try { saved = Number(sessionStorage.getItem(key)) || 0; } catch {}
+      showDay(panels[saved] ? saved : 0);
+      tabs.hidden = false;
+      buttons.forEach((b, i) => b.addEventListener("click", () => {
+        showDay(i);
+        try { sessionStorage.setItem(key, String(i)); } catch {}
       }));
     }
   </script>
 
   <section class="how">
-    <h2>Как прибавлять</h2>
+    <h2>{p.home ? "Как прибавлять" : "Когда прибавлять вес"}</h2>
     <p>{p.home ? HOME_PROGRESS_RULE : PROGRESS_RULE}</p>
   </section>
   <section class="how">
     <h2>Когда тренироваться</h2>
     <p>{REST_RULE}</p>
   </section>
-  <HealthWarning>{p.home ? `${BAND_SAFETY}.` : HEAVY_WARNING}</HealthWarning>
+  <CareNote>{p.home && `${BAND_CHECK}.`}</CareNote>
 </Base>
 
 <script>
@@ -109,39 +127,53 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
 </script>
 
 <style>
-  .phead { display: grid; gap: 14px; }
-  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 480px; }
-  .facts div { background: var(--surface); border-radius: 16px; padding: 10px 6px; text-align: center; font-size: 13px; color: var(--muted); }
-  .facts b { display: block; font: 800 20px var(--f-display); color: var(--fg); }
-  .mine { display: grid; gap: 6px; justify-items: start; }
-  .mine .btn { min-height: 48px; box-sizing: border-box; }
+  .phead { display: grid; gap: 14px; background: var(--surface); border-radius: 28px; padding: 18px; }
+  .ptop { display: grid; grid-template-columns: minmax(0, 1fr) 104px; align-items: center; gap: 8px; }
+  .ptop > div { min-width: 0; }
+  .ptop img { display: block; width: 104px; height: 104px; }
+  h1 { font-size: clamp(23px, 3.4vw, 34px); overflow-wrap: anywhere; }
+  .who { margin: 6px 0 0; font-size: 15px; font-weight: 800; color: var(--fg2); }
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .facts div { background: var(--bg); border-radius: 16px; padding: 10px 6px; text-align: center; font-size: 12px; line-height: 1.25; font-weight: 700; color: var(--soft); }
+  .facts b { display: block; font: 800 20px/1.2 var(--f-display); color: var(--fg); }
+  .desc { margin: 0; font-size: 15px; line-height: 1.45; color: var(--text); }
+  .mine { display: grid; gap: 8px; }
+  .mine .btn { justify-content: center; min-height: 52px; font-size: 16px; }
   /* Выбрана — кнопка спокойная: главное действие на странице уже сделано. */
-  .mine .btn[aria-pressed="true"] { background: var(--surface); color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+  .mine .btn[aria-pressed="true"] { background: var(--bg); color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
   .mine p { margin: 0; font-size: 14px; color: var(--muted); }
-  @media (min-width: 1024px) {
-    .phead { grid-template-columns: minmax(0, 1fr) minmax(300px, 420px); column-gap: 40px; align-items: end; }
-    .facts { grid-column: 2; grid-row: 1; width: 100%; }
-    .lead, .mine { grid-column: 1; }
+  .mine p:empty { display: none; }
+  .tabs { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 4px; margin-top: 16px; background: var(--surface); border-radius: 999px; padding: 4px; }
+  .tabs button { border: 0; border-radius: 999px; min-height: 44px; padding: 0 6px; background: none; color: var(--fg2); font: 800 14px var(--f-body); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .tabs [aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+  .days { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 24px; align-items: start; margin-top: 12px; }
+  .day h2 { margin-bottom: 10px; }
+  /* Заголовок дня заменяют вкладки. Без JavaScript вкладок нет, и заголовки нужны. */
+  @media (max-width: 1023px) {
+    .day.off { display: none; }
+    .tabs:not([hidden]) + .days h2 { display: none; }
   }
-  .days { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 12px; align-items: start; margin-top: 20px; }
-  .day { background: var(--surface); border-radius: 22px; padding: 10px 16px 14px; }
-  /* Своя галочка: у summary с display: flex стандартная стрелка пропадает, и день не выглядит раскрывающимся. */
-  summary { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; list-style: none; }
-  summary::-webkit-details-marker { display: none; }
-  summary::after { content: ""; width: 9px; height: 9px; margin-right: 3px; border: solid var(--fg); border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg); }
-  .day[open] summary::after { transform: translateY(2px) rotate(-135deg); }
-  summary b { font-weight: 800; font-size: 20px; }
-  summary span { font: 500 14px var(--f-mono); color: var(--muted); margin-left: auto; }
-  .mus { margin: 6px 0 4px; font-size: 15px; color: var(--muted); }
-  /* В зале на экран смотрят мельком: подходы — отдельной крупной строкой под названием, а не мелко сбоку. */
-  .ex { display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 4px 12px; align-items: center; min-height: 48px; padding: 12px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
-  .ex:last-child { border-bottom: 0; }
-  .ex i { width: 12px; height: 12px; margin-top: 5px; align-self: start; border-radius: 50%; background: var(--gc); }
-  .ex b { font-weight: 800; font-size: 18px; line-height: 1.25; }
-  .ex > span { grid-column: 2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font: 500 17px var(--f-mono); color: var(--fg); }
-  .ex small { display: block; font: 500 15px var(--f-body); color: var(--muted); }
-  .how { background: var(--surface); border-radius: 22px; padding: 16px; margin-top: 12px; max-width: 70ch; }
-  .how p { margin: 6px 0 0; color: var(--text); }
+  @media (min-width: 1024px) {
+    .tabs { display: none; }
+    .days { margin-top: 20px; }
+  }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .pills span { display: flex; align-items: center; gap: 6px; background: var(--surface); border-radius: 999px; padding: 5px 12px 5px 9px; font-size: 13px; font-weight: 800; }
+  .pills i { width: 12px; height: 12px; border-radius: 50%; }
+  /* Маршрут дня: цветные кружки на линии. Линия тянется под кружком на всю высоту строки. */
+  .route { list-style: none; margin: 0; padding: 0; }
+  .route li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; }
+  .mark { display: flex; flex-direction: column; align-items: center; }
+  .mark span { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: var(--gi); font: 800 15px var(--f-display); }
+  .mark::after { content: ""; flex: 1; width: 3px; border-radius: 2px; background: var(--line); }
+  .route li:last-child .mark::after { background: none; }
+  .route a { display: grid; gap: 2px; align-content: start; min-height: 44px; padding: 2px 0 20px; text-decoration: none; }
+  .route b { font-size: 16px; line-height: 1.25; font-weight: 800; }
+  .route small { font-size: 14px; line-height: 1.35; font-weight: 700; color: var(--soft); }
+  @media (hover: hover) { .route a:hover b { color: var(--accent); } }
+  .how { background: var(--surface); border-radius: 24px; padding: 16px 18px; margin-top: 12px; max-width: 70ch; }
+  .how h2 { font-size: 16px; }
+  .how p { margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: var(--text); }
   .how a { display: inline-block; padding: 6px 0; font-weight: 800; color: var(--accent); text-underline-offset: 3px; white-space: nowrap; }
   .how + :global(.warn) { margin-top: 12px; max-width: 70ch; }
 </style>

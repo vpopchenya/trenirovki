@@ -61,22 +61,39 @@ export async function allBasics() {
 /** Что бывает дома и в дороге: по этому списку работает фильтр «Без зала». */
 export const HOME_EQUIPMENT = ["Резинка", "Свой вес"];
 export const isHome = (equipment: string[]) => equipment.every(x => HOME_EQUIPMENT.includes(x));
-export const HOME_LABEL = "🏠 Без зала";
+export const HOME_LABEL = "Без зала";
 /** Общая для всех упражнений с резинкой ошибка: страница добавляет её сама, в файлах упражнений не повторяем. */
-export const BAND_SAFETY = "Плохо закреплённая или надорванная резинка — может сорваться и ударить. Перед подходом проверь узел и саму резинку";
+export const BAND_CHECK = "Перед подходом проверь узел и саму резинку";
+export const BAND_SAFETY = `Резинка закреплена слабо или надорвана. ${BAND_CHECK}`;
 
 export const levelClass = (level: string) => (level === "новичок" ? "lvl1" : "lvl2");
+export const levelLabel = (level: string) => (level === "новичок" ? "Для новичка" : "Для опытных");
 
-export const HEALTH_WARNING = "Приложение не заменяет врача. Если что-то болит или есть травма, сначала посоветуйся с ним.";
+/** «Штанга, скамья»: как подпись в тексте, с заглавной только первое слово. */
+export const equipmentText = (equipment: string[]) => equipment.map((x, i) => (i ? x.toLowerCase() : x)).join(", ");
+
+/** Значок упражнения — по главному инвентарю: сначала особое, штанга и гантели важнее скамьи. */
+const EQUIPMENT_ICONS = [["Брусья", "dipbars"], ["Турник", "pullup"], ["Резинка", "band"], ["Штанга", "barbell"], ["Гантели", "dumbbell"], ["Свой вес", "mat"]];
+export function equipmentIcon(equipment: string[]) {
+  const found = EQUIPMENT_ICONS.find(([name]) => equipment.includes(name));
+  if (!found) throw new Error(`Нет значка для инвентаря: ${equipment.join(", ")}`);
+  return found[1];
+}
+const programIcon = (p: { goal: string; level: string; focus?: string }, home: boolean) =>
+  home ? "band" : p.focus === "glutes" ? "mat" : p.goal === "сила" ? "plate" : p.goal === "похудение" ? "rope" : p.level === "опытный" ? "barbell" : "dumbbell";
+
+/** Подсказка про самочувствие: на упражнениях, программах и в тренировке. */
+export const CARE_NOTE = "Выбирай нагрузку по самочувствию. Новое упражнение начинай с лёгкого веса. С тяжёлым весом лучше работать со страховкой.";
+/** То же для статей «Основ» и страницы «О проекте». */
+export const BASICS_NOTE = "Советы здесь общие. Прислушивайся к себе и выбирай то, что подходит именно тебе.";
 /** Общее для всех программ правило: на странице одно на всех, в файлах программ не повторяем. */
-export const PROGRESS_RULE = "Сделал все подходы на верхней границе повторений — в следующий раз возьми чуть больше вес. Упражнения без веса: добавь повторы или секунды.";
+export const PROGRESS_RULE = "Получилось сделать все подходы на верхней границе повторений? В следующий раз возьми чуть больше. Без веса — добавь повторы или секунды.";
 /** То же для программ без зала: штанги нет, нагрузку прибавляют резинкой. */
-export const HOME_PROGRESS_RULE = "Сделал все подходы на верхней границе повторений — в следующий раз возьми резинку потуже или перехвати её короче, а если она закреплена — встань дальше от крепления. Упражнения без резинки: добавь повторы или секунды.";
+export const HOME_PROGRESS_RULE = "Получилось сделать все подходы на верхней границе повторений? В следующий раз возьми резинку потуже или перехвати её короче, а если она закреплена — встань дальше от крепления. Без резинки — добавь повторы или секунды.";
 export const NO_BAND_NOTE = "Нет резинки? На странице каждого такого упражнения написано, чем его заменить.";
 export const REST_RULE = "Между тренировками — минимум день отдыха: мышцы растут и восстанавливаются, пока ты отдыхаешь.";
-export const HEAVY_WARNING = "Тяжёлые веса — только со страховкой.";
 /** У всех программ на похудение. Сразу за текстом страница ставит ссылку на статью о питании. */
-export const FAT_LOSS_NOTE = "Честно: сами тренировки вес почти не снижают, результат даёт питание. Программа помогает сохранить мышцы, пока худеешь.";
+export const FAT_LOSS_NOTE = "Главное для снижения веса — питание. А программа помогает сохранить мышцы, пока худеешь.";
 export const FAT_LOSS_LINK = "Как питаться →";
 
 /** Ключ localStorage: имя файла выбранной программы. Хранится только на телефоне, на сервер не уходит. */
@@ -102,13 +119,15 @@ export async function allPrograms() {
       if (hard) throw new Error(`Программа «${p.data.name}»: упражнение «${hard.ex.data.name}» только для опытных`);
       const badRest = items.find(i => restSeconds(i.rest) === null);
       if (badRest) throw new Error(`Программа «${p.data.name}»: непонятный отдых «${badRest.rest}»`);
-      const dayGroups = items.map(i => i.ex.data.group);
-      return { name: day.name, items, groups: dayGroups, muscles: [...new Set(dayGroups)].map(id => groups.find(g => g.id === id)!.name.toLowerCase()).join(" · ") };
+      const dayGroups = [...new Set(items.map(i => i.ex.data.group))].map(id => groups.find(g => g.id === id)!);
+      return { name: day.name, items, groups: dayGroups, muscles: dayGroups.map(g => g.name.toLowerCase()).join(" · ") };
     }));
     const focusGroup = groups.find(g => g.id === p.data.focus);
     // Считаем по упражнениям, а не отдельным полем: зальное упражнение в «домашней» программе сразу снимет метку.
     const home = days.every(d => d.items.every(i => isHome(i.ex.data.equipment)));
-    return { id: p.id, ...p.data, days, home, focusText: focusGroup && `упор на ${focusGroup.acc}` };
+    const focusText = focusGroup && `упор на ${focusGroup.acc}`;
+    const forWhom = [levelLabel(p.data.level), home ? "резинка и свой вес" : focusText].filter(Boolean).join(", ");
+    return { id: p.id, ...p.data, days, home, forWhom, short: p.data.name.split(" для ")[0], icon: programIcon(p.data, home) };
   }));
   return views.sort((a, b) => a.order - b.order);
 }

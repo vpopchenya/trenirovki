@@ -1,7 +1,7 @@
 ---
 import { render } from "astro:content";
 import Base from "../../layouts/Base.astro";
-import HealthWarning from "../../components/HealthWarning.astro";
+import CareNote from "../../components/CareNote.astro";
 import { allBasics, articleLd, breadcrumbs } from "../../lib/catalog";
 
 export async function getStaticPaths() {
@@ -23,7 +23,7 @@ const path = `${base}osnovy/${a.id}/`;
     <h1 data-testid="article-title">{title}</h1>
     <p class="lead">{description}</p>
     <div class="body" data-testid="article-body"><Content /></div>
-    <HealthWarning />
+    <CareNote basics />
     <section class="sources" data-testid="article-sources">
       <h2>Откуда цифры</h2>
       <ul>{sources.map(s => <li><a href={s.url}>{s.title}</a></li>)}</ul>

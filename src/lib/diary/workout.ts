@@ -3,13 +3,13 @@
 import { changeWorkout, finishWorkout, getMeta, listWorkouts, saveWorkout, updateMeta, updateSet, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
 import { filesReminder, myProgram, saveDiaryFile } from "./file";
 import { keepScreenOn, mmss, restSeconds, secondsLeft, signal, unlockAudio } from "./timer";
-import { backIcon, barbell, button, countSets, el, exerciseHistory, goal, groupColor, minutes, numberField, planSets, present, setsLine, setText, type Child, type SetValues } from "./ui";
+import { backIcon, button, countSets, dayBar, el, exerciseHistory, goal, groupColor, minutes, numberField, planSets, present, setsLine, setText, type Child, type SetValues } from "./ui";
 
 interface ProgramItem { exerciseId: string; exerciseName: string; group: string; fields: SetField[]; weightLabel: string | null; note: string | null; sets: number; reps: string; rest: string }
 interface ProgramDay { name: string; muscles: string; items: ProgramItem[] }
 interface Program { id: string; name: string; days: ProgramDay[] }
 
-const page = JSON.parse(document.querySelector("#workout-data")!.textContent!) as { programs: Program[]; health: string };
+const page = JSON.parse(document.querySelector("#workout-data")!.textContent!) as { programs: Program[]; care: string };
 const root = document.querySelector<HTMLElement>("#workout")!;
 const base = import.meta.env.BASE_URL;
 
@@ -227,27 +227,36 @@ async function finishNow() {
   }
 }
 
+/** Строка маршрута дня: цветной кружок с номером, у сделанного — галочка. */
+function routeRow(group: string, n: number, name: string, meta: string, done: boolean) {
+  return el("li", { class: done ? "wr ok" : "wr", "data-testid": "route-row", style: `${groupColor(group)};--gi:var(--gi-${group},#fff)` },
+    el("span", { class: "wn" }, done ? "✓" : String(n)),
+    el("span", {}, el("b", {}, name), el("span", { class: "sub" }, meta)));
+}
+
 function dayCard(day: ProgramDay) {
-  return el("div", { class: "card", "data-testid": "day-card" },
-    barbell(day.items),
-    el("p", { class: "mutedline" }, day.muscles),
-    el("div", {}, ...day.items.map(x => el("div", { class: "ex", style: groupColor(x.group) },
-      el("i", { class: "dot" }), el("b", {}, x.exerciseName), el("span", {}, `${x.sets} × ${x.reps}`)))),
-    !state.workout && button("done", "start-workout", "Начать тренировку", start));
+  return el("div", { class: "col", "data-testid": "day-card" },
+    dayBar(day.items, { lit: () => false }),
+    el("p", { class: "dayline" }, `Сделано 0 из ${day.items.length}`),
+    el("ol", { class: "route" }, ...day.items.map((x, k) => routeRow(x.group, k + 1, x.exerciseName, `${x.sets} × ${x.reps}`, false))),
+    button("wbtn", "start-workout", "Начать тренировку", start));
 }
 
 function resumeCard(w: Workout) {
-  return el("div", { class: "card calm", "data-testid": "resume" },
-    el("p", {}, el("b", {}, "Тренировка не закончена: "), `${w.dayName}, упражнение ${position(w) + 1} из ${w.items.length}, сделано подходов: ${countSets(w)}.`),
-    el("div", { class: "row2" },
-      button("wbtn", "resume-continue", "Продолжить", () => {
-        unlockAudio(); // после обновления страницы звук снова нужно разрешить нажатием
-        state.peek = false;
-        state.signaled = !!w.rest && secondsLeft(w.rest.endsAt) <= 0; // сигнал о том, что уже прошло, только мешает
-        openExercise(position(w));
-        draw();
-      }),
-      button("wbtn ghost", "resume-finish", "Закончить", finish)));
+  const finished = (x: WorkoutItem) => x.sets.length >= x.plan.sets;
+  const meta = (x: WorkoutItem) => finished(x) ? "Сделано" : x.sets.length ? `Подходов: ${x.sets.length} из ${x.plan.sets}` : x.skipped ? "Пропущено" : `${x.plan.sets} × ${x.plan.reps}`;
+  return el("div", { class: "col", "data-testid": "resume" },
+    dayBar(w.items, { lit: finished }),
+    el("p", { class: "dayline" }, `Сделано ${w.items.filter(finished).length} из ${w.items.length}, подходов: ${countSets(w)}`),
+    el("ol", { class: "route" }, ...w.items.map((x, k) => routeRow(x.group, k + 1, x.exerciseName, meta(x), finished(x)))),
+    button("wbtn", "resume-continue", "Продолжить", () => {
+      unlockAudio(); // после обновления страницы звук снова нужно разрешить нажатием
+      state.peek = false;
+      state.signaled = !!w.rest && secondsLeft(w.rest.endsAt) <= 0; // сигнал о том, что уже прошло, только мешает
+      openExercise(position(w));
+      draw();
+    }),
+    button("wbtn ghost", "resume-finish", "Закончить", finish));
 }
 
 const errorCard = () => state.error && el("div", { class: "card bad", "data-testid": "save-error", role: "alert" }, el("p", {}, el("b", {}, state.error)));
@@ -261,7 +270,7 @@ const storageError = () => !state.storageOk && el("div", { class: "card bad", "d
 
 function noProgramView(): Child[] {
   return [
-    el("h1", {}, "Сначала выбери ", el("em", { class: "wave" }, "программу")),
+    el("h1", {}, "Сначала выбери программу"),
     el("p", { "data-testid": "no-program" }, "Тренировка идёт по дням программы. Выбери подходящую, а записи дневника останутся на месте."),
     storageError(),
     el("a", { class: "wbtn", href: `${base}programmy/`, "data-testid": "to-programs" }, "К программам"),
@@ -274,12 +283,12 @@ function dayView(): Child[] {
   if (!program && !w) return noProgramView();
   const day = program?.days[state.day];
   const others = !w && program ? program.days.map((x, k) => k !== state.day && button("wrow two alt", "other-day",
-    [el("span", {}, el("b", {}, x.name), el("span", { class: "sub" }, x.muscles)), barbell(x.items, { small: true })],
+    [el("span", {}, el("b", {}, x.name), el("span", { class: "sub" }, x.muscles)), dayBar(x.items, { small: true })],
     () => { state.day = k; draw(); })) : [];
   return [el("div", { class: "daygrid" },
     el("div", { class: "col" },
-      el("p", { class: "eyebrow plain" }, `Моя программа: ${w?.programName ?? program!.name}`),
-      el("h1", {}, "Сегодня ", el("em", { class: "wave" }, w?.dayName ?? day!.name)),
+      el("p", { class: "eyebrow" }, w?.programName ?? program!.name),
+      el("h1", {}, w?.dayName ?? day!.name),
       storageError(),
       errorCard(),
       w && resumeCard(w),
@@ -287,7 +296,7 @@ function dayView(): Child[] {
     el("div", { class: "col" },
       others.some(Boolean) && el("div", { class: "card" }, el("h2", {}, "Другой день"), el("div", { class: "list" }, ...others)),
       diaryRow(),
-      el("p", { class: "warn", "data-testid": "health-warning" }, page.health)))];
+      el("p", { class: "warn", "data-testid": "care-note" }, page.care)))];
 }
 
 function setChips(x: WorkoutItem) {
@@ -304,7 +313,7 @@ function setChips(x: WorkoutItem) {
 
 function planAside(w: Workout) {
   return el("aside", { class: "aside card", "data-testid": "day-plan" },
-    el("h2", {}, w.dayName), barbell(w.items, { cur: state.i }),
+    el("h2", {}, w.dayName), dayBar(w.items, { lit: (_x, k) => k <= state.i }),
     el("div", {}, ...w.items.map((x, k) => el("div", { class: `ex ${k === state.i ? "now" : ""} ${k > state.i ? "soft" : ""}`, style: groupColor(x.group) },
       el("i", { class: "dot" }), el("b", {}, x.exerciseName), el("span", {}, x.skipped && !x.sets.length ? "пропущено" : `${x.sets.length}/${x.plan.sets}`)))));
 }
@@ -317,11 +326,11 @@ function workView(): Child[] {
   const past = lastSets(x.exerciseId);
   return [
     el("div", { class: "left", style: `${groupColor(x.group)};--gi:var(--gi-${x.group},#fff)` },
-      el("div", { class: "bbtop" }, barbell(w.items, { cur: state.i })),
+      el("div", { class: "bartop" }, dayBar(w.items, { lit: (_x, k) => k <= state.i })),
       el("div", { class: "wtop" },
         button("round", "workout-exit", backIcon(), () => { state.screen = "day"; draw(); }, { "aria-label": "Выйти из тренировки" }),
-        el("span", { class: "mono", "data-testid": "exercise-pos" }, `Упражнение ${state.i + 1} из ${total}`),
-        x.note && el("span", { class: "tag" }, x.note)),
+        el("span", { class: "pos", "data-testid": "exercise-pos" }, `Упражнение ${state.i + 1} из ${total}`),
+        x.note && el("span", { class: "wnote" }, x.note)),
       state.peek && w.rest && el("button", { type: "button", class: "pill plain", "data-testid": "rest-pill", click: unpeek }, "Отдых ", el("span", { "data-rest": "clock" }, mmss(Math.max(secondsLeft(w.rest.endsAt), 0)))),
       el("h1", { class: "name", "data-testid": "exercise-name" }, x.exerciseName),
       errorCard(),
@@ -384,7 +393,7 @@ function restView(): Child[] {
       errorCard(),
       el("div", { class: "rest", "data-testid": "rest" },
         el("div", { class: "reshead" },
-          el("span", { class: "mono" }, finished.exerciseName),
+          el("span", { class: "pos" }, finished.exerciseName),
           button("icon", "rest-sound", soundIcon(state.sound), toggleSound, { "aria-label": state.sound ? "Выключить звук" : "Включить звук" })),
         ring(finished.group, left, rest.total),
         el("div", { class: "adj" },
@@ -422,9 +431,9 @@ function sumView(): Child[] {
   const line = (x: WorkoutItem, text: string) => el("div", { class: "ex", style: groupColor(x.group) }, el("i", { class: "dot" }), el("b", {}, x.exerciseName), el("span", {}, text));
   return [el("div", { class: "sumgrid", "data-testid": "summary" },
     el("div", { class: "wide col" },
-      el("h1", {}, "Тренировка ", el("em", { class: "wave" }, "готова")),
-      el("p", {}, `${w.dayName}, ${w.programName}`),
-      barbell(w.items),
+      el("img", { class: "medal", src: `${base}img/medal.webp`, alt: "", width: "168", height: "168" }),
+      el("h1", {}, "Тренировка записана"),
+      el("p", { class: "sumtext" }, `${w.dayName}. Следующий раз — через день отдыха.`),
       el("div", { class: "stats" },
         el("div", {}, el("b", {}, `${countSets(w)} из ${planSets(w)}`), "подходов"),
         el("div", {}, el("b", {}, `${doneItems.length} из ${w.items.length}`), "упражнений"),
@@ -445,7 +454,10 @@ function sumView(): Child[] {
           draw();
         })),
       state.fileNote && el("div", { class: `card ${state.fileNote.kind}`, "data-testid": "file-result", role: "status" }, el("p", {}, state.fileNote.text)),
-      el("a", { class: state.reminder ? "wbtn ghost" : "wbtn", href: `${base}dnevnik/`, "data-testid": "to-diary" }, "Открыть дневник")))];
+      el("a", { class: "wrow pic", href: `${base}dnevnik/`, "data-testid": "to-diary" },
+        el("img", { src: `${base}img/notebook.webp`, alt: "", width: "72", height: "72" }),
+        el("span", {}, el("b", {}, "Дневник"), el("span", { class: "sub" }, "Все тренировки и веса — в этом браузере"))),
+      el("a", { class: state.reminder ? "wbtn ghost" : "wbtn", href: base, "data-testid": "to-home" }, "Готово")))];
 }
 
 function draw() {

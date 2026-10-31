@@ -1,4 +1,4 @@
-/* Дневник и тренировка, вид «Плитка и блин» (макет v5-trenirovka-maket.html в studio). Разметку рисует скрипт,
+/* Дневник и тренировка, новый мобильный вид поверх «Плитки и блина» (макет v5-trenirovka-maket.html в studio). Разметку рисует скрипт,
    поэтому стили глобальные, а не в компоненте. */
 .dv { --stub: #ffb36b; --ok: #7fd99a; --bad: #ff8f83; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
 .dv p { margin: 0; }
@@ -20,16 +20,29 @@
 .card.bad { background: color-mix(in srgb, #e5322d 18%, var(--surface)); }
 .card.okc { background: color-mix(in srgb, #2e9e4f 18%, var(--surface)); }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.warn { font-size: 13px; color: var(--muted); }
+.warn { font-size: 14px; line-height: 1.45; font-weight: 700; color: var(--soft); }
 .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gc); flex: none; }
 
-.bb { display: flex; align-items: center; gap: 2px; height: 34px; max-width: 340px; }
-.bb span { flex: 1 1 10px; min-width: 8px; height: 4px; border-radius: 2px; background: var(--muted); }
-.bb i { flex: none; width: 12px; border-radius: 3px; background: var(--gc); }
-.bb i.off { background: var(--line); }
-.bb.small { height: 26px; gap: 1px; max-width: 150px; }
-.bb.small i { width: 5px; border-radius: 2px; }
-.bb.small span { height: 3px; min-width: 4px; }
+/* Прогресс дня: сегмент на упражнение, сделанное — цветом группы. */
+.segs { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 5px; }
+.segs i { height: 12px; border-radius: 6px; background: var(--gc); }
+.segs i.off { background: var(--line); }
+.segs.small { max-width: 150px; gap: 3px; }
+.segs.small i { height: 6px; border-radius: 3px; }
+
+/* Маршрут дня. */
+.route { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.wr { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 12px; min-height: 72px; padding: 12px 14px 12px 12px; border-radius: 22px; background: var(--surface); }
+.wn { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--bg); font: 800 15px var(--f-display); }
+.wr.ok .wn { background: var(--gc); color: var(--gi); }
+.wr b { display: block; font-size: 16px; line-height: 1.25; font-weight: 800; }
+.wr .sub { display: block; font-size: 14px; line-height: 1.35; font-weight: 700; color: var(--soft); }
+.dv .dayline { margin-top: -4px; font-size: 14px; font-weight: 800; color: var(--fg2); }
+.medal { display: block; width: 168px; height: 168px; justify-self: center; }
+.sumtext { text-align: center; color: var(--text); }
+.sumgrid h1 { text-align: center; }
+.wrow.pic { grid-template-columns: 72px minmax(0, 1fr); padding: 10px 14px 10px 10px; min-height: 92px; color: inherit; text-decoration: none; }
+.wrow.pic img { display: block; width: 72px; height: 72px; }
 
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
 .stats div { background: var(--surface); border-radius: 16px; padding: 10px 6px; text-align: center; font-size: 13px; color: var(--muted); line-height: 1.25; }
@@ -44,7 +57,7 @@
 .exh { display: flex; align-items: center; gap: 10px; }
 .exh b { font-weight: 800; font-size: 16px; line-height: 1.25; }
 .setrow { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 46px; border: 0; background: none; border-top: 1px solid var(--line); padding: 0; text-align: left; font-weight: 700; font-size: 16px; }
-.setrow em { font-style: normal; font: 500 12px var(--f-mono); color: var(--muted); }
+.setrow em { font-style: normal; font-weight: 700; font-size: 13px; color: var(--muted); }
 
 .fields { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; }
 .field { display: grid; gap: 2px; text-align: center; min-width: 0; }
@@ -60,20 +73,18 @@ body.in-detail .bar .logo { display: flex !important; }
 
 /* Тренировка: плитка в цвете группы, основная кнопка закреплена снизу. */
 .col { display: grid; gap: 12px; align-content: start; }
-.eyebrow.plain { text-transform: none; letter-spacing: 0; }
-.mutedline { font: 500 12px var(--f-mono); color: var(--muted); }
 .wrow.two { grid-template-columns: minmax(0, 1fr) auto; color: inherit; text-decoration: none; }
 .wrow.alt { background: var(--surface2); }
 .chev { font-weight: 800; font-size: 20px; }
 .ex { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
 .ex:last-child { border-bottom: 0; }
 .ex b { font-weight: 700; line-height: 1.25; }
-.ex span:last-child { font: 500 13px var(--f-mono); color: var(--text); white-space: nowrap; }
+.ex span:last-child { font-weight: 700; font-size: 14px; color: var(--text); white-space: nowrap; }
 .ex.now b { font-weight: 800; }
 .ex.soft b { color: var(--muted); }
 .wtop { display: flex; align-items: center; gap: 8px; }
-.wtop .mono { flex: 1; min-width: 0; font: 500 13px var(--f-mono); color: var(--text); }
-.wtop .tag { color: var(--stub); background: var(--surface); white-space: nowrap; }
+.wtop .pos { flex: 1; min-width: 0; font-weight: 800; font-size: 14px; color: var(--text); }
+.wtop .wnote { font-weight: 800; font-size: 13px; color: var(--stub); white-space: nowrap; }
 .round { flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--surface2); display: grid; place-items: center; }
 .round svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; }
 .dv .name { font-size: clamp(21px, 3vw, 28px); }
@@ -106,7 +117,7 @@ body.in-detail .bar .logo { display: flex !important; }
 /* Отдых: блин тает по кругу, под ним — что дальше. */
 .rest { display: grid; gap: 10px; }
 .reshead { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
-.reshead .mono { font: 500 13px var(--f-mono); color: var(--text); }
+.reshead .pos { font-weight: 800; font-size: 14px; color: var(--text); }
 .plate { position: relative; width: min(238px, 68vw, 40dvh); aspect-ratio: 1; margin: -6px auto 0; }
 .plate svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
 .plate div { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
@@ -147,7 +158,7 @@ body.in-work main { padding-top: 12px; }
   .aside { display: grid; gap: 4px; grid-column: 2; grid-row: 1; position: sticky; top: 84px; }
   .dock { position: static; padding: 0; background: none; }
   .dock > div { max-width: none; }
-  .bbtop { display: none; }
+  .bartop { display: none; }
   .daygrid { grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: start; }
 }
 /* На телефоне и планшете первым — список: дневник открывают ради записей, файл идёт после них, срочное напоминание остаётся сверху. */

@@ -10,15 +10,15 @@ const base = import.meta.env.BASE_URL;
   jsonLd={breadcrumbs(Astro.site!, [["Каталог", base], ["Основы", `${base}osnovy/`]])}>
   <div class="intro">
     <nav class="crumbs" aria-label="Путь"><a href={base}>Каталог</a><span>/</span><span>Основы</span></nav>
-    <h1 data-testid="basics-title">Не только <em class="wave">зал</em></h1>
-    <p class="lead">Результат дают три вещи вместе: тренировки, еда и сон. Тренировка даёт телу нагрузку, из еды оно берёт материал и энергию, а восстанавливается в отдыхе. Без любой из трёх остальные работают хуже.</p>
+    <h1 data-testid="basics-title">Не только зал</h1>
+    <p class="lead">Результат складывается из трёх вещей: тренировок, еды и сна. Тренировка даёт телу нагрузку, еда — материал и энергию, а сон — время на восстановление.</p>
   </div>
   <BasicsCards />
-  <a class="btn main to-programs" href={`${base}programmy/`} data-testid="basics-programs">Выбрать программу →</a>
+  <a class="btn main to-programs" href={`${base}programmy/`} data-testid="basics-programs">Выбрать программу</a>
 </Base>
 
 <style>
   .intro { display: grid; margin-bottom: 20px; }
   .intro .lead { margin-top: 14px; }
-  .to-programs { margin-top: 20px; min-height: 48px; }
+  .to-programs { display: flex; justify-content: center; max-width: 420px; margin: 16px auto 0; min-height: 52px; font-size: 16px; }
 </style>

@@ -1,0 +1,12 @@
+---
+// Короткая нейтральная подсказка про самочувствие. basics — текст для статей и «О проекте». Своё дополнение страницы — в слот.
+import { BASICS_NOTE, CARE_NOTE } from "../lib/catalog";
+
+interface Props { basics?: boolean }
+const { basics = false } = Astro.props;
+---
+<p class="warn" data-testid="care-note">{basics ? BASICS_NOTE : CARE_NOTE} <slot /></p>
+
+<style>
+  .warn { margin: 0; font-size: 14px; line-height: 1.45; font-weight: 700; color: var(--soft); }
+</style>

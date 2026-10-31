@@ -1,26 +1,22 @@
 ---
 import Base from "../layouts/Base.astro";
-import BasicsCards from "../components/BasicsCards.astro";
 import BodyMap from "../components/BodyMap.astro";
 import InstallCard from "../components/InstallCard.astro";
-import BodyDefs from "../components/BodyDefs.astro";
-import MuscleIcon from "../components/MuscleIcon.astro";
 import { getCollection } from "astro:content";
 import groups from "../data/groups.json";
 import { allPrograms, plural, MY_PROGRAM_KEY } from "../lib/catalog";
-import { subsText } from "../lib/groups";
 
 const all = await getCollection("exercises");
 const count = (id: string) => all.filter(e => e.data.group === id).length;
 const base = import.meta.env.BASE_URL;
 const first = groups[0];
+const countText = (id: string) => (count(id) ? `${count(id)} ${plural(count(id))}` : "скоро");
 const programNames = Object.fromEntries((await allPrograms()).map(p => [p.id, p.name]));
 ---
 <Base jsonLd={{ "@context": "https://schema.org", "@type": "WebSite", name: "Карманный тренер", inLanguage: "ru", url: new URL(base, Astro.site).href }} title="Карманный тренер" description="Бесплатный каталог упражнений для зала и дома: 7 групп мышц, техника по шагам на русском и частые ошибки. Работает на телефоне.">
   <div class="home">
     <div class="hello">
-      <p class="hi">Привет! Начнём?</p>
-      <h1 data-testid="home-title">Что качаем <em class="wave">сегодня?</em></h1>
+      <h1 data-testid="home-title">Что качаем <em class="hl">сегодня?</em></h1>
       <div class="programs mine" data-testid="home-my-program" hidden>
         <a data-testid="home-my-program-link"><b>Моя программа</b><small></small></a>
         <a class="btn main" href={`${base}trenirovka/`} data-testid="home-start-workout">Начать тренировку</a>
@@ -45,51 +41,48 @@ const programNames = Object.fromEntries((await allPrograms()).map(p => [p.id, p.
 
     <section class="map" aria-label="Выбор мышцы">
       <BodyMap selected={first.id} clickable />
-      <div class="pick" data-testid="picked-group" style={`--gc: var(--g-${first.id})`}>
-        <span><b class="pn">{first.name}</b><small class="ps">{subsText(first)}</small></span>
-        <a class="btn main" href={`${base}myshcy/${first.slug}/`}>Упражнения →</a>
+      <div class="pick" data-testid="picked-group">
+        <span><b class="pn">{first.name}</b><small class="ps">{countText(first.id)}</small></span>
+        <a class="btn main" href={`${base}myshcy/${first.slug}/`}>Упражнения</a>
       </div>
     </section>
 
     <div class="left">
       <InstallCard />
       <a class="programs" href={`${base}programmy/`} data-testid="home-programs">
-        <span><b>Готовые программы</b><small>Набор, сила, похудение: что делать в каждый день</small></span>
-        <span class="btn main" aria-hidden="true">Выбрать →</span>
+        <span><b>Готовые программы</b><small>План на каждый день: набор, сила, похудение</small></span>
+        <img src={`${base}img/dumbbell.webp`} alt="" width="84" height="84" />
       </a>
-      <p class="lead">Нажми на мышцу на схеме или выбери группу. У каждого упражнения — техника по шагам и частые ошибки.</p>
-      <BodyDefs sides={["front", "back"]} />
-      <nav class="groups" aria-label="Группы мышц">
-        {groups.map(g => (
-          <a class:list={["gcard", { sel: g.id === first.id }]} style={`--gc: var(--g-${g.id}); --gi: var(--gi-${g.id})`} href={`${base}myshcy/${g.slug}/`} data-g={g.id} data-testid={`group-${g.id}`}>
-            <span class="disc"><MuscleIcon group={g} class="gmuscle" /></span>
-            {count(g.id) > 0 && <span class="big" aria-hidden="true">{count(g.id)}</span>}
-            <b>{g.name}</b><span class="subs">{subsText(g)}</span><em>{count(g.id) ? `${count(g.id)} ${plural(count(g.id))}` : "скоро"}</em>
-          </a>
-        ))}
-      </nav>
-      <div>
-        <p class="eyebrow">Основы</p>
-        <BasicsCards />
-      </div>
+      <section class="gsect">
+        <h2>Группы мышц</h2>
+        <nav class="groups" aria-label="Группы мышц">
+          {groups.map((g, i) => (
+            <a class="gcard tinted" style={`--gc: var(--g-${g.id}); --gi: var(--gi-${g.id})`} href={`${base}myshcy/${g.slug}/`} data-g={g.id} data-testid={`group-${g.id}`}>
+              <img class="win" src={`${base}img/m-${g.id}.webp`} alt="" width="438" height="360" loading="lazy" />
+              <span class="foot">
+                <span class="text"><b>{g.name}</b><span class="count">{countText(g.id)}</span></span>
+                {/* Порядковый номер, а не число упражнений. */}
+                <span class="num" aria-hidden="true" data-testid="group-number">{i + 1}</span>
+              </span>
+            </a>
+          ))}
+        </nav>
+      </section>
     </div>
   </div>
 </Base>
 
 <script>
   import groups from "../data/groups.json";
-  import { subsText } from "../lib/groups";
   const byId = Object.fromEntries(groups.map(g => [g.id, g]));
   const base = import.meta.env.BASE_URL;
   const pick = document.querySelector<HTMLElement>(".pick")!;
 
   document.addEventListener("pick", ev => {
     const g = byId[(ev as CustomEvent<string>).detail];
-    pick.style.setProperty("--gc", `var(--g-${g.id})`);
     pick.querySelector(".pn")!.textContent = g.name;
-    pick.querySelector(".ps")!.textContent = subsText(g);
+    pick.querySelector(".ps")!.textContent = document.querySelector(`.gcard[data-g="${g.id}"] .count`)!.textContent;
     pick.querySelector("a")!.href = `${base}myshcy/${g.slug}/`;
-    document.querySelectorAll<HTMLElement>(".gcard").forEach(c => c.classList.toggle("sel", c.dataset.g === g.id));
   });
 </script>
 
@@ -97,40 +90,48 @@ const programNames = Object.fromEntries((await allPrograms()).map(p => [p.id, p.
   /* Телефон: заголовок → схема → группы. Компьютер: схема справа на всю высоту. */
   .home { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "map" "left"; gap: 24px; align-items: start; }
   .hello { grid-area: title; }
-  .hi { margin: 0 0 6px; font-weight: 800; font-size: 15px; color: var(--accent); }
   .map { grid-area: map; background: var(--surface); border-radius: 24px; padding: 14px; }
   .left { grid-area: left; display: grid; gap: 28px; }
   @media (min-width: 1024px) {
     .home { grid-template-columns: minmax(0, 1fr) minmax(0, 460px); grid-template-areas: "title map" "left map"; column-gap: 48px; }
     .map { position: sticky; top: 76px; }
   }
-  /* Мелкие группы — отдельной строкой на всю ширину: рядом с кнопкой они ломались по одному слову. */
-  .pick { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; margin-top: 8px; background: var(--bg); border-radius: 16px; padding: 12px 14px; border-left: 6px solid var(--gc); }
-  .pick > span { display: contents; }
-  .pick b { font: 800 19px var(--f-display); letter-spacing: -.02em; }
-  .pick .btn { grid-row: 1; grid-column: 2; }
-  .pick small { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
-  .programs { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border-radius: 24px; padding: 16px; text-decoration: none; }
-  .programs b { display: block; font: 800 18px var(--f-display); letter-spacing: -.02em; }
-  .programs small { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; }
+  .pick { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; background: var(--bg); border-radius: 20px; padding: 10px 10px 10px 16px; }
+  .pick > span { display: grid; min-width: 0; }
+  .pick b { font: 800 18px var(--f-display); letter-spacing: -.02em; }
+  .pick small { color: var(--soft); font-size: 13px; font-weight: 700; }
+  .pick .btn { min-height: 46px; }
+  .programs { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border-radius: 24px; padding: 14px 14px 14px 18px; text-decoration: none; }
+  .programs b { display: block; font: 800 17px/1.2 var(--f-display); letter-spacing: -.02em; }
+  .programs small { display: block; margin-top: 4px; color: var(--soft); font-size: 14px; line-height: 1.35; font-weight: 700; }
+  .programs img { flex: none; width: 84px; height: 84px; }
   /* Длинное название не должно сжимать кнопку: на телефоне она уходит на отдельную строку. */
   .mine { margin-top: 16px; flex-wrap: wrap; }
   .mine > a:first-child { flex: 1 1 200px; min-height: 44px; text-decoration: none; }
-  /* Группы — плитки целиком в цвете блина: мышца в тёмном «диске», крупная бледная цифра — сколько упражнений. */
-  .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-  .gcard { display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; min-height: 150px; background: var(--gc); color: var(--gi);
-    border-radius: 26px; padding: 14px 16px; text-decoration: none; position: relative; overflow: hidden;
-    transition: transform .15s cubic-bezier(.3, 1.5, .5, 1), box-shadow .15s; -webkit-tap-highlight-color: transparent; }
-  .gcard:active { transform: scale(.95) rotate(-1deg); }
-  @media (hover: hover) { .gcard:hover { transform: translateY(-3px); } }
-  .disc { position: absolute; left: 12px; top: 12px; width: 52px; height: 52px; border-radius: 50%; background: var(--bg); overflow: hidden; }
-  .disc :global(.gmuscle) { width: 100%; height: 100%; display: block; }
-  .big { position: absolute; right: 10px; top: -10px; font: 800 76px/1 var(--f-display); letter-spacing: -.06em; opacity: .2; pointer-events: none; }
-  .gcard b { font: 800 17px var(--f-display); letter-spacing: -.02em; margin-top: 64px; }
-  .gcard .subs { font-size: 13px; line-height: 1.35; font-weight: 700; }
-  .gcard em { font-style: normal; font-weight: 800; font-size: 12px; margin-top: 4px; }
-  /* На телефоне плиток две в ряд: нечётная последняя растягивается, чтобы не висела одна. */
-  @media (max-width: 559px) { .gcard:last-child:nth-child(odd) { grid-column: 1 / -1; min-height: 120px; } }
-  .gcard.sel { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--gc); }
+  .gsect { display: grid; gap: 12px; }
+  /* Группы — плитки в цвете блина: мышца в окне, большая бледная цифра — порядковый номер, целиком внутри отступа. */
+  .groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .gcard { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 10px 10px 14px; border-radius: 26px; color: var(--gi); text-decoration: none;
+    transition: transform .15s; -webkit-tap-highlight-color: transparent; }
+  .gcard:active { transform: scale(.97); }
+  @media (hover: hover) { .gcard:hover { transform: translateY(-2px); } }
+  .win { display: block; width: 100%; height: auto; aspect-ratio: 146 / 120; object-fit: cover; border-radius: 18px; background: var(--bg); }
+  .foot { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 4px; padding: 0 2px 0 6px; }
+  .text { display: grid; gap: 2px; min-width: 0; }
+  .gcard b { font: 800 15px/1.2 var(--f-display); letter-spacing: -.02em; }
+  .count { font-size: 13px; line-height: 1.3; font-weight: 800; white-space: nowrap; }
+  .num { font: 800 38px/.9 var(--f-display); letter-spacing: -.04em; opacity: .34; }
+  /* Седьмая плитка на всю ширину: окно слева, текст справа. */
+  .gcard:last-child { grid-column: 1 / -1; display: grid; grid-template-columns: 146px minmax(0, 1fr); align-items: center; gap: 10px; }
+  @media (min-width: 768px) {
+    .groups { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .gcard:last-child { grid-column: span 2; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  }
+  /* Рядом со схемой левая колонка узкая: в четыре ряда текст наехал бы на цифру. */
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .groups { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .gcard:last-child { grid-column: 1 / -1; grid-template-columns: 146px minmax(0, 1fr); }
+    .num { font-size: 30px; }
+  }
   @media (prefers-reduced-motion: reduce) { .gcard { transition: none; } }
 </style>
