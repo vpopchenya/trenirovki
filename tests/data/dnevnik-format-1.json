@@ -1,0 +1,499 @@
+{
+ "app": "karmannyj-trener",
+ "format": 1,
+ "exportedAt": "2026-10-30T12:00:00.000Z",
+ "myProgram": "sila-novichok-2-raza",
+ "workouts": [
+  {
+   "id": "obrazec-1",
+   "programId": "sila-novichok-2-raza",
+   "programName": "Сила для новичка, 2 раза в неделю (ЗАГЛУШКА: записи для показа)",
+   "dayIndex": 0,
+   "dayName": "День 1",
+   "startedAt": "2026-10-22T18:00:00.000Z",
+   "finishedAt": "2026-10-22T18:52:00.000Z",
+   "updatedAt": "2026-10-22T18:52:00.000Z",
+   "items": [
+    {
+     "exerciseId": "goblet-prisedaniya",
+     "exerciseName": "Гоблет-приседания",
+     "group": "legs",
+     "fields": [
+      "weight",
+      "reps"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "6–8 повторов",
+      "rest": "3 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": 16,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-22T18:10:00.000Z"
+      },
+      {
+       "weight": 16,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-22T18:11:00.000Z"
+      },
+      {
+       "weight": 16,
+       "reps": 7,
+       "seconds": null,
+       "doneAt": "2026-10-22T18:12:00.000Z"
+      }
+     ]
+    },
+    {
+     "exerciseId": "zhim-shtangi-lezha",
+     "exerciseName": "Жим штанги лёжа",
+     "group": "chest",
+     "fields": [
+      "weight",
+      "reps"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "6–8 повторов",
+      "rest": "3 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": 40,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-22T18:18:00.000Z"
+      },
+      {
+       "weight": 40,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-22T18:19:00.000Z"
+      },
+      {
+       "weight": 40,
+       "reps": 7,
+       "seconds": null,
+       "doneAt": "2026-10-22T18:20:00.000Z"
+      }
+     ]
+    },
+    {
+     "exerciseId": "planka",
+     "exerciseName": "Планка",
+     "group": "core",
+     "fields": [
+      "seconds"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "30–45 сек",
+      "rest": "1 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": null,
+       "reps": null,
+       "seconds": 35,
+       "doneAt": "2026-10-22T18:26:00.000Z"
+      },
+      {
+       "weight": null,
+       "reps": null,
+       "seconds": 35,
+       "doneAt": "2026-10-22T18:27:00.000Z"
+      },
+      {
+       "weight": null,
+       "reps": null,
+       "seconds": 30,
+       "doneAt": "2026-10-22T18:28:00.000Z"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "obrazec-2",
+   "programId": "sila-novichok-2-raza",
+   "programName": "Сила для новичка, 2 раза в неделю (ЗАГЛУШКА: записи для показа)",
+   "dayIndex": 1,
+   "dayName": "День 2",
+   "startedAt": "2026-10-24T18:00:00.000Z",
+   "finishedAt": "2026-10-24T18:41:00.000Z",
+   "updatedAt": "2026-10-24T18:41:00.000Z",
+   "items": [
+    {
+     "exerciseId": "yagodichnyj-most-so-shtangoj",
+     "exerciseName": "Ягодичный мост со штангой",
+     "group": "glutes",
+     "fields": [
+      "weight",
+      "reps"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "6–8 повторов",
+      "rest": "3 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": 50,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-24T18:10:00.000Z"
+      },
+      {
+       "weight": 50,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-24T18:11:00.000Z"
+      },
+      {
+       "weight": 50,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-24T18:12:00.000Z"
+      }
+     ]
+    },
+    {
+     "exerciseId": "skruchivaniya-na-polu",
+     "exerciseName": "Скручивания на полу",
+     "group": "core",
+     "fields": [
+      "reps"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "12–15 повторов",
+      "rest": "1 мин"
+     },
+     "skipped": true,
+     "sets": []
+    }
+   ]
+  },
+  {
+   "id": "obrazec-3",
+   "programId": "sila-novichok-2-raza",
+   "programName": "Сила для новичка, 2 раза в неделю (ЗАГЛУШКА: записи для показа)",
+   "dayIndex": 0,
+   "dayName": "День 1",
+   "startedAt": "2026-10-27T18:00:00.000Z",
+   "finishedAt": "2026-10-27T18:49:00.000Z",
+   "updatedAt": "2026-10-27T18:49:00.000Z",
+   "items": [
+    {
+     "exerciseId": "goblet-prisedaniya",
+     "exerciseName": "Гоблет-приседания",
+     "group": "legs",
+     "fields": [
+      "weight",
+      "reps"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "6–8 повторов",
+      "rest": "3 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": 16,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-27T18:10:00.000Z"
+      },
+      {
+       "weight": 16,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-27T18:11:00.000Z"
+      },
+      {
+       "weight": 16,
+       "reps": 7,
+       "seconds": null,
+       "doneAt": "2026-10-27T18:12:00.000Z"
+      }
+     ]
+    },
+    {
+     "exerciseId": "zhim-shtangi-lezha",
+     "exerciseName": "Жим штанги лёжа",
+     "group": "chest",
+     "fields": [
+      "weight",
+      "reps"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "6–8 повторов",
+      "rest": "3 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": 42.5,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-27T18:18:00.000Z"
+      },
+      {
+       "weight": 42.5,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-27T18:19:00.000Z"
+      },
+      {
+       "weight": 42.5,
+       "reps": 7,
+       "seconds": null,
+       "doneAt": "2026-10-27T18:20:00.000Z"
+      }
+     ]
+    },
+    {
+     "exerciseId": "planka",
+     "exerciseName": "Планка",
+     "group": "core",
+     "fields": [
+      "seconds"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "30–45 сек",
+      "rest": "1 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": null,
+       "reps": null,
+       "seconds": 35,
+       "doneAt": "2026-10-27T18:26:00.000Z"
+      },
+      {
+       "weight": null,
+       "reps": null,
+       "seconds": 35,
+       "doneAt": "2026-10-27T18:27:00.000Z"
+      },
+      {
+       "weight": null,
+       "reps": null,
+       "seconds": 30,
+       "doneAt": "2026-10-27T18:28:00.000Z"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "obrazec-4",
+   "programId": "sila-novichok-2-raza",
+   "programName": "Сила для новичка, 2 раза в неделю (ЗАГЛУШКА: записи для показа)",
+   "dayIndex": 1,
+   "dayName": "День 2",
+   "startedAt": "2026-10-29T18:00:00.000Z",
+   "finishedAt": "2026-10-29T18:54:00.000Z",
+   "updatedAt": "2026-10-29T18:54:00.000Z",
+   "items": [
+    {
+     "exerciseId": "yagodichnyj-most-so-shtangoj",
+     "exerciseName": "Ягодичный мост со штангой",
+     "group": "glutes",
+     "fields": [
+      "weight",
+      "reps"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "6–8 повторов",
+      "rest": "3 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": 50,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-29T18:10:00.000Z"
+      },
+      {
+       "weight": 50,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-29T18:11:00.000Z"
+      },
+      {
+       "weight": 50,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-29T18:12:00.000Z"
+      }
+     ]
+    },
+    {
+     "exerciseId": "skruchivaniya-na-polu",
+     "exerciseName": "Скручивания на полу",
+     "group": "core",
+     "fields": [
+      "reps"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "12–15 повторов",
+      "rest": "1 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": null,
+       "reps": 15,
+       "seconds": null,
+       "doneAt": "2026-10-29T18:18:00.000Z"
+      },
+      {
+       "weight": null,
+       "reps": 14,
+       "seconds": null,
+       "doneAt": "2026-10-29T18:19:00.000Z"
+      },
+      {
+       "weight": null,
+       "reps": 12,
+       "seconds": null,
+       "doneAt": "2026-10-29T18:20:00.000Z"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "obrazec-5",
+   "programId": "sila-novichok-2-raza",
+   "programName": "Сила для новичка, 2 раза в неделю (ЗАГЛУШКА: записи для показа)",
+   "dayIndex": 0,
+   "dayName": "День 1",
+   "startedAt": "2026-10-20T18:00:00.000Z",
+   "finishedAt": null,
+   "updatedAt": "2026-10-20T18:20:00.000Z",
+   "items": [
+    {
+     "exerciseId": "goblet-prisedaniya",
+     "exerciseName": "Гоблет-приседания",
+     "group": "legs",
+     "fields": [
+      "weight",
+      "reps"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "6–8 повторов",
+      "rest": "3 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": 16,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-20T18:10:00.000Z"
+      },
+      {
+       "weight": 16,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-20T18:11:00.000Z"
+      },
+      {
+       "weight": 16,
+       "reps": 7,
+       "seconds": null,
+       "doneAt": "2026-10-20T18:12:00.000Z"
+      }
+     ]
+    },
+    {
+     "exerciseId": "zhim-shtangi-lezha",
+     "exerciseName": "Жим штанги лёжа",
+     "group": "chest",
+     "fields": [
+      "weight",
+      "reps"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "6–8 повторов",
+      "rest": "3 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": 40,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-20T18:18:00.000Z"
+      },
+      {
+       "weight": 40,
+       "reps": 8,
+       "seconds": null,
+       "doneAt": "2026-10-20T18:19:00.000Z"
+      },
+      {
+       "weight": 40,
+       "reps": 7,
+       "seconds": null,
+       "doneAt": "2026-10-20T18:20:00.000Z"
+      }
+     ]
+    },
+    {
+     "exerciseId": "planka",
+     "exerciseName": "Планка",
+     "group": "core",
+     "fields": [
+      "seconds"
+     ],
+     "plan": {
+      "sets": 3,
+      "reps": "30–45 сек",
+      "rest": "1 мин"
+     },
+     "skipped": false,
+     "sets": [
+      {
+       "weight": null,
+       "reps": null,
+       "seconds": 35,
+       "doneAt": "2026-10-20T18:26:00.000Z"
+      },
+      {
+       "weight": null,
+       "reps": null,
+       "seconds": 35,
+       "doneAt": "2026-10-20T18:27:00.000Z"
+      },
+      {
+       "weight": null,
+       "reps": null,
+       "seconds": 30,
+       "doneAt": "2026-10-20T18:28:00.000Z"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

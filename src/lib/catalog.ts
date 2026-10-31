@@ -79,7 +79,7 @@ export const FAT_LOSS_NOTE = "Честно: сами тренировки вес
 export const FAT_LOSS_LINK = "Как питаться →";
 
 /** Ключ localStorage: имя файла выбранной программы. Хранится только на телефоне, на сервер не уходит. */
-export const MY_PROGRAM_KEY = "my-program";
+export { MY_PROGRAM_KEY } from "./storage-keys";
 
 /** Программы по порядку, с упражнениями вместо ссылок. Сюда же — проверки, которых не выразить схемой. */
 export async function allPrograms() {

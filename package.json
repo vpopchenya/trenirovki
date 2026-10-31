@@ -12,7 +12,8 @@
     "@fontsource/ibm-plex-mono": "5.2.5",
     "@fontsource/nunito": "5.3.0",
     "@fontsource/unbounded": "5.3.0",
-    "astro": "7.3.8"
+    "astro": "7.3.8",
+    "idb": "8.0.4"
   },
   "devDependencies": {
     "workbox-cli": "7.4.1"

@@ -1,6 +1,10 @@
 node_modules/
 dist/
 .astro/
+.venv/
+__pycache__/
+.pytest_cache/
+test-results/
 .env
 .env.*
 !.env.example

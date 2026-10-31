@@ -1,0 +1,72 @@
+/* Дневник и тренировка, вид «Плитка и блин» (макет v5-trenirovka-maket.html в studio). Разметку рисует скрипт,
+   поэтому стили глобальные, а не в компоненте. */
+.dv { --stub: #ffb36b; --ok: #7fd99a; --bad: #ff8f83; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.dv p { margin: 0; }
+.dv :where(button, input) { font: inherit; color: inherit; }
+.dv :where(button) { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.dv.narrow { max-width: 620px; margin-inline: auto; }
+
+.wbtn { width: 100%; min-height: 56px; border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 800; font-size: 17px; padding: 0 18px; text-align: center; text-decoration: none; display: grid; place-items: center; transition: transform .1s; }
+.wbtn.ghost { background: var(--surface2); color: var(--fg); }
+.wbtn.danger { background: none; box-shadow: inset 0 0 0 2px var(--bad); color: var(--bad); }
+.wbtn:active, .step:active { transform: scale(.97); }
+.lnk { background: none; border: 0; text-align: left; min-height: 46px; padding: 0; font-weight: 800; font-size: 15px; color: var(--text); text-decoration: underline; text-decoration-color: var(--muted); text-underline-offset: 3px; justify-self: start; }
+.lnk.end { color: var(--bad); }
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 16px 0 12px; border: 0; border-radius: 999px; background: var(--surface2); font-weight: 800; font-size: 15px; white-space: nowrap; justify-self: start; }
+.pill svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.card { background: var(--surface); border-radius: 22px; padding: 14px; display: grid; gap: 10px; }
+.card.calm { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+.card.bad { background: color-mix(in srgb, #e5322d 18%, var(--surface)); }
+.card.okc { background: color-mix(in srgb, #2e9e4f 18%, var(--surface)); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.warn { font-size: 13px; color: var(--muted); }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gc); flex: none; }
+
+.bb { display: flex; align-items: center; gap: 1px; height: 26px; max-width: 150px; }
+.bb span { flex: 1 1 10px; min-width: 4px; height: 3px; border-radius: 2px; background: var(--muted); }
+.bb i { flex: none; width: 5px; border-radius: 2px; background: var(--gc); }
+
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.stats div { background: var(--surface); border-radius: 16px; padding: 10px 6px; text-align: center; font-size: 13px; color: var(--muted); line-height: 1.25; }
+.stats b { display: block; font: 800 20px/1.2 var(--f-display); color: var(--fg); letter-spacing: -.03em; }
+.wrow { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: center; width: 100%; text-align: left; border: 0; border-radius: 22px; background: var(--surface); padding: 12px 14px; transition: transform .1s; }
+.wrow:active { transform: scale(.98); }
+.wdate { font: 800 19px/1.1 var(--f-display); letter-spacing: -.03em; }
+.wdate small { display: block; font: 800 13px var(--f-body); letter-spacing: 0; color: var(--muted); margin-top: 3px; }
+.wrow b { display: block; font-weight: 800; font-size: 16px; line-height: 1.25; }
+.wrow .sub { color: var(--text); font-size: 14px; line-height: 1.3; display: block; margin-bottom: 4px; }
+.list { display: grid; gap: 8px; }
+.exh { display: flex; align-items: center; gap: 10px; }
+.exh b { font-weight: 800; font-size: 16px; line-height: 1.25; }
+.setrow { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 46px; border: 0; background: none; border-top: 1px solid var(--line); padding: 0; text-align: left; font-weight: 700; font-size: 16px; }
+.setrow em { font-style: normal; font: 500 12px var(--f-mono); color: var(--muted); }
+
+.fields { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; }
+.field { display: grid; gap: 2px; text-align: center; min-width: 0; }
+.field label { font-weight: 800; font-size: 14px; line-height: 1.2; }
+.num { width: 100%; min-width: 0; border: 0; background: none; text-align: center; font: 800 32px/1.05 var(--f-display); letter-spacing: -.04em; padding: 0; border-radius: 10px; }
+.steps { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.step { height: 48px; border: 0; border-radius: 18px; background: var(--surface2); color: #fff; font-weight: 800; font-size: 28px; line-height: 1; transition: transform .1s; }
+.edit { display: grid; gap: 8px; background: var(--bg); border-radius: 16px; padding: 10px; }
+
+/* «Подробности»: стрелка своя, поэтому кнопка «Назад» в шапке уступает место логотипу. */
+body.in-detail .bar .back { display: none; }
+body.in-detail .bar .logo { display: flex !important; }
+
+@media (min-width: 768px) {
+  .dv { gap: 16px; }
+  .card { padding: 18px; }
+}
+@media (min-width: 1024px) {
+  .diarygrid { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 12px; align-items: start; }
+  .diarygrid > .side { position: sticky; top: 84px; display: grid; gap: 12px; }
+  .only-m { display: none !important; }
+}
+/* На телефоне и планшете первым — список: дневник открывают ради записей, файл идёт после них, срочное напоминание остаётся сверху. */
+@media (max-width: 1023px) {
+  .diarygrid { display: flex; flex-direction: column; gap: 12px; }
+  .diarygrid > .side { display: contents; }
+  .o1 { order: 1; } .o2 { order: 2; } .o3 { order: 3; } .o4 { order: 4; }
+}
+@media (prefers-reduced-motion: reduce) { .wbtn, .step, .wrow { transition: none; } }
