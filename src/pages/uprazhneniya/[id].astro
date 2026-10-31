@@ -70,6 +70,7 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
           <h2>Частые ошибки</h2>
           <ul class="errs" data-testid="errors">{errors.map(s => <li>{s}</li>)}</ul>
         </section>
+        <div class="hist" data-exercise={ex.id}></div>
         {inPrograms.length > 0 && (
           <section class="sect" data-testid="in-programs">
             <h2>Входит в программы</h2>
@@ -101,6 +102,14 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
     </div>
   </div>
 </Base>
+
+<script>
+  import { showHistory } from "../../lib/diary/history";
+  const hist = document.querySelector<HTMLElement>(".hist")!;
+  showHistory(hist);
+  // Вернулись «Назад» из кэша браузера: за это время могла закончиться тренировка.
+  addEventListener("pageshow", ev => { if (ev.persisted) showHistory(hist); });
+</script>
 
 <script>
   dispatchEvent(new CustomEvent("goal", { detail: "exercise_open" }));
@@ -185,6 +194,13 @@ const [head, tail] = cut > 0 ? [e.name.slice(0, cut + 1), e.name.slice(cut + 1)]
   /* На телефоне наведения нет: без стрелки плашка не отличается от простого текста. */
   .inprog a::after { content: "→"; color: var(--accent); }
   @media (hover: hover) { .inprog a:hover { background: var(--surface2); } }
+  /* Разметку блока рисует скрипт, поэтому :global. Пустой блок места не занимает. */
+  .hist:not(:empty) { margin-top: 28px; }
+  .hist :global(h2) { margin-bottom: 14px; }
+  .hist :global(ul) { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .hist :global(li) { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 14px; background: var(--surface); border-radius: 16px; padding: 12px 14px; }
+  .hist :global(li span) { color: var(--muted); }
+  .hist :global(li b) { font: 500 16px var(--f-mono); color: var(--fg); }
   .noband { margin: 0; background: var(--surface); border-radius: 20px; padding: 12px 14px; color: var(--fg); font-size: 16.5px; }
   .side { display: grid; gap: 12px; }
   .box { background: var(--surface); border-radius: 24px; padding: 16px; }

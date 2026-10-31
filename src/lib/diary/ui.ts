@@ -38,6 +38,15 @@ export function setsLine(sets: WorkoutSet[]) {
   if (first.weight === null) return `${reps} раз`;
   return sets.every(s => s.weight === first.weight) ? `${decimal(first.weight)} кг × ${reps}` : sets.map(setText).join(", ");
 }
+export const dayMonth = (iso: string) => new Date(iso).toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
+
+/** Законченные тренировки с этим упражнением и хотя бы одним подходом, из любой программы. Порядок — как в workouts. */
+export function exerciseHistory(workouts: Workout[], exerciseId: string) {
+  return workouts.flatMap(w => {
+    const item = w.finishedAt ? w.items.find(x => x.exerciseId === exerciseId && x.sets.length) : null;
+    return item ? [{ startedAt: w.startedAt, sets: item.sets }] : [];
+  });
+}
 export const countSets = (w: Workout) => w.items.reduce((n, x) => n + x.sets.length, 0);
 export const planSets = (w: Workout) => w.items.reduce((n, x) => n + x.plan.sets, 0);
 export const minutes = (w: Workout) => w.finishedAt && Math.max(1, Math.round((Date.parse(w.finishedAt) - Date.parse(w.startedAt)) / 60000));

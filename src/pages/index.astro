@@ -21,10 +21,10 @@ const programNames = Object.fromEntries((await allPrograms()).map(p => [p.id, p.
     <div class="hello">
       <p class="hi">Привет! Начнём?</p>
       <h1 data-testid="home-title">Что качаем <em class="wave">сегодня?</em></h1>
-      <a class="programs mine" data-testid="home-my-program" hidden>
-        <span><b>Моя программа</b><small></small></span>
-        <span class="btn main" aria-hidden="true">Открыть →</span>
-      </a>
+      <div class="programs mine" data-testid="home-my-program" hidden>
+        <a data-testid="home-my-program-link"><b>Моя программа</b><small></small></a>
+        <a class="btn main" href={`${base}trenirovka/`} data-testid="home-start-workout">Начать тренировку</a>
+      </div>
       {/* Сразу за разметкой, чтобы карточка не прыгала. Имени нет в списке (программу убрали) — главная как обычно.
           pageshow — вернулись «Назад» из кэша браузера, а выбор мог поменяться. */}
       <script is:inline define:vars={{ KEY: MY_PROGRAM_KEY, names: programNames, base }}>
@@ -35,7 +35,7 @@ const programNames = Object.fromEntries((await allPrograms()).map(p => [p.id, p.
           const known = Object.keys(names).includes(id);
           mine.hidden = !known;
           if (!known) return;
-          mine.href = `${base}programmy/${id}/`;
+          mine.querySelector("a").href = `${base}programmy/${id}/`;
           mine.querySelector("small").textContent = names[id];
         };
         show();
@@ -113,7 +113,9 @@ const programNames = Object.fromEntries((await allPrograms()).map(p => [p.id, p.
   .programs { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border-radius: 24px; padding: 16px; text-decoration: none; }
   .programs b { display: block; font: 800 18px var(--f-display); letter-spacing: -.02em; }
   .programs small { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; }
-  .mine { margin-top: 16px; }
+  /* Длинное название не должно сжимать кнопку: на телефоне она уходит на отдельную строку. */
+  .mine { margin-top: 16px; flex-wrap: wrap; }
+  .mine > a:first-child { flex: 1 1 200px; min-height: 44px; text-decoration: none; }
   /* Группы — плитки целиком в цвете блина: мышца в тёмном «диске», крупная бледная цифра — сколько упражнений. */
   .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
   .gcard { display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; min-height: 150px; background: var(--gc); color: var(--gi);

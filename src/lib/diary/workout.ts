@@ -3,7 +3,7 @@
 import { changeWorkout, finishWorkout, getMeta, listWorkouts, saveWorkout, updateMeta, updateSet, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
 import { filesReminder, myProgram, saveDiaryFile } from "./file";
 import { keepScreenOn, mmss, restSeconds, secondsLeft, signal, unlockAudio } from "./timer";
-import { backIcon, barbell, button, countSets, el, goal, groupColor, minutes, numberField, planSets, present, setsLine, setText, type Child, type SetValues } from "./ui";
+import { backIcon, barbell, button, countSets, el, exerciseHistory, goal, groupColor, minutes, numberField, planSets, present, setsLine, setText, type Child, type SetValues } from "./ui";
 
 interface ProgramItem { exerciseId: string; exerciseName: string; group: string; fields: SetField[]; weightLabel: string | null; note: string | null; sets: number; reps: string; rest: string }
 interface ProgramDay { name: string; muscles: string; items: ProgramItem[] }
@@ -46,15 +46,7 @@ const unit = (reps: string) => (/сек|повтор/.test(reps) ? reps : `${rep
 /** Первое число плана: «6–8» → 6, «30–45 сек» → 30. */
 const planStart = (reps: string) => parseInt(reps, 10) || 1;
 
-/** Последняя законченная тренировка с этим упражнением и хотя бы одним подходом, из любой программы. */
-function lastSets(exerciseId: string) {
-  for (const w of state.history) {
-    if (!w.finishedAt) continue;
-    const item = w.items.find(x => x.exerciseId === exerciseId && x.sets.length);
-    if (item) return item.sets;
-  }
-  return null;
-}
+const lastSets = (exerciseId: string) => exerciseHistory(state.history, exerciseId)[0]?.sets ?? null;
 
 /** Куда вернуться: первое упражнение, где подходы не закончены. */
 const position = (w: Workout) => {

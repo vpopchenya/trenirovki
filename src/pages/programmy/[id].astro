@@ -24,6 +24,7 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
     <p class="lead">{p.description}</p>
     {/* Без JavaScript выбрать нечем, поэтому кнопку показывает скрипт. */}
     <div class="mine" hidden>
+      <a class="btn main" href={`${base}trenirovka/`} data-testid="start-workout-link" hidden>Начать тренировку</a>
       <button class="btn main" type="button" aria-pressed="false" data-testid="my-program-btn">Моя программа</button>
       <p role="status" data-testid="my-program-hint"></p>
     </div>
@@ -31,10 +32,11 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
   {/* Сразу за разметкой, а не в конце страницы: кнопка не прыгает. pageshow — вернулись «Назад» из кэша браузера,
       а там могла быть выбрана другая программа. */}
   <script is:inline define:vars={{ KEY: MY_PROGRAM_KEY, id: p.id }}>
-    const box = document.querySelector(".mine"), btn = box.querySelector("button"), hint = box.querySelector("p");
+    const box = document.querySelector(".mine"), btn = box.querySelector("button"), hint = box.querySelector("p"), start = box.querySelector("a");
     const read = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
     const show = () => {
       const mine = read() === id;
+      start.hidden = !mine;
       btn.setAttribute("aria-pressed", String(mine));
       btn.textContent = mine ? "✓ Моя программа" : "Моя программа";
       hint.textContent = mine ? "Откроется сразу с главной. Нажми ещё раз, чтобы убрать." : "";
@@ -112,7 +114,7 @@ const perDay = Math.max(...p.days.map(d => d.items.length));
   .facts div { background: var(--surface); border-radius: 16px; padding: 10px 6px; text-align: center; font-size: 13px; color: var(--muted); }
   .facts b { display: block; font: 800 20px var(--f-display); color: var(--fg); }
   .mine { display: grid; gap: 6px; justify-items: start; }
-  .mine .btn { min-height: 48px; }
+  .mine .btn { min-height: 48px; box-sizing: border-box; }
   /* Выбрана — кнопка спокойная: главное действие на странице уже сделано. */
   .mine .btn[aria-pressed="true"] { background: var(--surface); color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
   .mine p { margin: 0; font-size: 14px; color: var(--muted); }

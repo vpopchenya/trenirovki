@@ -1,17 +1,16 @@
 // Экран дневника: список, подробности, исправление, удаление, файл.
 import { clearWorkouts, deleteWorkout, getMeta, getWorkout, listWorkouts, updateSet, type Meta, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
 import { filesReminder, LIMITS, loadDiaryFile, saveDiaryFile } from "./file";
-import { backIcon, barbell, button, countSets, el, goal, groupColor, minutes, numberField, plural, present, setText, type Child, type SetValues } from "./ui";
+import { backIcon, barbell, button, countSets, dayMonth, el, goal, groupColor, minutes, numberField, plural, present, setText, type Child, type SetValues } from "./ui";
 
 const setsWord = (n: number) => `${n} ${plural(n, "подход", "подхода", "подходов")}`;
 const workoutsWord = (n: number) => `${n} ${plural(n, "тренировка", "тренировки", "тренировок")}`;
 const dateParts = (iso: string) => {
   const d = new Date(iso);
-  const dayMonth = d.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
   return {
     day: String(d.getDate()),
     weekday: d.toLocaleDateString("ru-RU", { weekday: "short" }),
-    dayMonth,
+    dayMonth: dayMonth(iso),
     month: d.toLocaleDateString("ru-RU", { month: "long", year: "numeric" }).replace(" г.", ""),
   };
 };
