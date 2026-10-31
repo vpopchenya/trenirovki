@@ -1,6 +1,6 @@
 // Файл дневника: единственный способ перенести записи на другой телефон и сохранить их. Загрузка только добавляет.
 import { MY_PROGRAM_KEY } from "../storage-keys";
-import { listWorkouts, mergeWorkouts, updateMeta, type MergeResult, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
+import { listWorkouts, mergeWorkouts, updateMeta, type MergeResult, type Meta, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
 
 const APP = "karmannyj-trener";
 const FORMAT = 1;
@@ -71,6 +71,7 @@ function readItem(raw: unknown): WorkoutItem {
   check(fields.length > 0 && fields.every(f => typeof f === "string" && Object.hasOwn(LIMITS, f)));
   return {
     exerciseId: text(i.exerciseId), exerciseName: text(i.exerciseName), group: i.group as string, fields,
+    weightLabel: i.weightLabel == null ? null : text(i.weightLabel), note: i.note == null ? null : text(i.note),
     plan: { sets: count(plan.sets, 50), reps: text(plan.reps), rest: text(plan.rest) },
     skipped: i.skipped as boolean, sets: list(i.sets, 100).map(s => readSet(s, fields)),
   };
@@ -79,6 +80,7 @@ function readItem(raw: unknown): WorkoutItem {
 function readWorkout(raw: unknown): Workout {
   const w = record(raw);
   check(typeof w.id === "string" && /^[\w-]{1,64}$/.test(w.id)); // попадает в адрес страницы
+  check(Array.isArray(w.items) && w.items.length > 0);
   return {
     id: w.id as string, programId: text(w.programId), programName: text(w.programName),
     dayIndex: count(w.dayIndex, 50), dayName: text(w.dayName),
@@ -104,7 +106,7 @@ export function parseDiaryFile(content: string): ParseResult {
   }
 }
 
-function myProgram() {
+export function myProgram() {
   try { return localStorage.getItem(MY_PROGRAM_KEY); } catch { return null; } // хранилище закрыто: как будто не выбрана
 }
 
@@ -154,6 +156,13 @@ export async function saveDiaryFile() {
   }
   await updateMeta({ lastFileAt: now.toISOString() });
   return file.name;
+}
+
+/** Спокойное напоминание: после первой законченной тренировки и дальше через каждые 5. Вернёт, сколько прошло, или null. */
+export function filesReminder(workouts: Workout[], meta: Meta) {
+  const finished = workouts.filter(w => w.finishedAt);
+  const since = meta.lastFileAt ? finished.filter(w => w.finishedAt! > meta.lastFileAt!).length : finished.length;
+  return since >= (meta.lastFileAt ? 5 : 1) ? since : null;
 }
 
 export type LoadResult = ({ ok: true } & MergeResult) | { ok: false; message: string };

@@ -1,36 +1,10 @@
 // Экран дневника: список, подробности, исправление, удаление, файл.
-// Текст из записей может прийти из чужого файла, поэтому разметку строим только через el(): всё попадает как текст.
 import { clearWorkouts, deleteWorkout, getMeta, getWorkout, listWorkouts, updateSet, type Meta, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
-import { LIMITS, loadDiaryFile, saveDiaryFile } from "./file";
+import { filesReminder, LIMITS, loadDiaryFile, saveDiaryFile } from "./file";
+import { backIcon, barbell, button, countSets, el, goal, groupColor, minutes, numberField, plural, present, setText, type Child, type SetValues } from "./ui";
 
-type Child = Node | string | null | false;
-type Attrs = Record<string, string | ((ev: Event) => void)>;
-
-function el(tag: string, attrs: Attrs = {}, ...children: Child[]) {
-  const node = document.createElement(tag);
-  for (const [key, val] of Object.entries(attrs)) {
-    if (typeof val === "function") node.addEventListener(key, val);
-    else node.setAttribute(key, val);
-  }
-  node.append(...children.filter((c): c is Node | string => c !== null && c !== false));
-  return node;
-}
-const button = (cls: string, testid: string, label: Child | Child[], onClick: () => void, attrs: Attrs = {}) =>
-  el("button", { type: "button", class: cls, "data-testid": testid, click: onClick, ...attrs }, ...[label].flat());
-const groupColor = (group: string) => `--gc:var(--g-${group},var(--muted))`;
-
-const plural = (n: number, one: string, few: string, many: string) =>
-  n % 10 === 1 && n % 100 !== 11 ? one : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? few : many;
 const setsWord = (n: number) => `${n} ${plural(n, "подход", "подхода", "подходов")}`;
 const workoutsWord = (n: number) => `${n} ${plural(n, "тренировка", "тренировки", "тренировок")}`;
-const decimal = (v: number) => String(v).replace(".", ",");
-
-function setText(s: WorkoutSet) {
-  if (s.seconds !== null) return `${s.seconds} сек`;
-  return s.weight === null ? `${s.reps} раз` : `${decimal(s.weight)} кг × ${s.reps}`;
-}
-const countSets = (w: Workout) => w.items.reduce((n, x) => n + x.sets.length, 0);
-const minutes = (w: Workout) => w.finishedAt && Math.max(1, Math.round((Date.parse(w.finishedAt) - Date.parse(w.startedAt)) / 60000));
 const dateParts = (iso: string) => {
   const d = new Date(iso);
   const dayMonth = d.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
@@ -42,13 +16,6 @@ const dateParts = (iso: string) => {
   };
 };
 
-function barbell(items: WorkoutItem[]) {
-  const plate = (x: WorkoutItem, i: number) => el("i", { style: `${groupColor(x.group)};height:${Math.max(26 - i * 3, 6)}px` });
-  const plates = items.map(plate);
-  const mirror = items.map(plate).reverse();
-  return el("div", { class: "bb", "aria-hidden": "true" }, ...plates, el("span"), ...mirror);
-}
-
 const root = document.querySelector<HTMLElement>("#diary")!;
 const picker = document.querySelector<HTMLInputElement>("#diary-file")!;
 
@@ -57,7 +24,7 @@ const state = {
   message: null as Message,
   askClear: false,
   askDelete: false,
-  edit: null as null | { item: number; set: number; values: Partial<Record<SetField, number>> },
+  edit: null as null | { item: number; set: number; values: SetValues },
   error: "",
 };
 
@@ -75,7 +42,7 @@ async function fail(err: unknown, text = "Не получилось сохран
 async function saveFile() {
   try {
     const name = await saveDiaryFile();
-    if (name) { state.message = { kind: "okc", text: `Файл сохранён: ${name}` }; state.askClear = false; }
+    if (name) { state.message = { kind: "okc", text: `Файл сохранён: ${name}` }; state.askClear = false; goal("diary_export"); }
   } catch (err) { return fail(err, "Файл не сохранился. Попробуй ещё раз."); }
   await draw();
 }
@@ -86,6 +53,7 @@ async function loadFile() {
   if (!file) return;
   try {
     const r = await loadDiaryFile(file);
+    if (r.ok) goal("diary_import");
     state.message = r.ok
       ? { kind: "okc", text: `Файл загружен: добавлено ${r.added}${r.updated ? `, обновлено ${r.updated}` : ""}, уже были ${r.same}.` }
       : { kind: "bad", text: r.message };
@@ -96,23 +64,22 @@ async function loadFile() {
 const messageCard = (cls = "") => state.message && el("div", { class: `card ${state.message.kind} ${cls}`, "data-testid": "file-result", role: "status" }, el("p", {}, state.message.text));
 const errorCard = () => state.error && el("div", { class: "card bad o1", "data-testid": "diary-error", role: "alert" }, el("p", {}, state.error));
 
-/** Спокойное напоминание: после первой законченной тренировки и дальше через каждые 5. */
 function reminderCard(workouts: Workout[], meta: Meta) {
-  const finished = workouts.filter(w => w.finishedAt);
-  const since = meta.lastFileAt ? finished.filter(w => w.finishedAt! > meta.lastFileAt!).length : finished.length;
-  if (since < (meta.lastFileAt ? 5 : 1)) return null;
+  const since = filesReminder(workouts, meta);
+  if (since === null) return null;
   return el("div", { class: "card calm o1", "data-testid": "file-reminder" },
     el("p", {}, el("b", {}, "Пора сохранить файл. "), meta.lastFileAt ? `После прошлого файла ${plural(since, "прошла", "прошло", "прошло")} ${workoutsWord(since)}.` : "Записи лежат только в этом браузере."),
     button("wbtn only-m", "reminder-save", "Сохранить в файл", saveFile));
 }
 
-function fileCard() {
+function fileCard(persisted: boolean) {
   return el("div", { class: "card o3", "data-testid": "file-card" },
     el("h2", {}, "Файл дневника"),
     el("p", {}, "Записи лежат только в этом браузере. Очистишь его или сменишь телефон — они пропадут. Файл — твоя копия."),
     button("wbtn", "diary-export", "Сохранить в файл", saveFile),
     button("wbtn ghost", "diary-import", "Загрузить из файла", () => picker.click()),
-    el("p", { class: "warn" }, "Загрузка только добавляет записи и ничего не стирает."));
+    el("p", { class: "warn" }, "Загрузка только добавляет записи и ничего не стирает."),
+    !persisted && el("p", { class: "warn", "data-testid": "not-persisted" }, "Браузер может стереть записи, если на телефоне кончится место. Поставь приложение на экран и сохраняй файл."));
 }
 
 function clearBlock() {
@@ -132,7 +99,7 @@ function workoutRow(w: Workout) {
   const details = [setsWord(countSets(w)), minutes(w) ? `${minutes(w)} мин` : "не закончена", w.items.some(x => x.skipped) && "есть пропуск"].filter(Boolean).join(" · ");
   return button("wrow", "workout-row", [
     el("span", { class: "wdate" }, day, el("small", {}, weekday)),
-    el("span", {}, el("b", {}, w.dayName), el("span", { class: "sub" }, details), barbell(w.items)),
+    el("span", {}, el("b", {}, w.dayName), el("span", { class: "sub" }, details), barbell(w.items, { small: true })),
   ], () => { location.hash = encodeURIComponent(w.id); });
 }
 
@@ -159,49 +126,22 @@ function emptyView() {
 }
 
 async function listView() {
-  const [workouts, meta] = await Promise.all([listWorkouts(), getMeta()]);
+  const [workouts, meta, persisted] = await Promise.all([listWorkouts(), getMeta(), navigator.storage?.persisted?.() ?? true]);
   if (!workouts.length) return emptyView();
   return [
     el("h1", { "data-testid": "diary-title" }, el("em", { class: "wave" }, "Дневник")),
     el("div", { class: "diarygrid" },
-      el("div", { class: "side" }, errorCard(), messageCard("o1"), reminderCard(workouts, meta), fileCard(), clearBlock()),
+      el("div", { class: "side" }, errorCard(), messageCard("o1"), reminderCard(workouts, meta), fileCard(persisted), clearBlock()),
       workoutList(workouts)),
   ];
 }
 
-const FIELD_LABEL: Record<SetField, string> = { weight: "Вес, кг", reps: "Повторы", seconds: "Секунды" };
-const FIELD_STEP: Record<SetField, number> = { weight: 2.5, reps: 1, seconds: 5 };
-const clamp = (v: number, field: SetField) => Math.min(LIMITS[field].max, Math.max(LIMITS[field].min, v));
-
-function fieldInput(field: SetField) {
-  const values = state.edit!.values;
-  const id = `edit-${field}`;
-  const input = el("input", {
-    class: "num", id, "data-testid": id, inputmode: "decimal", value: decimal(values[field]!),
-    change: ev => {
-      const target = ev.target as HTMLInputElement;
-      const n = parseFloat(target.value.replace(",", "."));
-      if (!Number.isNaN(n)) values[field] = clamp(field === "weight" ? n : Math.round(n), field);
-      target.value = decimal(values[field]!);
-    },
-  }) as HTMLInputElement;
-  const adjust = (by: number) => () => {
-    values[field] = clamp(values[field]! + by, field);
-    input.value = decimal(values[field]!);
-  };
-  return el("div", { class: "field" }, el("label", { for: id }, FIELD_LABEL[field]), input,
-    el("div", { class: "steps" },
-      button("step", `edit-${field}-minus`, "−", adjust(-FIELD_STEP[field]), { "aria-label": "Меньше" }),
-      button("step", `edit-${field}-plus`, "+", adjust(FIELD_STEP[field]), { "aria-label": "Больше" })));
-}
-
-function editForm(w: Workout, i: number, k: number) {
+function editForm(w: Workout, item: WorkoutItem, i: number, k: number) {
   const fields = (Object.keys(LIMITS) as SetField[]).filter(f => state.edit!.values[f] !== undefined);
   return el("div", { class: "edit", "data-testid": "set-edit" },
-    el("div", { class: "fields" }, ...fields.map(fieldInput)),
+    el("div", { class: "fields" }, ...fields.map(f => numberField(f, state.edit!.values, "edit", item.weightLabel))),
     el("div", { class: "row2" },
       button("wbtn", "edit-save", "Сохранить", async () => {
-        document.querySelector<HTMLElement>(".edit input:focus")?.blur(); // ручной ввод применяется при потере фокуса
         try { await updateSet(w.id, i, k, state.edit!.values); } catch (err) { return fail(err); }
         state.edit = null; draw();
       }),
@@ -210,17 +150,17 @@ function editForm(w: Workout, i: number, k: number) {
 
 function exerciseCard(w: Workout, item: WorkoutItem, i: number) {
   const startEdit = (k: number, s: WorkoutSet) => () => {
-    const values: Partial<Record<SetField, number>> = {};
+    const values: SetValues = {};
     for (const f of Object.keys(LIMITS) as SetField[]) if (s[f] !== null) values[f] = s[f]!;
     state.edit = { item: i, set: k, values };
     draw();
   };
   const row = (s: WorkoutSet, k: number) => state.edit?.item === i && state.edit.set === k
-    ? editForm(w, i, k)
+    ? editForm(w, item, i, k)
     : button("setrow", "set-row", [el("span", {}, `${k + 1}: ${setText(s)}`), el("em", {}, "исправить")], startEdit(k, s), { "aria-label": `Исправить подход ${k + 1}` });
   return el("div", { class: "card", style: groupColor(item.group), "data-testid": "workout-exercise" },
     el("div", { class: "exh" }, el("i", { class: "dot" }), el("b", {}, item.exerciseName)),
-    item.skipped && el("p", { class: "warn" }, "Пропущено"),
+    !item.sets.length && el("p", { class: "warn" }, "Пропущено"),
     item.sets.length > 0 && el("div", {}, ...item.sets.map(row)));
 }
 
@@ -236,22 +176,14 @@ function deleteBlock(w: Workout) {
       button("wbtn ghost", "delete-cancel", "Оставить", () => { state.askDelete = false; draw(); })));
 }
 
-const BACK = () => {
-  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  icon.setAttribute("viewBox", "0 0 24 24");
-  icon.setAttribute("aria-hidden", "true");
-  icon.innerHTML = '<path d="M15 5l-7 7 7 7"/>';
-  return icon;
-};
-
 async function detailView(id: string) {
   const w = await getWorkout(id);
   if (!w) { location.hash = ""; return []; } // удалена или чужая ссылка
   const { dayMonth } = dateParts(w.startedAt);
   const sets = countSets(w);
-  const done = w.items.filter(x => !x.skipped).length;
+  const done = w.items.filter(x => x.sets.length).length;
   return [
-    button("pill", "diary-back", [BACK(), "Дневник"], () => { location.hash = ""; }),
+    button("pill", "diary-back", [backIcon(), "Дневник"], () => { location.hash = ""; }),
     el("h1", {}, `${w.dayName}, `, el("em", { class: "wave" }, dayMonth)),
     el("p", {}, w.programName),
     errorCard(),
@@ -281,7 +213,7 @@ async function draw() {
       el("div", { class: "card bad", "data-testid": "storage-error", role: "alert" }, el("p", {}, el("b", {}, STORAGE_ERROR)))];
   }
   root.className = id ? "dv narrow" : "dv";
-  root.replaceChildren(...view.filter((c): c is Node | string => c !== null && c !== false));
+  root.replaceChildren(...present(view));
 }
 
 // Адрес #id: кнопка «назад» на телефоне возвращает из подробностей в список, обновление страницы их не закрывает.

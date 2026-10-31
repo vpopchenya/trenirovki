@@ -4,7 +4,8 @@
 //   2) заменить абзац о Метрике в src/pages/o-proekte.astro полной политикой (по закону 99-З: цель, кто
 //      собирает, какие данные, сколько хранятся, как отозвать согласие; данные уходят в Россию — проверить,
 //      нужно ли отдельное согласие на передачу за границу). Нет данных — пометка ЗАГЛУШКА;
-//   3) в Метрике завести цели «JavaScript-событие»: exercise_open, video_play, app_installed, program_open, program_chosen.
+//   3) в Метрике завести цели «JavaScript-событие»: exercise_open, video_play, app_installed, program_open, program_chosen,
+//      workout_start, workout_finish, diary_export, diary_import.
 // Выбор человека хранится в localStorage под ключом CONSENT_KEY ("yes" / "no").
 export const METRIKA_ID: number | null = null;
 export const CONSENT_KEY = "consent-analytics";

@@ -17,6 +17,8 @@ export interface WorkoutItem {
   exerciseName: string;
   group: string; // группа мышц: цвет точки и блина на штанге
   fields: SetField[];
+  weightLabel: string | null; // подпись веса: «Вес с грифом», «Вес одной гантели»
+  note: string | null; // пометка из программы: «на каждую руку»
   plan: { sets: number; reps: string; rest: string };
   skipped: boolean;
   sets: WorkoutSet[];
@@ -86,15 +88,49 @@ export async function saveWorkout(workout: Workout) {
   await (await db()).put("workouts", { ...workout, updatedAt: new Date().toISOString() });
 }
 
-/** Меняет один подход, перечитав запись в той же операции: другая вкладка могла за это время дописать подходы. */
-export async function updateSet(id: string, item: number, set: number, change: Partial<WorkoutSet>) {
+/** Меняет запись, перечитав её в той же операции: другая вкладка могла за это время дописать подходы. */
+export async function changeWorkout(id: string, change: (workout: Workout) => void) {
   const tx = (await db()).transaction("workouts", "readwrite");
   const workout = await tx.store.get(id);
-  const target = workout?.items[item]?.sets[set];
-  if (!workout || !target) throw new Error("Запись изменилась, подхода уже нет");
-  Object.assign(target, change);
-  await tx.store.put({ ...workout, updatedAt: new Date().toISOString() });
+  if (!workout) throw new Error("Записи уже нет");
+  change(workout);
+  workout.updatedAt = new Date().toISOString();
+  await tx.store.put(workout);
   await tx.done;
+  return workout;
+}
+
+/** Перерыв дольше часа: человек ушёл и закончил потом, концом считаем последний подход. */
+const LONG_BREAK_MS = 60 * 60 * 1000;
+
+/** Заканчивает тренировку одной операцией, по свежей записи. Без подходов удаляет и вернёт null: пустая запись в дневнике только мешает. */
+export async function finishWorkout(id: string) {
+  const tx = (await db()).transaction("workouts", "readwrite");
+  const workout = await tx.store.get(id);
+  if (!workout) throw new Error("Записи уже нет");
+  const doneAt = workout.items.flatMap(x => x.sets.map(s => s.doneAt)).sort().at(-1);
+  if (!doneAt) {
+    await tx.store.delete(id);
+    await tx.done;
+    return null;
+  }
+  if (!workout.finishedAt) {
+    const now = new Date();
+    workout.finishedAt = now.getTime() - Date.parse(doneAt) > LONG_BREAK_MS ? doneAt : now.toISOString();
+    for (const item of workout.items) if (!item.sets.length) item.skipped = true;
+    workout.updatedAt = now.toISOString();
+    await tx.store.put(workout);
+  }
+  await tx.done;
+  return workout;
+}
+
+export function updateSet(id: string, item: number, set: number, change: Partial<WorkoutSet>) {
+  return changeWorkout(id, workout => {
+    const target = workout.items[item]?.sets[set];
+    if (!target) throw new Error("Подхода уже нет");
+    Object.assign(target, change);
+  });
 }
 
 export async function deleteWorkout(id: string) {

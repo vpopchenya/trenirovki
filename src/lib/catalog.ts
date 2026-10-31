@@ -81,6 +81,15 @@ export const FAT_LOSS_LINK = "Как питаться →";
 /** Ключ localStorage: имя файла выбранной программы. Хранится только на телефоне, на сервер не уходит. */
 export { MY_PROGRAM_KEY } from "./storage-keys";
 
+/** Что спрашиваем у подхода. Вес — за одну гантель или с грифом. Новый случай должен уронить сборку, а не молча записать лишнее. */
+export function setFields(name: string, equipment: string[], reps: string) {
+  if (reps.includes("сек")) return { fields: ["seconds"] as const, weightLabel: null };
+  if (equipment.includes("Штанга")) return { fields: ["weight", "reps"] as const, weightLabel: "Вес с грифом" };
+  if (equipment.includes("Гантели")) return { fields: ["weight", "reps"] as const, weightLabel: "Вес одной гантели" };
+  if (equipment.some(x => ["Свой вес", "Турник", "Брусья", "Резинка"].includes(x))) return { fields: ["reps"] as const, weightLabel: null };
+  throw new Error(`Упражнение «${name}»: непонятно, какие поля спрашивать (${equipment.join(", ")})`);
+}
+
 /** Программы по порядку, с упражнениями вместо ссылок. Сюда же — проверки, которых не выразить схемой. */
 export async function allPrograms() {
   const list = await getCollection("programs");

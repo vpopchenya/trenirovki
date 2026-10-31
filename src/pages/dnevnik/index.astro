@@ -3,7 +3,7 @@ import Base from "../../layouts/Base.astro";
 import "../../styles/diary.css";
 const base = import.meta.env.BASE_URL;
 ---
-<Base title="Дневник" description="Записи тренировок. Они хранятся только в этом браузере." nav="none" noindex back={{ href: base, label: "Каталог" }}>
+<Base title="Дневник" description="Записи тренировок. Они хранятся только в этом браузере." nav="workout" noindex back={{ href: `${base}trenirovka/`, label: "Тренировка" }}>
   <div id="diary" class="dv" data-testid="diary"></div>
   <input id="diary-file" type="file" accept=".json,.txt,application/json,text/plain" hidden data-testid="diary-file">
   <noscript><p class="lead" data-testid="noscript-hint">Дневнику нужен JavaScript: включи его в настройках браузера.</p></noscript>

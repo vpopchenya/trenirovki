@@ -6,7 +6,7 @@ import Logo from "../components/Logo.astro";
 interface Props {
   title: string;
   description: string;
-  nav?: "catalog" | "programs" | "basics" | "none";
+  nav?: "catalog" | "programs" | "workout" | "basics" | "none";
   noindex?: boolean;  // 404, дневник, тренировка: не показывать в поиске
   jsonLd?: object;     // разметка для поисковиков (хлебные крошки и т.п.)
   // Кнопка «Назад» на внутренних страницах: куда ведёт, если пришли не с нашего сайта, и подпись (группа — точка её цвета).
@@ -18,11 +18,10 @@ const base = import.meta.env.BASE_URL;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const fullTitle = title === "Карманный тренер" ? title : `${title} — Карманный тренер`;
 
-// «Тренировка» появится на этапе 3, пока видна с пометкой «скоро».
 const items = [
   { id: "catalog", label: "Каталог", href: base, icon: '<path d="M4 6h16M4 12h16M4 18h10"/>' },
   { id: "programs", label: "Программы", href: `${base}programmy/`, icon: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/>' },
-  { id: "workout", label: "Тренировка", icon: '<path d="M3 12h3m12 0h3M6 8v8m12-8v8M9 10v4m6-4v4M9 12h6"/>' },
+  { id: "workout", label: "Тренировка", href: `${base}trenirovka/`, icon: '<path d="M3 12h3m12 0h3M6 8v8m12-8v8M9 10v4m6-4v4M9 12h6"/>' },
   { id: "basics", label: "Основы", href: `${base}osnovy/`, icon: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>' },
 ];
 ---
@@ -64,9 +63,7 @@ const items = [
     )}
     <a class:list={["logo", { "has-back": back }]} href={base} data-testid="logo"><Logo />Карманный <em>тренер</em></a>
     <nav class="topnav" aria-label="Разделы">
-      {items.map(i => i.href
-        ? <a href={i.href} class:list={{ on: i.id === nav }} aria-current={i.id === nav ? "page" : undefined}>{i.label}</a>
-        : <span>{i.label}<span class="soon">скоро</span></span>)}
+      {items.map(i => <a href={i.href} class:list={{ on: i.id === nav }} aria-current={i.id === nav ? "page" : undefined}>{i.label}</a>)}
     </nav>
   </div></header>
 
@@ -74,9 +71,7 @@ const items = [
   <footer class="gut"><div class="wrap"><a href={`${base}o-proekte/`}>О проекте</a></div></footer>
 
   <nav class="tabbar" aria-label="Разделы" data-testid="tabbar"><div class="in">
-    {items.map(i => i.href
-      ? <a href={i.href} class:list={{ on: i.id === nav }} aria-current={i.id === nav ? "page" : undefined}><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} />{i.label}</a>
-      : <span class="off"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} />{i.label}</span>)}
+    {items.map(i => <a href={i.href} class:list={{ on: i.id === nav }} aria-current={i.id === nav ? "page" : undefined}><svg viewBox="0 0 24 24" aria-hidden="true" set:html={i.icon} />{i.label}</a>)}
   </div></nav>
 
   <Analytics />
@@ -132,7 +127,6 @@ const items = [
   .topnav > * { padding: 8px 14px; border-radius: 999px; text-decoration: none; transition: background .15s, color .15s, transform .1s; }
   .topnav a.on { background: var(--accent); color: var(--accent-ink); }
   .topnav a:active { transform: scale(.95); }
-  .topnav > span { color: var(--fg2); opacity: .7; }
   @media (hover: hover) { .topnav a:not(.on):hover { background: var(--surface2); color: var(--fg); } }
 
   main { padding-top: 28px; }
@@ -145,9 +139,8 @@ const items = [
     left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
     max-width: 520px; margin-inline: auto; background: var(--paper); color: var(--paper-ink); border-radius: 28px; box-shadow: 0 14px 30px -10px #000; }
   .tabbar .in { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px; }
-  .tabbar a, .tabbar .off { display: grid; justify-items: center; align-content: center; gap: 2px; height: 56px; border-radius: 22px; font-size: 12px; font-weight: 800;
+  .tabbar a { display: grid; justify-items: center; align-content: center; gap: 2px; height: 56px; border-radius: 22px; font-size: 12px; font-weight: 800;
     color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; transition: background .2s, color .2s, transform .15s cubic-bezier(.3, 1.5, .5, 1); }
-  .tabbar .off { opacity: .6; }
   .tabbar a:active { transform: scale(.9); }
   .tabbar a.on { background: var(--accent); color: var(--accent-ink); }
   .tabbar :focus-visible { outline-color: var(--accent-ink); }

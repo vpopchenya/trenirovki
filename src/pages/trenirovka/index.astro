@@ -1,0 +1,26 @@
+---
+import Base from "../../layouts/Base.astro";
+import "../../styles/diary.css";
+import { allPrograms, setFields, HEALTH_WARNING } from "../../lib/catalog";
+
+// Данные встроены в страницу, а не лежат отдельным .json: он не попал бы в список сохранённых для работы без сети.
+const programs = (await allPrograms()).map(p => ({
+  id: p.id,
+  name: p.name,
+  days: p.days.map(d => ({
+    name: d.name,
+    muscles: d.muscles,
+    items: d.items.map(i => ({
+      exerciseId: i.ex.id, exerciseName: i.ex.data.name, group: i.ex.data.group, ...setFields(i.ex.data.name, i.ex.data.equipment, i.reps),
+      note: i.note ?? null, sets: i.sets, reps: i.reps, rest: i.rest,
+    })),
+  })),
+}));
+const data = JSON.stringify({ programs, health: HEALTH_WARNING }).replace(/</g, "\\u003c");
+---
+<Base title="Тренировка" description="Тренировка по выбранной программе. Записи хранятся только в этом браузере." nav="workout" noindex>
+  <div id="workout" class="dv" data-testid="workout"></div>
+  <noscript><p class="lead" data-testid="noscript-hint">Тренировке нужен JavaScript: включи его в настройках браузера.</p></noscript>
+  <script id="workout-data" type="application/json" set:html={data}></script>
+  <script src="../../lib/diary/workout.ts"></script>
+</Base>
