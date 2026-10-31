@@ -1,6 +1,6 @@
 // Файл дневника: единственный способ перенести записи на другой телефон и сохранить их. Загрузка только добавляет.
 import { MY_PROGRAM_KEY } from "../storage-keys";
-import { listWorkouts, mergeWorkouts, updateMeta, type MergeResult, type Meta, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
+import { listWorkouts, mergeWorkouts, updateMeta, type MergeResult, type Meta, type RestState, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
 
 const APP = "karmannyj-trener";
 const FORMAT = 1;
@@ -77,6 +77,13 @@ function readItem(raw: unknown): WorkoutItem {
   };
 }
 
+function readRest(raw: unknown, items: number): RestState {
+  const r = record(raw);
+  const rest = { endsAt: time(r.endsAt), total: count(r.total, 7200), from: count(r.from, 50), to: count(r.to, 50) };
+  check(rest.total > 0 && rest.from < items && rest.to < items);
+  return rest;
+}
+
 function readWorkout(raw: unknown): Workout {
   const w = record(raw);
   check(typeof w.id === "string" && /^[\w-]{1,64}$/.test(w.id)); // попадает в адрес страницы
@@ -85,6 +92,7 @@ function readWorkout(raw: unknown): Workout {
     id: w.id as string, programId: text(w.programId), programName: text(w.programName),
     dayIndex: count(w.dayIndex, 50), dayName: text(w.dayName),
     startedAt: time(w.startedAt), finishedAt: w.finishedAt === null ? null : time(w.finishedAt), updatedAt: time(w.updatedAt),
+    rest: w.rest == null ? null : readRest(w.rest, w.items.length),
     items: list(w.items, 50).map(readItem),
   };
 }

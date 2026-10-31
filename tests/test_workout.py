@@ -34,6 +34,7 @@ def done(page, n=1):
     start = page.get_by_test_id("set-chip").count()
     for k in range(n):
         page.get_by_test_id("set-done").click()
+        page.get_by_test_id("rest-skip").click()  # таймер проверяет test_rest.py
         if start + k + 1 < 3:
             expect(page.get_by_test_id("set-pos")).to_have_text(f"Подход {start + k + 2} из 3")
 
@@ -157,7 +158,7 @@ def test_next_day_goes_round(work):
     expect(work.get_by_text("Сегодня День 2")).to_be_visible()
     work.get_by_test_id("start-workout").click()
     expect(work.get_by_test_id("exercise-name")).to_have_text("Ягодичный мост со штангой")
-    work.get_by_test_id("set-done").click()
+    done(work)
     finish_early(work)
     work.goto("trenirovka/")
     expect(work.get_by_text("Сегодня День 1")).to_be_visible()
@@ -230,8 +231,9 @@ def test_band_exercise_asks_only_reps(page):
 
 def test_double_tap_makes_one_set(work):
     work.get_by_test_id("set-done").dblclick(force=True)
-    expect(work.get_by_test_id("set-chip")).to_have_count(1)
+    expect(work.get_by_test_id("rest")).to_be_visible()
     work.wait_for_timeout(600)
+    expect(work.get_by_test_id("rest")).to_be_visible()
     assert len(stored(work)[0]["items"][0]["sets"]) == 1
 
 
@@ -239,7 +241,7 @@ def test_skip_on_last_exercise_asks_first(work):
     for _ in range(4):
         work.get_by_test_id("skip-exercise").click()
     expect(work.get_by_test_id("exercise-pos")).to_have_text("Упражнение 5 из 5")
-    work.get_by_test_id("set-done").click()
+    done(work)
     work.get_by_test_id("skip-exercise").click()
     expect(work.get_by_test_id("finish-confirm")).to_be_visible()
     work.get_by_test_id("finish-cancel").click()

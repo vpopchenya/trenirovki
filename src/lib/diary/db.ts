@@ -24,6 +24,14 @@ export interface WorkoutItem {
   sets: WorkoutSet[];
 }
 
+/** Идущий отдых. from — упражнение, чей подход только что сделан, to — куда идём после отдыха. */
+export interface RestState {
+  endsAt: string;
+  total: number; // секунд, для круга на экране
+  from: number;
+  to: number;
+}
+
 export interface Workout {
   id: string;
   programId: string;
@@ -33,6 +41,7 @@ export interface Workout {
   startedAt: string;
   finishedAt: string | null; // пусто — тренировка не закончена
   updatedAt: string;
+  rest?: RestState | null;
   items: WorkoutItem[];
 }
 
@@ -117,6 +126,7 @@ export async function finishWorkout(id: string) {
   if (!workout.finishedAt) {
     const now = new Date();
     workout.finishedAt = now.getTime() - Date.parse(doneAt) > LONG_BREAK_MS ? doneAt : now.toISOString();
+    workout.rest = null;
     for (const item of workout.items) if (!item.sets.length) item.skipped = true;
     workout.updatedAt = now.toISOString();
     await tx.store.put(workout);

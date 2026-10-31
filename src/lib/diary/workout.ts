@@ -1,7 +1,8 @@
 // Экран «Тренировка»: одно упражнение на экране, каждый подход сразу в базе. Программу берём со страницы только при
 // старте, дальше работаем по копии в записи: выкладка посреди тренировки ничего не меняет.
-import { changeWorkout, finishWorkout, getMeta, listWorkouts, saveWorkout, updateSet, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
+import { changeWorkout, finishWorkout, getMeta, listWorkouts, saveWorkout, updateMeta, updateSet, type SetField, type Workout, type WorkoutItem, type WorkoutSet } from "./db";
 import { filesReminder, myProgram, saveDiaryFile } from "./file";
+import { keepScreenOn, mmss, restSeconds, secondsLeft, signal, unlockAudio } from "./timer";
 import { backIcon, barbell, button, countSets, el, goal, groupColor, minutes, numberField, planSets, present, setsLine, setText, type Child, type SetValues } from "./ui";
 
 interface ProgramItem { exerciseId: string; exerciseName: string; group: string; fields: SetField[]; weightLabel: string | null; note: string | null; sets: number; reps: string; rest: string }
@@ -26,6 +27,10 @@ const state = {
   errorText: "", // что сказать, если текущая запись не удалась
   askFinish: false,
   busy: false,
+  peek: false, // с отдыха открыли упражнение: исправить подход или посмотреть технику, таймер идёт
+  signaled: false,
+  sound: true,
+  noWake: false,
   locked: false, // сразу после подхода: второе нажатие не должно стать лишним подходом
   reminder: false,
   fileNote: null as null | { kind: "okc" | "bad"; text: string },
@@ -34,6 +39,8 @@ const state = {
 const SET_ERROR = "Подход не записался. Нажми ещё раз. Цифры на месте.";
 const SAVE_ERROR = "Не получилось сохранить. Нажми ещё раз, записанное на месте.";
 const DOUBLE_TAP_MS = 450;
+const REST_FALLBACK = 90; // запись из чужого файла с непонятным отдыхом
+const REST_STEP = 15;
 
 const unit = (reps: string) => (/сек|повтор/.test(reps) ? reps : `${reps} повторов`);
 /** Первое число плана: «6–8» → 6, «30–45 сек» → 30. */
@@ -51,6 +58,7 @@ function lastSets(exerciseId: string) {
 
 /** Куда вернуться: первое упражнение, где подходы не закончены. */
 const position = (w: Workout) => {
+  if (w.rest) return w.rest.to;
   const i = w.items.findIndex(x => !x.skipped && x.sets.length < x.plan.sets);
   return i < 0 ? w.items.length - 1 : i;
 };
@@ -121,38 +129,91 @@ function next(): Promise<void> | void {
 const newSet = (): WorkoutSet => ({ weight: state.values.weight ?? null, reps: state.values.reps ?? null, seconds: state.values.seconds ?? null, doneAt: new Date().toISOString() });
 
 function done() {
+  unlockAudio();
   const x = item();
   if (state.edit !== null) {
     return write(async () => {
       state.workout = await updateSet(state.workout!.id, state.i, state.edit!, state.values);
       state.edit = null;
+      if (state.peek) { state.peek = false; state.i = state.workout!.rest!.to; lockDone(); }
       prefill();
     });
   }
-  if (x.sets.length >= x.plan.sets) return write(async () => { await next(); });
+  if (x.sets.length >= x.plan.sets) return write(async () => {
+    await change(w => { w.rest = null; });
+    state.peek = false;
+    await next();
+  });
   return write(async () => {
     const first = countSets(state.workout!) === 0;
     const set = newSet();
-    await change(w => { const it = w.items[state.i]; it.sets.push(set); it.skipped = false; });
+    const from = state.i, full = x.sets.length + 1 >= x.plan.sets;
+    const to = full ? from + 1 : from;
+    const total = restSeconds(x.plan.rest) ?? REST_FALLBACK;
+    const lastSet = full && to >= state.workout!.items.length; // после последнего подхода тренировки таймера нет
+    await change(w => {
+      const it = w.items[from];
+      it.sets.push(set);
+      it.skipped = false;
+      w.rest = lastSet ? null : { endsAt: new Date(Date.now() + total * 1000).toISOString(), total, from, to };
+    });
     state.errorText = SAVE_ERROR; // подход уже в базе: дальше ошибка не про него
     lockDone();
     if (first) askPersist();
-    if (item().sets.length < item().plan.sets) prefill();
-    else await next();
+    state.peek = false;
+    state.signaled = false;
+    if (lastSet) return finishNow();
+    openExercise(to);
   }, SET_ERROR);
+}
+
+const leaveRest = () => write(async () => {
+  const to = state.workout!.rest!.to;
+  await change(w => { w.rest = null; });
+  lockDone(); // на этом месте появляется «Готово»: второе касание не должно стать подходом
+  state.peek = false;
+  openExercise(to);
+});
+
+const shiftRest = (seconds: number) => write(async () => {
+  unlockAudio();
+  await change(w => {
+    const rest = w.rest!;
+    rest.endsAt = new Date(Date.parse(rest.endsAt) + seconds * 1000).toISOString();
+    if (seconds > 0) rest.total += seconds;
+  });
+});
+
+function peekSet() {
+  state.peek = true;
+  openExercise(state.workout!.rest!.from);
+  draw();
+}
+
+function unpeek() {
+  state.peek = false;
+  openExercise(state.workout!.rest!.to);
+  draw();
+}
+
+async function toggleSound() {
+  state.sound = !state.sound;
+  try { await updateMeta({ sound: state.sound }); } catch (err) { console.warn(err); }
+  draw();
 }
 
 function lockDone() {
   state.locked = true;
   setTimeout(() => {
     state.locked = false;
-    root.querySelector<HTMLButtonElement>('[data-testid="set-done"]')?.removeAttribute("disabled");
+    root.querySelector("[data-lock]")?.removeAttribute("disabled");
   }, DOUBLE_TAP_MS);
 }
 
 /** С последнего упражнения не уходим молча: законченную тренировку обратно не открыть. */
 const skip = () => write(async () => {
-  await change(w => { w.items[state.i].skipped = true; });
+  await change(w => { w.items[state.i].skipped = true; w.rest = null; });
+  state.peek = false;
   if (state.i < state.workout!.items.length - 1) return openExercise(state.i + 1);
   state.askFinish = true;
 });
@@ -187,7 +248,13 @@ function resumeCard(w: Workout) {
   return el("div", { class: "card calm", "data-testid": "resume" },
     el("p", {}, el("b", {}, "Тренировка не закончена: "), `${w.dayName}, упражнение ${position(w) + 1} из ${w.items.length}, сделано подходов: ${countSets(w)}.`),
     el("div", { class: "row2" },
-      button("wbtn", "resume-continue", "Продолжить", () => { openExercise(position(w)); draw(); }),
+      button("wbtn", "resume-continue", "Продолжить", () => {
+        unlockAudio(); // после обновления страницы звук снова нужно разрешить нажатием
+        state.peek = false;
+        state.signaled = !!w.rest && secondsLeft(w.rest.endsAt) <= 0; // сигнал о том, что уже прошло, только мешает
+        openExercise(position(w));
+        draw();
+      }),
       button("wbtn ghost", "resume-finish", "Закончить", finish)));
 }
 
@@ -263,6 +330,7 @@ function workView(): Child[] {
         button("round", "workout-exit", backIcon(), () => { state.screen = "day"; draw(); }, { "aria-label": "Выйти из тренировки" }),
         el("span", { class: "mono", "data-testid": "exercise-pos" }, `Упражнение ${state.i + 1} из ${total}`),
         x.note && el("span", { class: "tag" }, x.note)),
+      state.peek && w.rest && el("button", { type: "button", class: "pill plain", "data-testid": "rest-pill", click: unpeek }, "Отдых ", el("span", { "data-rest": "clock" }, mmss(Math.max(secondsLeft(w.rest.endsAt), 0)))),
       el("h1", { class: "name", "data-testid": "exercise-name" }, x.exerciseName),
       errorCard(),
       el("div", { class: "tile", "data-testid": "set-tile" },
@@ -271,7 +339,7 @@ function workView(): Child[] {
         past && el("p", { "data-testid": "last-time" }, "В прошлый раз: ", el("b", {}, setsLine(past)))),
       el("div", { class: "sets", "data-testid": "set-list" }, ...setChips(x)),
       editing && button("lnk", "edit-cancel", "Отменить исправление", () => { state.edit = null; prefill(); draw(); }),
-      el("div", { class: "dock" }, el("div", {}, button("done", "set-done", label, done, state.locked ? { disabled: "" } : {}))),
+      el("div", { class: "dock" }, el("div", {}, button("done", "set-done", label, done, { "data-lock": "", ...state.locked ? { disabled: "" } : {} }))),
       el("div", { class: "more" },
         el("a", { class: "lnk", href: `${base}uprazhneniya/${encodeURIComponent(x.exerciseId)}/`, "data-testid": "technique" }, "Техника"),
         !full && button("lnk", "skip-exercise", "Пропустить упражнение", skip),
@@ -285,6 +353,75 @@ function workView(): Child[] {
           : button("lnk end", "finish-workout", "Закончить тренировку", () => { state.askFinish = true; draw(); }))),
     planAside(w),
   ];
+}
+
+const soundIcon = (on: boolean) => {
+  const box = el("span", { class: "svgbox" });
+  box.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/>${on ? '<path d="M16 9a4.5 4.5 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>' : '<path d="m16 9.5 5 5m0-5-5 5"/>'}</svg>`;
+  return box;
+};
+
+/** Что дальше: следующий подход с подставленными цифрами или новое упражнение. */
+function nextUp(w: Workout, from: number) {
+  const x = item();
+  if (state.i !== from) return [x.exerciseName, `Упражнение ${state.i + 1} из ${w.items.length}`];
+  const { weight = null, reps = null, seconds = null } = state.values;
+  return [`Подход ${x.sets.length + 1} из ${x.plan.sets}`, setText({ weight, reps, seconds, doneAt: "" })];
+}
+
+const RING_R = 92, RING_C = 2 * Math.PI * RING_R;
+const ringOffset = (left: number, total: number) => String(RING_C * (1 - Math.min(1, Math.max(0, left / total))));
+const overText = (left: number) => (left > 0 ? "отдых" : `закончился ${mmss(-left)} назад`);
+
+function ring(group: string, left: number, total: number) {
+  const box = el("div", { class: "plate" });
+  box.innerHTML = `<svg viewBox="0 0 238 238" aria-hidden="true"><circle cx="119" cy="119" r="${RING_R}" fill="none" stroke="var(--surface2)" stroke-width="46"/><circle data-rest="ring" cx="119" cy="119" r="${RING_R}" fill="none" stroke="var(--g-${group},var(--muted))" stroke-width="46" stroke-dasharray="${RING_C}" stroke-dashoffset="${ringOffset(left, total)}"/></svg>`;
+  box.append(el("div", {},
+    el("span", { class: "clock", "data-rest": "clock", "data-testid": "rest-time" }, mmss(Math.max(left, 0))),
+    el("small", { "data-rest": "label", "data-testid": "rest-label" }, overText(left))));
+  return box;
+}
+
+function restView(): Child[] {
+  const w = state.workout!, rest = w.rest!, left = secondsLeft(rest.endsAt), over = left <= 0;
+  const finished = w.items[rest.from];
+  const [title, sub] = nextUp(w, rest.from);
+  const off = over ? { disabled: "" } : {};
+  return [
+    el("div", { class: "left", style: groupColor(finished.group) },
+      errorCard(),
+      el("div", { class: "rest", "data-testid": "rest" },
+        el("div", { class: "reshead" },
+          el("span", { class: "mono" }, finished.exerciseName),
+          button("icon", "rest-sound", soundIcon(state.sound), toggleSound, { "aria-label": state.sound ? "Выключить звук" : "Включить звук" })),
+        ring(finished.group, left, rest.total),
+        el("div", { class: "adj" },
+          button("wbtn ghost", "rest-minus", "−15", () => shiftRest(-REST_STEP), off),
+          button("wbtn ghost", "rest-plus", "+15", () => shiftRest(REST_STEP), off)),
+        el("div", { class: "nextc", "data-testid": "rest-next" }, el("p", { class: "eyebrow" }, "Дальше"), el("b", {}, title), el("span", {}, sub)),
+        button("lnk", "rest-peek", "Исправить подход или открыть технику", peekSet),
+        state.noWake && el("p", { class: "warn", "data-testid": "no-wake" }, "Экран может погаснуть по настройкам телефона. Время всё равно будет верным.")),
+      el("div", { class: "dock" }, el("div", {}, button(over ? "done" : "done quiet", "rest-skip", over ? "К подходу" : "Пропустить", leaveRest,
+        { "data-lock": "", ...state.locked ? { disabled: "" } : {} })))),
+    planAside(w),
+  ];
+}
+
+/** Обновляем только цифры: перерисовка всего экрана сбила бы ввод в полях при подглядывании. */
+function tick() {
+  const rest = state.screen === "work" ? state.workout?.rest : null;
+  if (!rest) return;
+  const left = secondsLeft(rest.endsAt);
+  if (left <= 0 && !state.signaled && !document.hidden) {
+    state.signaled = true;
+    signal(state.sound);
+    if (!state.peek) draw();
+  }
+  if (left > 0) state.signaled = false;
+  const part = (name: string) => root.querySelector(`[data-rest="${name}"]`);
+  if (part("clock")) part("clock")!.textContent = mmss(Math.max(left, 0));
+  if (part("label")) part("label")!.textContent = overText(left);
+  part("ring")?.setAttribute("stroke-dashoffset", ringOffset(left, rest.total));
 }
 
 function sumView(): Child[] {
@@ -323,7 +460,11 @@ function draw() {
   const work = state.screen === "work";
   document.body.classList.toggle("in-work", work);
   root.className = work ? "dv work" : "dv";
-  root.replaceChildren(...present(work ? workView() : state.screen === "sum" ? sumView() : dayView()));
+  const resting = work && !!state.workout?.rest && !state.peek;
+  root.replaceChildren(...present(resting ? restView() : work ? workView() : state.screen === "sum" ? sumView() : dayView()));
+  keepScreenOn(work, ok => {
+    if (ok !== !state.noWake) { state.noWake = !ok; if (root.querySelector('[data-testid="rest"]')) draw(); }
+  });
   if (work && state.askFinish) root.querySelector('[data-testid="finish-confirm"]')?.scrollIntoView({ block: "center" });
 }
 
@@ -332,6 +473,7 @@ async function open() {
   try {
     state.history = await listWorkouts();
     state.workout = state.history.find(w => !w.finishedAt) ?? null;
+    state.sound = (await getMeta()).sound;
   } catch (err) {
     console.warn(err);
     state.storageOk = false;
@@ -342,4 +484,14 @@ async function open() {
   }
   draw();
 }
+/** Вернулись на страницу, а отдых истёк, пока не смотрели: время покажем, сигнал уже ни к чему. */
+function catchUp() {
+  const rest = state.screen === "work" ? state.workout?.rest : null;
+  if (document.hidden || !rest || state.signaled || secondsLeft(rest.endsAt) > 0) return;
+  state.signaled = true;
+  if (!state.peek) draw();
+}
+document.addEventListener("visibilitychange", catchUp);
+addEventListener("pageshow", catchUp);
+setInterval(tick, 500);
 open();

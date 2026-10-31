@@ -80,6 +80,13 @@ def test_save_clear_load_gives_same_data(filled, tmp_path):
     assert export(filled, tmp_path / "second.json")["workouts"] == before["workouts"]
 
 
+def test_rest_comes_back_from_file(diary, tmp_path):
+    rest = {"endsAt": "2026-10-20T18:30:00.000Z", "total": 90, "from": 0, "to": 1}
+    load(diary, changed(tmp_path, lambda d: d["workouts"][-1].update(rest=rest))).to_contain_text("добавлено 5")
+    saved = export(diary, tmp_path / "again.json")
+    assert next(w for w in saved["workouts"] if not w["finishedAt"])["rest"] == rest
+
+
 def test_unfinished_workout_is_shown(filled):
     expect(rows(filled).last).to_contain_text("не закончена")
 
@@ -110,6 +117,7 @@ DAMAGE = {
     "поле вложенным списком": lambda d: d["workouts"][-1]["items"][0].update(fields=[["weight"]]),
     "подход без значений": lambda d: d["workouts"][-1]["items"][0]["sets"][0].update(weight=None, reps=None),
     "лишнее значение": lambda d: d["workouts"][-1]["items"][0]["sets"][0].update(seconds=30),
+    "отдых за границей списка": lambda d: d["workouts"][-1].update(rest={"endsAt": "2026-10-20T18:30:00.000Z", "total": 90, "from": 0, "to": 99}),
     "дробные повторы": lambda d: d["workouts"][-1]["items"][0]["sets"][0].update(reps=8.5),
 }
 

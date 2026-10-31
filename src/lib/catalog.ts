@@ -1,5 +1,6 @@
 import { getCollection, getEntry } from "astro:content";
 import groups from "../data/groups.json";
+import { restSeconds } from "./diary/timer";
 
 export type Group = (typeof groups)[number];
 export type Side = "front" | "back";
@@ -99,6 +100,8 @@ export async function allPrograms() {
       // Новичку нельзя выдать опытное упражнение: страховки и опыта у него нет, а текст программы этого не остановит.
       const hard = items.find(i => p.data.level === "новичок" && i.ex.data.level === "опытный");
       if (hard) throw new Error(`Программа «${p.data.name}»: упражнение «${hard.ex.data.name}» только для опытных`);
+      const badRest = items.find(i => restSeconds(i.rest) === null);
+      if (badRest) throw new Error(`Программа «${p.data.name}»: непонятный отдых «${badRest.rest}»`);
       const dayGroups = items.map(i => i.ex.data.group);
       return { name: day.name, items, groups: dayGroups, muscles: [...new Set(dayGroups)].map(id => groups.find(g => g.id === id)!.name.toLowerCase()).join(" · ") };
     }));
