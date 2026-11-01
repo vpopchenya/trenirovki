@@ -33,14 +33,15 @@
 - ревью изменений — как обычно (`/check`, ревьюер);
 - проверка — сборка без ошибок и скриншоты на 375 / 768 / 1280; тяжёлых автотестов и проверок в CI нет;
 - автотесты (pytest + Playwright) в CI подключаем, когда продукт будет готов (решение Вадима 31.10.2026 отменило
-  «автотесты дневника останавливают выкладку»). Пока `tests/` — только проверки дневника, запускаем руками;
+  «автотесты дневника останавливают выкладку»). Пока `tests/` запускаем руками;
 - выкладка: коммит в `main` → push → GitHub Actions сам собирает и выкладывает на GitHub Pages.
 
 ## Команды
 - `npm install` — поставить зависимости (Node 22).
 - `npm run dev` — разработка, http://localhost:4321/trenirovki/
 - `npm run build` — сборка в `dist/`.
-- `.venv\Scripts\python -m pytest` — проверки дневника, идут по `dist/`: сначала сборка. Первый раз:
+- `.venv\Scripts\python scripts\guide_screenshots.py` — переснять экраны для «Как пользоваться» (`public/img/guide/`): сначала сборка, потом ещё одна сборка. Изменился размер снимка — поправить `width` и `height` на странице.
+- `.venv\Scripts\python -m pytest` — проверки, идут по `dist/`: сначала сборка. Первый раз:
   `python -m venv .venv`, `.venv\Scripts\pip install -r tests/requirements.txt`, `.venv\Scripts\playwright install chromium`.
 
 ## Стек

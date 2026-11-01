@@ -41,6 +41,7 @@ OLDER_START = """() => new Promise((ok, no) => {
 # Для снимков: сообщение автоматического браузера людям на телефоне не покажется, меню заслоняет отдельные блоки.
 HIDE_NO_WAKE = "[data-testid=no-wake] { display: none }"
 HIDE_MENU = ".tabbar { display: none }"
+HIDE_PREVIEW = "[data-testid=video] img { display: none }"  # превью чужого ролика заблокировано: без значка битой картинки
 
 
 def save(png, name):
@@ -68,6 +69,7 @@ def catalog(page):
     page.goto("myshcy/grud/")
     shot(page, "group")
     page.goto("uprazhneniya/zhim-shtangi-lezha/")
+    page.add_style_tag(content=HIDE_PREVIEW)
     shot(page, "exercise")
     page.goto("programmy/")
     shot(page, "programs")
@@ -99,7 +101,7 @@ def workout(page):
 
     page.evaluate(OLDER_START)
     summary, rest = page.get_by_test_id("summary"), page.get_by_test_id("rest-skip")
-    page.get_by_test_id("rest-skip").click()
+    rest.click()
     while not summary.is_visible():
         page.get_by_test_id("set-done").click()
         page.wait_for_timeout(500)  # кнопка гаснет после нажатия: защита от двойного касания
@@ -127,6 +129,7 @@ def main():
             viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=SCALE,
             locale="ru-RU", service_workers="block", reduced_motion="reduce",
         )
+        context.route("**://i.ytimg.com/**", lambda route: route.abort())  # чужой кадр в наш репозиторий не кладём
         page = context.new_page()
         catalog(page)
         workout(page)
