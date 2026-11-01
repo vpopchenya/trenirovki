@@ -53,6 +53,18 @@ export const articleLd = (site: URL, a: { title: string; description: string; pu
   author: { "@type": "Organization", name: "Карманный тренер", url: new URL(import.meta.env.BASE_URL, site).href },
 });
 
+/** Разметка ролика для поисковиков. Файла ролика у нас нет, поэтому embedUrl вместо contentUrl. */
+export const videoLd = (exerciseName: string, v: { id: string; title: string; author: string; uploaded: string; seconds: number }) => ({
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  name: v.title,
+  description: `${exerciseName}: техника упражнения, показывает ${v.author}.`,
+  thumbnailUrl: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
+  uploadDate: v.uploaded,
+  duration: `PT${v.seconds}S`,
+  embedUrl: `https://www.youtube.com/embed/${v.id}`,
+});
+
 /** Статьи «Основ» по порядку. */
 export async function allBasics() {
   return (await getCollection("osnovy")).sort((a, b) => a.data.order - b.data.order);

@@ -34,6 +34,9 @@ const exercises = defineCollection({
       title: z.string(),
       channel: z.string(),
       lang: z.enum(["ru", "en"]),
+      // Для разметки VideoObject, берёт со страницы ролика scripts/video_dates.py. Часовой пояс просит Google.
+      uploaded: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/),
+      seconds: z.number().int().positive(),
     })).min(1).max(3),
     order: z.number().int(),               // порядок в списке группы
   }).refine(e => subsOf[e.group].includes(e.sub), { message: "sub: такой мелкой группы нет в groups.json у этой группы" })
