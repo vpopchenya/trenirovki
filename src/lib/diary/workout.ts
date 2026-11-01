@@ -296,6 +296,7 @@ function dayView(): Child[] {
     el("div", { class: "col" },
       others.some(Boolean) && el("div", { class: "card" }, el("h2", {}, "Другой день"), el("div", { class: "list" }, ...others)),
       diaryRow(),
+      el("a", { class: "lnk", href: `${base}kak-polzovatsya/#trenirovka`, "data-testid": "workout-guide" }, "Как пользоваться"),
       el("p", { class: "warn", "data-testid": "care-note" }, page.care)))];
 }
 

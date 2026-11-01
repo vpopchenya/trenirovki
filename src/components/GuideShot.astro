@@ -1,0 +1,10 @@
+---
+// Скриншот на странице «Как пользоваться». Файлы снимает scripts/guide_screenshots.py, width и height — размер снимка в пикселях.
+interface Props { name: string; alt: string; width: number; height: number }
+const { name, alt, width, height } = Astro.props;
+---
+<img class="shot" src={`${import.meta.env.BASE_URL}img/guide/${name}.webp`} alt={alt} width={width} height={height} loading="lazy" data-testid="guide-shot" />
+
+<style>
+  .shot { display: block; width: min(100%, 300px); height: auto; margin: 8px auto; border-radius: 18px; border: 1px solid var(--line); }
+</style>

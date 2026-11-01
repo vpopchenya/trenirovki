@@ -68,7 +68,7 @@ const items = [
   </div></header>
 
   <main class="gut"><div class="wrap"><slot /></div></main>
-  <footer class="gut"><div class="wrap"><a href={`${base}o-proekte/`}>О проекте</a></div></footer>
+  <footer class="gut"><div class="wrap"><a href={`${base}kak-polzovatsya/`} data-testid="guide-link">Как пользоваться</a><a href={`${base}o-proekte/`}>О проекте</a></div></footer>
 
   <nav class="tabbar" aria-label="Разделы" data-testid="tabbar"><div class="in">
     {items.map(i => <a href={i.href} class:list={{ on: i.id === nav }} aria-current={i.id === nav ? "page" : undefined}>{i.label}</a>)}
@@ -131,6 +131,7 @@ const items = [
 
   main { padding-top: 28px; }
   footer { padding-block: 40px calc(110px + env(safe-area-inset-bottom, 0px)); font-size: 13px; color: var(--muted); }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; }
   footer a { font-size: 16px; font-weight: 800; color: var(--fg); text-decoration: none; }
   @media (hover: hover) { footer a:hover { color: var(--accent); } }
 
