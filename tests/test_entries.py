@@ -5,6 +5,7 @@ from conftest import DIST
 from playwright.sync_api import expect
 
 PROGRAM = "sila-novichok-2-raza"
+OTHER = "massa-novichok-2-raza"
 EXERCISE = "goblet-prisedaniya"
 
 
@@ -55,6 +56,75 @@ def test_other_program_has_no_start(page):
     page.add_init_script(f"localStorage.setItem('my-program', '{PROGRAM}')")
     page.goto("programmy/massa-novichok-2-raza/")
     expect(page.get_by_test_id("start-workout-link")).to_be_hidden()
+
+
+def start_set(page, sets=1):
+    """Начинает тренировку выбранной программы и делает подходы, ничего не заканчивая."""
+    page.add_init_script(f"if (!localStorage.getItem('my-program')) localStorage.setItem('my-program', '{PROGRAM}')")
+    page.goto("trenirovka/")
+    page.get_by_test_id("start-workout").click()
+    expect(page.get_by_test_id("set-done")).to_be_visible()  # экран появляется, когда запись уже в базе
+    for k in range(sets):
+        page.get_by_test_id("set-done").click()
+        page.get_by_test_id("rest-skip").click()
+        expect(page.get_by_test_id("set-pos")).to_have_text(f"Подход {k + 2} из 3")
+
+
+def choose_other_and_start(page):
+    page.goto(f"programmy/{OTHER}/")
+    page.get_by_test_id("my-program-btn").click()
+    page.get_by_test_id("start-workout-link").click()
+    expect(page.get_by_test_id("start-workout")).to_be_visible()
+
+
+def test_new_program_replaces_unfinished_workout(page):
+    start_set(page)
+    choose_other_and_start(page)
+    expect(page.get_by_test_id("old-workout-closed")).to_contain_text("Сила")
+    expect(page.get_by_test_id("resume")).to_have_count(0)
+    expect(page.locator(".eyebrow")).to_contain_text("Набор")
+    page.goto("dnevnik/")
+    expect(page.get_by_test_id("workout-row")).to_have_count(1)
+
+
+def test_new_program_drops_empty_workout_quietly(page):
+    start_set(page, sets=0)
+    choose_other_and_start(page)
+    expect(page.get_by_test_id("old-workout-closed")).to_have_count(0)
+    page.goto("dnevnik/")
+    expect(page.get_by_test_id("diary-empty")).to_be_visible()
+
+
+def test_same_program_still_resumes(page):
+    start_set(page)
+    page.goto("trenirovka/")
+    expect(page.get_by_test_id("resume")).to_be_visible()
+
+
+def test_no_program_keeps_unfinished_workout(page):
+    seed(page, [workout(1, finished=False)])
+    page.goto("trenirovka/")
+    expect(page.get_by_test_id("resume")).to_be_visible()
+
+
+def test_chosen_program_resumes_when_other_is_newer(page):
+    """Две незаконченные, например после загрузки файла: чужая закрывается, своя остаётся."""
+    page.add_init_script(f"localStorage.setItem('my-program', '{OTHER}')")
+    seed(page, [{**workout(1, finished=False), "programId": OTHER, "programName": "Набор"}, workout(2, finished=False)])
+    page.goto("trenirovka/")
+    expect(page.get_by_test_id("resume")).to_be_visible()
+    expect(page.get_by_test_id("old-workout-closed")).to_contain_text("Сила")
+    expect(page.locator(".eyebrow")).to_contain_text("Набор")
+
+
+@pytest.mark.parametrize("where, testid", [("trenirovka/", "to-programs"), (f"programmy/{PROGRAM}/", "my-program-btn"), ("trenirovka/", "start-workout")])
+@pytest.mark.parametrize("width", [768, 1280])
+def test_buttons_not_stretched_on_desktop(page, where, testid, width):
+    if testid == "start-workout":
+        page.add_init_script(f"localStorage.setItem('my-program', '{PROGRAM}')")
+    page.set_viewport_size({"width": width, "height": 800})
+    page.goto(where)
+    assert page.get_by_test_id(testid).bounding_box()["width"] < 400
 
 
 def test_home_card_starts_and_opens_program(page):

@@ -34,6 +34,7 @@ const state = {
   locked: false, // сразу после подхода: второе нажатие не должно стать лишним подходом
   reminder: false,
   fileNote: null as null | { kind: "okc" | "bad"; text: string },
+  closedName: "", // какую программу закрыли при смене: человек должен знать, куда делась начатая тренировка
 };
 
 const SET_ERROR = "Подход не записался. Нажми ещё раз. Цифры на месте.";
@@ -105,6 +106,7 @@ function start() {
   return write(async () => {
     await saveWorkout(workout);
     state.workout = workout;
+    state.closedName = "";
     goal("workout_start");
     openExercise(0);
   }).then(() => { if (state.error) { state.error = ""; state.storageOk = false; draw(); } });
@@ -269,13 +271,12 @@ const storageError = () => !state.storageOk && el("div", { class: "card bad", "d
   el("p", {}, el("b", {}, "Записи сейчас не сохранятся. "), "Браузер закрыл доступ к хранилищу, так бывает в приватной вкладке. Открой сайт обычной вкладкой."));
 
 function noProgramView(): Child[] {
-  return [
+  return [el("div", { class: "pick" },
     el("h1", {}, "Сначала выбери программу"),
     el("p", { "data-testid": "no-program" }, "Тренировка идёт по дням программы. Выбери подходящую, а записи дневника останутся на месте."),
     storageError(),
     el("a", { class: "wbtn", href: `${base}programmy/`, "data-testid": "to-programs" }, "К программам"),
-    el("a", { class: "lnk", href: `${base}dnevnik/`, "data-testid": "open-diary" }, "Дневник"),
-  ];
+    el("a", { class: "lnk", href: `${base}dnevnik/`, "data-testid": "open-diary" }, "Дневник"))];
 }
 
 function dayView(): Child[] {
@@ -291,6 +292,7 @@ function dayView(): Child[] {
       el("h1", {}, w?.dayName ?? day!.name),
       storageError(),
       errorCard(),
+      state.closedName && el("div", { class: "card calm", "data-testid": "old-workout-closed", role: "status" }, el("p", {}, `Прошлая тренировка закончена и лежит в дневнике: ${state.closedName}.`)),
       w && resumeCard(w),
       !w && day && dayCard(day)),
     el("div", { class: "col" },
@@ -473,11 +475,26 @@ function draw() {
   if (work && state.askFinish) root.querySelector('[data-testid="finish-confirm"]')?.scrollIntoView({ block: "center" });
 }
 
+const chosenProgram = () => page.programs.find(p => p.id === myProgram()) ?? null;
+
+const unfinished = () => state.history.find(w => !w.finishedAt) ?? null;
+
+/** Выбрана другая программа: начатые заканчиваем, а не продолжаем. Сделанные подходы остаются в дневнике, пустые записи удаляются.
+ *  Незаконченных бывает несколько: из файла или из второй вкладки. */
+async function closeOtherPrograms() {
+  const others = state.history.filter(w => !w.finishedAt && state.program && w.programId !== state.program.id);
+  if (!others.length) return;
+  for (const w of others) if (await finishWorkout(w.id)) state.closedName = w.programName;
+  state.history = await listWorkouts();
+  state.workout = unfinished();
+}
+
 async function open() {
-  state.program = page.programs.find(p => p.id === myProgram()) ?? null;
+  state.program = chosenProgram();
   try {
     state.history = await listWorkouts();
-    state.workout = state.history.find(w => !w.finishedAt) ?? null;
+    state.workout = unfinished();
+    await closeOtherPrograms();
     state.sound = (await getMeta()).sound;
   } catch (err) {
     console.warn(err);
@@ -498,5 +515,7 @@ function catchUp() {
 }
 document.addEventListener("visibilitychange", catchUp);
 addEventListener("pageshow", catchUp);
+// «Назад» из кэша браузера: пока страница лежала там, могли выбрать другую программу.
+addEventListener("pageshow", e => { if (e.persisted && chosenProgram() !== state.program) location.reload(); });
 setInterval(tick, 500);
 open();

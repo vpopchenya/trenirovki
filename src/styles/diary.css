@@ -5,6 +5,7 @@
 .dv :where(button, input) { font: inherit; color: inherit; }
 .dv :where(button) { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .dv.narrow { max-width: 620px; margin-inline: auto; }
+.pick { display: grid; gap: 14px; }
 
 .wbtn { width: 100%; min-height: 56px; border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 800; font-size: 17px; padding: 0 18px; text-align: center; text-decoration: none; display: grid; place-items: center; transition: transform .1s; }
 .wbtn.ghost { background: var(--surface2); color: var(--fg); }
@@ -148,6 +149,12 @@ body.in-work main { padding-top: 12px; }
   .tile .step { height: 66px; }
   .sumgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
   .sumgrid .wide { grid-column: 1 / -1; }
+  /* Шире телефона кнопка на всю ширину теряет форму: экран выбора — карточка по центру. */
+  .pick { width: min(100%, 560px); justify-self: center; justify-items: center; margin-top: 32px; padding: 32px; border-radius: 28px; background: var(--surface); text-align: center; }
+  .pick h1 { font-size: 28px; }
+  .pick .wbtn { width: auto; min-width: 260px; padding: 0 36px; }
+  .pick .lnk { justify-self: center; }
+  .daygrid .col > .wbtn { width: auto; min-width: 280px; padding: 0 36px; justify-self: start; }
 }
 @media (min-width: 1024px) {
   .diarygrid { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 12px; align-items: start; }
